@@ -4,8 +4,7 @@ project(Exercise1 LANGUAGES CXX)
 # cmake module directory
 set(CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH}
-    ${PROJECT_SOURCE_DIR}/cmake
-    )
+    ${PROJECT_SOURCE_DIR}/cmake)
 
 # This include is required if you want 
 # to use CTest framework for you benchmarks with add_test()
@@ -26,7 +25,9 @@ endif()
 
 include(ConfigGBench)
 
+add_subdirectory(${PROJECT_SOURCE_DIR}/test/)
 add_subdirectory(${PROJECT_SOURCE_DIR}/bench/)
 
-set(SOURCE_FILES mmul.cpp)
+set(SOURCE_FILES main.cpp)
+
 add_executable(Exercise1 ${SOURCE_FILES})
