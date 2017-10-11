@@ -18,7 +18,7 @@ Matrix id(unsigned n) {
 
 // computes the product of two matrices
 Matrix operator*(const Matrix& a, const Matrix& b) {
-    unsigned n = a.size();
+	auto n = static_cast<unsigned>(a.size());
     Matrix c = id(n);
     for(unsigned i=0; i<n; ++i) {
         for(unsigned j=0; j<n; ++j) {
