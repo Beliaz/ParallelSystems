@@ -1,0 +1,29 @@
+{
+  "version": "0.2.1",
+  "defaults": {},
+  "configurations": [
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "Exercise1.exe",
+      "name": "Exercise1.exe 5",
+      "args": [
+        "5"
+      ]
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "Exercise1.exe",
+      "name": "Exercise1.exe 1000",
+      "args": [
+        "1000"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "Exercise1.exe",
+      "name": "Exercise1.exe"
+    }
+  ]
+}
