@@ -24,6 +24,13 @@
       "project": "CMakeLists.txt",
       "projectTarget": "Exercise1.exe",
       "name": "Exercise1.exe"
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "bench\\mmul_original.exe",
+      "name": "bench\\mmul_original.exe",
+      "args": ["--benchmark_out=./mmul_original.json", "--benchmark_out_format=json"] 
     }
   ]
 }
