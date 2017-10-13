@@ -1,0 +1,155 @@
+Start testing: Oct 13 18:53 DST
+----------------------------------------------------------
+1/4 Testing: Test_mmul_optimized_1
+1/4 Test: Test_mmul_optimized_1
+Command: "/mnt/c/Users/Florian/Dev/projects/ParallelSystems/Exercise1/build/test/mmul_optimized_1"
+Directory: /mnt/c/Users/Florian/Dev/projects/ParallelSystems/Exercise1/build/test
+"Test_mmul_optimized_1" start time: Oct 13 18:53 DST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"Test_mmul_optimized_1" end time: Oct 13 18:53 DST
+"Test_mmul_optimized_1" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/4 Testing: Test_mmul_original
+2/4 Test: Test_mmul_original
+Command: "/mnt/c/Users/Florian/Dev/projects/ParallelSystems/Exercise1/build/test/mmul_original"
+Directory: /mnt/c/Users/Florian/Dev/projects/ParallelSystems/Exercise1/build/test
+"Test_mmul_original" start time: Oct 13 18:53 DST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"Test_mmul_original" end time: Oct 13 18:53 DST
+"Test_mmul_original" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/4 Testing: Benchmark_mmul_optimized_1
+3/4 Test: Benchmark_mmul_optimized_1
+Command: "/mnt/c/Users/Florian/Dev/projects/ParallelSystems/Exercise1/build/bench/mmul_optimized_1" "--benchmark_out=/mnt/c/Users/Florian/Dev/projects/ParallelSystems/Exercise1/bench/mmul_optimized_1.lastrun.json" "--benchmark_out_format=json"
+Directory: /mnt/c/Users/Florian/Dev/projects/ParallelSystems/Exercise1/build/bench
+"Benchmark_mmul_optimized_1" start time: Oct 13 18:53 DST
+Output:
+----------------------------------------------------------
+Run on (8 X 2494 MHz CPU s)
+2017-10-13 18:53:42
+---------------------------------------------------------------------------
+Benchmark                                    Time           CPU Iterations
+---------------------------------------------------------------------------
+[0;32midentity/8/repeats:5_mean           [m[0;33m        86 ns         86 ns [m[0;36m   7466667[m
+[m[0;32midentity/8/repeats:5_median         [m[0;33m        89 ns         88 ns [m[0;36m   7466667[m
+[m[0;32midentity/8/repeats:5_stddev         [m[0;33m         4 ns          4 ns [m[0;36m   7466667[m
+[m[0;32midentity/16/repeats:5_mean          [m[0;33m       236 ns        235 ns [m[0;36m   2986667[m
+[m[0;32midentity/16/repeats:5_median        [m[0;33m       232 ns        230 ns [m[0;36m   2986667[m
+[m[0;32midentity/16/repeats:5_stddev        [m[0;33m         9 ns          9 ns [m[0;36m   2986667[m
+[m[0;32midentity/32/repeats:5_mean          [m[0;33m       774 ns        774 ns [m[0;36m    896000[m
+[m[0;32midentity/32/repeats:5_median        [m[0;33m       771 ns        767 ns [m[0;36m    896000[m
+[m[0;32midentity/32/repeats:5_stddev        [m[0;33m         5 ns         10 ns [m[0;36m    896000[m
+[m[0;32midentity/64/repeats:5_mean          [m[0;33m      3503 ns       3514 ns [m[0;36m    203636[m
+[m[0;32midentity/64/repeats:5_median        [m[0;33m      3498 ns       3530 ns [m[0;36m    203636[m
+[m[0;32midentity/64/repeats:5_stddev        [m[0;33m        35 ns         34 ns [m[0;36m    203636[m
+[m[0;32midentity/128/repeats:5_mean         [m[0;33m     12250 ns      12277 ns [m[0;36m     56000[m
+[m[0;32midentity/128/repeats:5_median       [m[0;33m     12258 ns      12277 ns [m[0;36m     56000[m
+[m[0;32midentity/128/repeats:5_stddev       [m[0;33m        27 ns          0 ns [m[0;36m     56000[m
+[m[0;32midentity/256/repeats:5_mean         [m[0;33m     52275 ns      51897 ns [m[0;36m     11200[m
+[m[0;32midentity/256/repeats:5_median       [m[0;33m     52204 ns      51618 ns [m[0;36m     11200[m
+[m[0;32midentity/256/repeats:5_stddev       [m[0;33m       284 ns       1167 ns [m[0;36m     11200[m
+[m[0;34midentity_BigO                       [m[0;33m      0.79 N^2       0.79 N^2 [m
+[m[0;34midentity_RMS                        [m[0;33m         3 %          5 % [m
+[m[0;32mmultiplication/8/repeats:5_mean     [m[0;33m       622 ns        622 ns [m[0;36m   1120000[m
+[m[0;32mmultiplication/8/repeats:5_median   [m[0;33m       620 ns        628 ns [m[0;36m   1120000[m
+[m[0;32mmultiplication/8/repeats:5_stddev   [m[0;33m         3 ns          8 ns [m[0;36m   1120000[m
+[m[0;32mmultiplication/16/repeats:5_mean    [m[0;33m      4277 ns       4277 ns [m[0;36m    160000[m
+[m[0;32mmultiplication/16/repeats:5_median  [m[0;33m      4280 ns       4297 ns [m[0;36m    160000[m
+[m[0;32mmultiplication/16/repeats:5_stddev  [m[0;33m        11 ns         44 ns [m[0;36m    160000[m
+[m[0;32mmultiplication/32/repeats:5_mean    [m[0;33m     32146 ns      32081 ns [m[0;36m     21333[m
+[m[0;32mmultiplication/32/repeats:5_median  [m[0;33m     32155 ns      32227 ns [m[0;36m     21333[m
+[m[0;32mmultiplication/32/repeats:5_stddev  [m[0;33m       103 ns        328 ns [m[0;36m     21333[m
+[m[0;32mmultiplication/64/repeats:5_mean    [m[0;33m    270772 ns     271584 ns [m[0;36m      2635[m
+[m[0;32mmultiplication/64/repeats:5_median  [m[0;33m    270815 ns     272770 ns [m[0;36m      2635[m
+[m[0;32mmultiplication/64/repeats:5_stddev  [m[0;33m      1847 ns       2652 ns [m[0;36m      2635[m
+[m[0;32mmultiplication/128/repeats:5_mean   [m[0;33m   2077749 ns    2070313 ns [m[0;36m       320[m
+[m[0;32mmultiplication/128/repeats:5_median [m[0;33m   2080738 ns    2050781 ns [m[0;36m       320[m
+[m[0;32mmultiplication/128/repeats:5_stddev [m[0;33m      8602 ns      26744 ns [m[0;36m       320[m
+[m[0;32mmultiplication/256/repeats:5_mean   [m[0;33m  27906008 ns   27875000 ns [m[0;36m        25[m
+[m[0;32mmultiplication/256/repeats:5_median [m[0;33m  27962600 ns   28125000 ns [m[0;36m        25[m
+[m[0;32mmultiplication/256/repeats:5_stddev [m[0;33m    113819 ns     342327 ns [m[0;36m        25[m
+[m[0;34mmultiplication_BigO                 [m[0;33m      1.65 N^3       1.65 N^3 [m
+[m[0;34mmultiplication_RMS                  [m[0;33m        11 %         12 % [m
+[m
+<end of output>
+Test time =  43.66 sec
+----------------------------------------------------------
+Test Passed.
+"Benchmark_mmul_optimized_1" end time: Oct 13 18:54 DST
+"Benchmark_mmul_optimized_1" time elapsed: 00:00:43
+----------------------------------------------------------
+
+4/4 Testing: Benchmark_mmul_original
+4/4 Test: Benchmark_mmul_original
+Command: "/mnt/c/Users/Florian/Dev/projects/ParallelSystems/Exercise1/build/bench/mmul_original" "--benchmark_out=/mnt/c/Users/Florian/Dev/projects/ParallelSystems/Exercise1/bench/mmul_original.lastrun.json" "--benchmark_out_format=json"
+Directory: /mnt/c/Users/Florian/Dev/projects/ParallelSystems/Exercise1/build/bench
+"Benchmark_mmul_original" start time: Oct 13 18:54 DST
+Output:
+----------------------------------------------------------
+Run on (8 X 2494 MHz CPU s)
+2017-10-13 18:54:26
+---------------------------------------------------------------------------
+Benchmark                                    Time           CPU Iterations
+---------------------------------------------------------------------------
+[0;32midentity/8/repeats:5_mean           [m[0;33m       355 ns        353 ns [m[0;36m   2036364[m
+[m[0;32midentity/8/repeats:5_median         [m[0;33m       352 ns        353 ns [m[0;36m   2036364[m
+[m[0;32midentity/8/repeats:5_stddev         [m[0;33m        14 ns          9 ns [m[0;36m   2036364[m
+[m[0;32midentity/16/repeats:5_mean          [m[0;33m       938 ns        937 ns [m[0;36m    746667[m
+[m[0;32midentity/16/repeats:5_median        [m[0;33m       933 ns        942 ns [m[0;36m    746667[m
+[m[0;32midentity/16/repeats:5_stddev        [m[0;33m        11 ns         18 ns [m[0;36m    746667[m
+[m[0;32midentity/32/repeats:5_mean          [m[0;33m      2083 ns       2077 ns [m[0;36m    344615[m
+[m[0;32midentity/32/repeats:5_median        [m[0;33m      2078 ns       2086 ns [m[0;36m    344615[m
+[m[0;32midentity/32/repeats:5_stddev        [m[0;33m        37 ns         38 ns [m[0;36m    344615[m
+[m[0;32midentity/64/repeats:5_mean          [m[0;33m      6782 ns       6585 ns [m[0;36m    112000[m
+[m[0;32midentity/64/repeats:5_median        [m[0;33m      6529 ns       6557 ns [m[0;36m    112000[m
+[m[0;32midentity/64/repeats:5_stddev        [m[0;33m       681 ns        268 ns [m[0;36m    112000[m
+[m[0;32midentity/128/repeats:5_mean         [m[0;33m     19946 ns      19838 ns [m[0;36m     37333[m
+[m[0;32midentity/128/repeats:5_median       [m[0;33m     19435 ns      19671 ns [m[0;36m     37333[m
+[m[0;32midentity/128/repeats:5_stddev       [m[0;33m       974 ns        868 ns [m[0;36m     37333[m
+[m[0;32midentity/256/repeats:5_mean         [m[0;33m    371420 ns     371585 ns [m[0;36m      1867[m
+[m[0;32midentity/256/repeats:5_median       [m[0;33m    372980 ns     376607 ns [m[0;36m      1867[m
+[m[0;32midentity/256/repeats:5_stddev       [m[0;33m      8355 ns       7485 ns [m[0;36m      1867[m
+[m[0;34midentity_BigO                       [m[0;33m      0.02 N^3       0.02 N^3 [m
+[m[0;34midentity_RMS                        [m[0;33m        17 %         17 % [m
+[m[0;32mmultiplication/8/repeats:5_mean     [m[0;33m       879 ns        879 ns [m[0;36m    746667[m
+[m[0;32mmultiplication/8/repeats:5_median   [m[0;33m       873 ns        879 ns [m[0;36m    746667[m
+[m[0;32mmultiplication/8/repeats:5_stddev   [m[0;33m        15 ns         26 ns [m[0;36m    746667[m
+[m[0;32mmultiplication/16/repeats:5_mean    [m[0;33m      5008 ns       5000 ns [m[0;36m    100000[m
+[m[0;32mmultiplication/16/repeats:5_median  [m[0;33m      5011 ns       5000 ns [m[0;36m    100000[m
+[m[0;32mmultiplication/16/repeats:5_stddev  [m[0;33m        20 ns        110 ns [m[0;36m    100000[m
+[m[0;32mmultiplication/32/repeats:5_mean    [m[0;33m     33672 ns      33692 ns [m[0;36m     21333[m
+[m[0;32mmultiplication/32/repeats:5_median  [m[0;33m     33700 ns      33692 ns [m[0;36m     21333[m
+[m[0;32mmultiplication/32/repeats:5_stddev  [m[0;33m       170 ns          0 ns [m[0;36m     21333[m
+[m[0;32mmultiplication/64/repeats:5_mean    [m[0;33m    260617 ns     260911 ns [m[0;36m      2635[m
+[m[0;32mmultiplication/64/repeats:5_median  [m[0;33m    260676 ns     260911 ns [m[0;36m      2635[m
+[m[0;32mmultiplication/64/repeats:5_stddev  [m[0;33m       603 ns          0 ns [m[0;36m      2635[m
+[m[0;32mmultiplication/128/repeats:5_mean   [m[0;33m   2090656 ns    2092391 ns [m[0;36m       345[m
+[m[0;32mmultiplication/128/repeats:5_median [m[0;33m   2092971 ns    2083333 ns [m[0;36m       345[m
+[m[0;32mmultiplication/128/repeats:5_stddev [m[0;33m      7721 ns      20254 ns [m[0;36m       345[m
+[m[0;32mmultiplication/256/repeats:5_mean   [m[0;33m  19534595 ns   19594595 ns [m[0;36m        37[m
+[m[0;32mmultiplication/256/repeats:5_median [m[0;33m  19479027 ns   19425676 ns [m[0;36m        37[m
+[m[0;32mmultiplication/256/repeats:5_stddev [m[0;33m    176701 ns     231302 ns [m[0;36m        37[m
+[m[0;34mmultiplication_BigO                 [m[0;33m      1.16 N^3       1.17 N^3 [m
+[m[0;34mmultiplication_RMS                  [m[0;33m         4 %          5 % [m
+[m
+<end of output>
+Test time =  44.44 sec
+----------------------------------------------------------
+Test Passed.
+"Benchmark_mmul_original" end time: Oct 13 18:55 DST
+"Benchmark_mmul_original" time elapsed: 00:00:44
+----------------------------------------------------------
+
+End testing: Oct 13 18:55 DST
