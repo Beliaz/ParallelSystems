@@ -1,5 +1,7 @@
-#include "../mmul.h"
+#include "../mmul_optimized_1.h"
 #include "custom_benchmark.h"
+
+using namespace mmul_optimized_1;
 
 static void identity(benchmark::State& state)
 {
@@ -24,7 +26,7 @@ static void multiplication(benchmark::State& state)
 	const auto a = [&]()
 	{
 		auto m = id(n);
-		m[0][0] = 42;
+		data(m)[0] = 42;
 
 		return m;
 	}();

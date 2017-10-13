@@ -1,21 +1,24 @@
-#include "../mmul.h"
+#include "../mmul_optimized_1.h"
 #include <cstdlib>
+#include <iostream>
+
+using namespace mmul_optimized_1;
 
 template<unsigned N>
 void test_identity_matrix()
 {
 	const auto m = id(N);
 
-	for(auto i = 0u; i < N; i++)
+	for (auto i = 0u; i < N; i++)
 	{
 		for (auto j = 0u; j < N; j++)
 		{
-			auto mij = m[i][j];
+			auto mij = data(m)[i*N + j];
 
 			if (i == j && mij == 1) continue;
 			if (i != j && mij == 0) continue;
 
-			throw;
+			throw "test_identity_matrix failed";
 		}
 	}
 }
@@ -24,18 +27,26 @@ template<unsigned N>
 void test_matrix_multiplication()
 {
 	auto a = id(N);
-	a[0][0] = 42;
+	data(a)[0] = 42;
 
 	const auto b = id(N);
 
 	// compute the product
 	const auto c = a * b;
 
-	// check that the result is correct
-	if(c != a) throw;
+	for (auto i = 0u; i < N; i++)
+	{
+		for (auto j = 0u; j < N; j++)
+		{
+			if(data(c)[i * N + j] == data(a)[i * N + j])
+				continue;
+
+			throw "test_matrix_multiplication failed";
+		}
+	}
 }
 
-int main(int, char**) 
+int main(int, char**)
 {
 	try
 	{
@@ -44,8 +55,9 @@ int main(int, char**)
 
 		return EXIT_SUCCESS;
 	}
-	catch(...)
+	catch (std::exception& ex)
 	{
+		std::cerr << ex.what() << "\n";
 		return EXIT_FAILURE;
 	}
 }

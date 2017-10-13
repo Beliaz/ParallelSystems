@@ -3,11 +3,11 @@
 
 #include <vector>
 
-using Matrix = std::vector<std::vector<double>>;
+using matrix = std::vector<std::vector<double>>;
 
 // initializes a square identity matrix of size n x n
-Matrix id(unsigned n) {
-	Matrix res;
+matrix id(unsigned n) {
+	matrix res;
 	res.resize(n);
 	for (unsigned i = 0; i<n; i++) {
 		res[i].resize(n);
@@ -19,9 +19,9 @@ Matrix id(unsigned n) {
 }
 
 // computes the product of two matrices
-Matrix operator*(const Matrix& a, const Matrix& b) {
+matrix operator*(const matrix& a, const matrix& b) {
 	auto n = static_cast<unsigned>(a.size());
-	Matrix c = id(n);
+	matrix c = id(n);
 	for (unsigned i = 0; i<n; ++i) {
 		for (unsigned j = 0; j<n; ++j) {
 			c[i][j] = 0;
