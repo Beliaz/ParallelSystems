@@ -1,5 +1,5 @@
-#ifndef MMUL_H
-#define MMUL_H
+#ifndef MMUL_OPTIMIZED_1_H
+#define MMUL_OPTIMIZED_1_H
 
 #include <vector>
 #include <memory>
@@ -45,18 +45,19 @@ namespace mmul_optimized_1
 
 		for (unsigned i = 0; i < n; ++i)
 		{
+			const auto row_a = i * n;
+
 			for (unsigned j = 0; j < n; ++j)
 			{
-				auto row = i * n;
-
-				data(c)[row + j] = 0;
+				auto sum = 0.0;
 
 				for (unsigned k = 0; k < n; ++k)
 				{
-					data(c)[row + j] +=
-						data(a)[row + k] *
-						data(b)[k * n + j];
+					sum +=  data(a)[row_a + k] *
+							data(b)[k * n + j];
 				}
+
+				data(c)[row_a + j] = sum;
 			}
 		}
 
