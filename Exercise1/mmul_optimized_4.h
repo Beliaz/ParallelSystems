@@ -3,7 +3,7 @@
 
 #include "mmul_optimized_1.h"
 
-namespace mmul_optimized_2
+namespace mmul_optimized_4
 {
 	using matrix_storage = mmul_optimized_1::matrix_storage;
 	using matrix = mmul_optimized_1::matrix;
@@ -41,33 +41,29 @@ namespace mmul_optimized_2
 		return o;
 	}
 
+	inline matrix zero(const size_t n)
+	{
+		auto m = make_matrix(n);
+
+		for (auto i = 0u; i < n * n; ++i)
+			data(m)[i] = 0.0;
+
+		return m;
+	}
+
 	// computes the product of two matrices
 	inline matrix operator*(const mmul_optimized_1::matrix& a, const mmul_optimized_1::matrix& b)
 	{
 		const auto n = dim(a);
 
-		auto c = make_matrix(n);
-		const auto b_trans = transpose(b);
+		auto c = zero(n);
 
-		for (unsigned i = 0; i < n; ++i)
-		{
-			const auto row_a = i * n;
-
-			for (unsigned j = 0; j < n; ++j)
-			{
-				const auto row_b = j * n;
-
-				auto sum = 0.0;
-
-				for (unsigned k = 0; k < n; ++k)
-				{
-					sum +=  data(a)[row_a  + k] *
-							data(b_trans)[row_b + k];
-				}
-
-				data(c)[row_a + j] = sum;
-			}
-		}
+		for (unsigned i = 0; i < n; ++i)	
+			for (unsigned k = 0; k < n; ++k)	
+				for (unsigned j = 0; j < n; ++j)
+					data(c)[i * n + j] += 
+						data(a)[i * n + k] *
+						data(b)[k * n + j];
 
 		return c;
 	}
