@@ -1,39 +1,39 @@
 Comparing ./bench/mmul_optimized_1.lastrun.json to ./bench/mmul_optimized_2.lastrun.json
 Benchmark                                      Time             CPU      Time Old      Time New       CPU Old       CPU New
 ---------------------------------------------------------------------------------------------------------------------------
-[92midentity/8/repeats:5_mean          [0m[97m         -0.0077[0m[97m         -0.0063[0m           111           110[0m           111           110
-[92midentity/8/repeats:5_median        [0m[97m         +0.0058[0m[97m         +0.0062[0m           113           114[0m           112           112
-[92midentity/8/repeats:5_stddev        [0m[91m         +0.2352[0m[91m         +0.4549[0m             4             5[0m             4             5
-[92midentity/16/repeats:5_mean         [0m[97m         +0.0078[0m[97m         +0.0043[0m           305           308[0m           306           307
-[92midentity/16/repeats:5_median       [0m[97m         +0.0118[0m[97m         +0.0222[0m           301           305[0m           298           305
-[92midentity/16/repeats:5_stddev       [0m[96m         -0.0742[0m[96m         -0.3005[0m            11            10[0m            14            10
-[92midentity/32/repeats:5_mean         [0m[97m         +0.0424[0m[97m         +0.0445[0m          1067          1112[0m          1066          1113
-[92midentity/32/repeats:5_median       [0m[97m         +0.0366[0m[97m         +0.0321[0m          1071          1110[0m          1088          1123
-[92midentity/32/repeats:5_stddev       [0m[96m         -0.4628[0m[96m         -0.5625[0m            17             9[0m            31            13
-[92midentity/64/repeats:5_mean         [0m[97m         +0.0084[0m[97m         +0.0091[0m          4588          4626[0m          4583          4625
-[92midentity/64/repeats:5_median       [0m[97m         +0.0083[0m[97m         +0.0000[0m          4594          4632[0m          4604          4604
-[92midentity/64/repeats:5_stddev       [0m[91m         +0.8817[0m[91m         +0.8708[0m            21            39[0m            47            88
-[92midentity/128/repeats:5_mean        [0m[97m         +0.0033[0m[97m         +0.0000[0m         16088         16141[0m         16113         16113
-[92midentity/128/repeats:5_median      [0m[97m         +0.0030[0m[97m         +0.0000[0m         16075         16124[0m         16044         16044
-[92midentity/128/repeats:5_stddev      [0m[97m         -0.0592[0m[97m         +0.0000[0m            35            33[0m           156           156
-[92midentity/256/repeats:5_mean        [0m[97m         -0.0003[0m[97m         +0.0000[0m         68376         68354[0m         68359         68359
-[92midentity/256/repeats:5_median      [0m[97m         +0.0004[0m[97m         +0.0051[0m         68294         68325[0m         68011         68359
-[92midentity/256/repeats:5_stddev      [0m[96m         -0.4799[0m[91m         +0.2649[0m           442           230[0m           780           986
-[92mmultiplication/8/repeats:5_mean    [0m[97m         +0.0238[0m[97m         +0.0224[0m           775           794[0m           778           795
-[92mmultiplication/8/repeats:5_median  [0m[97m         +0.0270[0m[97m         +0.0222[0m           772           793[0m           785           802
-[92mmultiplication/8/repeats:5_stddev  [0m[96m         -0.6951[0m[97m         -0.0000[0m             6             2[0m            10            10
-[92mmultiplication/16/repeats:5_mean   [0m[96m         -0.0898[0m[96m         -0.0847[0m          5519          5023[0m          5497          5031
-[92mmultiplication/16/repeats:5_median [0m[96m         -0.0795[0m[96m         -0.0810[0m          5449          5016[0m          5441          5000
-[92mmultiplication/16/repeats:5_stddev [0m[96m         -0.7857[0m[96m         -0.4400[0m           115            25[0m           125            70
-[92mmultiplication/32/repeats:5_mean   [0m[96m         -0.1067[0m[96m         -0.1071[0m         41812         37351[0m         41810         37332
-[92mmultiplication/32/repeats:5_median [0m[96m         -0.0957[0m[96m         -0.0909[0m         41319         37365[0m         41433         37667
-[92mmultiplication/32/repeats:5_stddev [0m[96m         -0.9014[0m[96m         -0.5730[0m          1029           101[0m          1074           458
-[92mmultiplication/64/repeats:5_mean   [0m[96m         -0.1079[0m[96m         -0.1066[0m        352929        314859[0m        352926        315290
-[92mmultiplication/64/repeats:5_median [0m[96m         -0.1056[0m[96m         -0.1106[0m        352042        314880[0m        352926        313895
-[92mmultiplication/64/repeats:5_stddev [0m[96m         -0.6670[0m[96m         -0.4500[0m          1971           656[0m          5672          3120
-[92mmultiplication/128/repeats:5_mean  [0m[96m         -0.0828[0m[96m         -0.0857[0m       2729797       2503777[0m       2734375       2500000
-[92mmultiplication/128/repeats:5_median[0m[96m         -0.0829[0m[96m         -0.0776[0m       2730087       2503646[0m       2722538       2511161
-[92mmultiplication/128/repeats:5_stddev[0m[97m         -0.0154[0m[97m         -0.0571[0m          7503          7387[0m         26469         24956
-[92mmultiplication/256/repeats:5_mean  [0m[96m         -0.4195[0m[96m         -0.4196[0m      36511632      21195194[0m      36513158      21191406
-[92mmultiplication/256/repeats:5_median[0m[96m         -0.4197[0m[96m         -0.4197[0m      36499158      21181781[0m      36184211      20996094
-[92mmultiplication/256/repeats:5_stddev[0m[96m         -0.7371[0m[96m         -0.4062[0m        156085         41030[0m        450430        267443
+[92midentity/8/repeats:5_mean          [0m[91m         +0.0505[0m[97m         +0.0474[0m           118           124[0m           118           123
+[92midentity/8/repeats:5_median        [0m[97m         +0.0069[0m[97m         +0.0227[0m           122           123[0m           123           126
+[92midentity/8/repeats:5_stddev        [0m[91m         +1.4105[0m[91m         +0.9535[0m             7            17[0m             8            16
+[92midentity/16/repeats:5_mean         [0m[97m         +0.0183[0m[97m         +0.0223[0m           314           319[0m           313           319
+[92midentity/16/repeats:5_median       [0m[97m         -0.0015[0m[97m         +0.0227[0m           313           313[0m           307           314
+[92midentity/16/repeats:5_stddev       [0m[91m         +0.1471[0m[97m         +0.0000[0m             9            11[0m            11            11
+[92midentity/32/repeats:5_mean         [0m[97m         -0.0187[0m[97m         -0.0153[0m          1050          1031[0m          1050          1034
+[92midentity/32/repeats:5_median       [0m[97m         -0.0168[0m[97m         -0.0233[0m          1045          1028[0m          1050          1025
+[92midentity/32/repeats:5_stddev       [0m[96m         -0.6478[0m[96m         -0.7031[0m            28            10[0m            39            11
+[92midentity/64/repeats:5_mean         [0m[97m         +0.0088[0m[97m         +0.0066[0m          4559          4599[0m          4562          4592
+[92midentity/64/repeats:5_median       [0m[97m         +0.0077[0m[97m         +0.0116[0m          4553          4588[0m          4499          4551
+[92midentity/64/repeats:5_stddev       [0m[96m         -0.2850[0m[96m         -0.4080[0m            51            37[0m            94            55
+[92midentity/128/repeats:5_mean        [0m[97m         -0.0032[0m[97m         -0.0087[0m         16104         16053[0m         16113         15974
+[92midentity/128/repeats:5_median      [0m[97m         -0.0037[0m[97m         +0.0000[0m         16073         16014[0m         16044         16044
+[92midentity/128/repeats:5_stddev      [0m[96m         -0.4932[0m[97m         +0.0000[0m           186            94[0m           156           156
+[92midentity/256/repeats:5_mean        [0m[97m         +0.0039[0m[97m         +0.0051[0m         68619         68883[0m         68359         68708
+[92midentity/256/repeats:5_median      [0m[97m         +0.0033[0m[97m         +0.0000[0m         68620         68847[0m         68011         68011
+[92midentity/256/repeats:5_stddev      [0m[96m         -0.4766[0m[96m         -0.3453[0m           812           425[0m          1459           955
+[92mmultiplication/8/repeats:5_mean    [0m[91m         +0.0566[0m[91m         +0.0541[0m           773           816[0m           774           816
+[92mmultiplication/8/repeats:5_median  [0m[91m         +0.0611[0m[91m         +0.0682[0m           770           817[0m           767           820
+[92mmultiplication/8/repeats:5_stddev  [0m[96m         -0.0849[0m[91m         +0.5275[0m            12            11[0m            10            15
+[92mmultiplication/16/repeats:5_mean   [0m[96m         -0.0855[0m[96m         -0.0921[0m          5536          5063[0m          5562          5050
+[92mmultiplication/16/repeats:5_median [0m[96m         -0.0722[0m[96m         -0.0816[0m          5450          5056[0m          5469          5022
+[92mmultiplication/16/repeats:5_stddev [0m[96m         -0.8355[0m[96m         -0.7024[0m           191            31[0m           210            62
+[92mmultiplication/32/repeats:5_mean   [0m[96m         -0.1466[0m[96m         -0.1467[0m         44086         37623[0m         43945         37499
+[92mmultiplication/32/repeats:5_median [0m[96m         -0.1448[0m[96m         -0.1429[0m         43958         37591[0m         43945         37667
+[92mmultiplication/32/repeats:5_stddev [0m[96m         -0.9441[0m[96m         -0.7576[0m          1518            85[0m          1544           374
+[92mmultiplication/64/repeats:5_mean   [0m[96m         -0.0994[0m[96m         -0.0910[0m        358064        322467[0m        354530        322266
+[92mmultiplication/64/repeats:5_median [0m[96m         -0.0881[0m[96m         -0.0711[0m        355967        324608[0m        352926        327846
+[92mmultiplication/64/repeats:5_stddev [0m[96m         -0.2245[0m[96m         -0.1304[0m          6038          4683[0m          8787          7641
+[92mmultiplication/128/repeats:5_mean  [0m[96m         -0.0890[0m[96m         -0.0855[0m       2767117       2520775[0m       2758049       2522321
+[92mmultiplication/128/repeats:5_median[0m[96m         -0.0840[0m[96m         -0.0776[0m       2750186       2519257[0m       2722538       2511161
+[92mmultiplication/128/repeats:5_stddev[0m[96m         -0.5654[0m[96m         -0.6857[0m         34358         14931[0m         79406         24956
+[92mmultiplication/256/repeats:5_mean  [0m[96m         -0.4249[0m[96m         -0.4246[0m      37189074      21388031[0m      37171053      21386719
+[92mmultiplication/256/repeats:5_median[0m[96m         -0.4225[0m[96m         -0.4194[0m      37132895      21442938[0m      37006579      21484375
+[92mmultiplication/256/repeats:5_stddev[0m[96m         -0.4873[0m[96m         -0.4062[0m        207009        106134[0m        367774        218366
