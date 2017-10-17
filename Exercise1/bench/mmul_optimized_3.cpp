@@ -1,5 +1,5 @@
 #include <vector>
-#include <cstdlib>
+#include "custom_benchmark.h"
 
 using Matrix = std::vector<std::vector<double>>;
 
@@ -31,7 +31,7 @@ Matrix zero(unsigned n) {
 
 // computes the product of two matrices
 Matrix operator*(const Matrix& a, const Matrix& b) {
-    unsigned n = a.size();
+    unsigned n = static_cast<unsigned>(a.size());
     Matrix c = zero(n);
     for(unsigned i=0; i<n; ++i) {
         for(unsigned k=0; k<n; ++k) {
@@ -43,21 +43,42 @@ Matrix operator*(const Matrix& a, const Matrix& b) {
     return c;
 }
 
+static void identity(benchmark::State& state)
+{
+	const auto n = state.range(0);
 
-int main(int argc, char** argv) {
+	state.SetComplexityN(n);
 
-    if(argc!=2) return EXIT_FAILURE;
-    unsigned n = atoi(argv[1]);
-    if(n==0) return EXIT_FAILURE;
-
-    // create two matrices
-    auto a = id(n);
-    a[0][0] = 42;
-    auto b = id(n);
-
-    // compute the product
-    auto c = a * b;
-
-    // check that the result is correct
-    return (c == a) ? EXIT_SUCCESS : EXIT_FAILURE;
+	while (state.KeepRunning())
+	{
+		benchmark::DoNotOptimize(id(n));
+	}
 }
+
+CUSTOM_BENCHMARK(identity);
+
+static void multiplication(benchmark::State& state)
+{
+	const auto n = state.range(0);
+
+	state.SetComplexityN(n);
+
+	const auto a = [&]()
+	{
+		auto m = id(n);
+		m[0][0] = 42;
+
+		return m;
+	}();
+
+	const auto b = id(n);
+
+	while (state.KeepRunning())
+	{
+		benchmark::DoNotOptimize(a * b);
+	}
+}
+
+CUSTOM_BENCHMARK(multiplication);
+
+BENCHMARK_MAIN();
