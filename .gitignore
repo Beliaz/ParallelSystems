@@ -40,3 +40,5 @@
 !**/.vs/**/*.json
 *.vspx
 Exercise1/.vs/VSWorkspaceState.json
+**/.idea/*
+**/cmake-build-debug/*
