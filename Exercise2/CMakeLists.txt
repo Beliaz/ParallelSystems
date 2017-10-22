@@ -35,6 +35,6 @@ include(ConfigGBench)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/bench/)
 
-set(SOURCE_FILES mmul.cpp)
+set(SOURCE_FILES main.cpp)
 
 add_executable(Exercise2 ${SOURCE_FILES})

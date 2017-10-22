@@ -1,0 +1,138 @@
+Start testing: Oct 22 19:28 DST
+----------------------------------------------------------
+1/3 Testing: Benchmark_contiguous_with_indirection
+1/3 Test: Benchmark_contiguous_with_indirection
+Command: "/mnt/c/Users/Florian/Dev/projects/ParallelSystems/Exercise2/build/bench/contiguous_with_indirection" "--benchmark_out=/mnt/c/Users/Florian/Dev/projects/ParallelSystems/Exercise2/bench/lastrun/contiguous_with_indirection.json" "--benchmark_out_format=json"
+Directory: /mnt/c/Users/Florian/Dev/projects/ParallelSystems/Exercise2/build/bench
+"Benchmark_contiguous_with_indirection" start time: Oct 22 19:28 DST
+Output:
+----------------------------------------------------------
+Run on (8 X 2494 MHz CPU s)
+2017-10-22 19:28:26
+***WARNING*** Library was built as DEBUG. Timings may be affected.
+----------------------------------------------------------------------------
+Benchmark                                     Time           CPU Iterations
+----------------------------------------------------------------------------
+[0;32mmultiplication/16/repeats:5_mean     [m[0;33m     75941 ns      75684 ns [m[0;36m      8960[m
+[m[0;32mmultiplication/16/repeats:5_median   [m[0;33m     75812 ns      76730 ns [m[0;36m      8960[m
+[m[0;32mmultiplication/16/repeats:5_stddev   [m[0;33m       755 ns       1560 ns [m[0;36m      8960[m
+[m[0;32mmultiplication/32/repeats:5_mean     [m[0;33m    571398 ns     571875 ns [m[0;36m      1000[m
+[m[0;32mmultiplication/32/repeats:5_median   [m[0;33m    570775 ns     578125 ns [m[0;36m      1000[m
+[m[0;32mmultiplication/32/repeats:5_stddev   [m[0;33m      6359 ns       8558 ns [m[0;36m      1000[m
+[m[0;32mmultiplication/64/repeats:5_mean     [m[0;33m   4432291 ns    4423701 ns [m[0;36m       154[m
+[m[0;32mmultiplication/64/repeats:5_median   [m[0;33m   4425955 ns    4464286 ns [m[0;36m       154[m
+[m[0;32mmultiplication/64/repeats:5_stddev   [m[0;33m     42594 ns      55572 ns [m[0;36m       154[m
+[m[0;32mmultiplication/128/repeats:5_mean    [m[0;33m  35059350 ns   35000000 ns [m[0;36m        20[m
+[m[0;32mmultiplication/128/repeats:5_median  [m[0;33m  35018400 ns   35156250 ns [m[0;36m        20[m
+[m[0;32mmultiplication/128/repeats:5_stddev  [m[0;33m    156813 ns     349386 ns [m[0;36m        20[m
+[m[0;32mmultiplication/256/repeats:5_mean    [m[0;33m 280233000 ns  281250000 ns [m[0;36m         3[m
+[m[0;32mmultiplication/256/repeats:5_median  [m[0;33m 279151667 ns  281250000 ns [m[0;36m         3[m
+[m[0;32mmultiplication/256/repeats:5_stddev  [m[0;33m   3382789 ns    3682848 ns [m[0;36m         3[m
+[m[0;32mmultiplication/512/repeats:5_mean    [m[0;33m2243419200 ns 2246875000 ns [m[0;36m         1[m
+[m[0;32mmultiplication/512/repeats:5_median  [m[0;33m2236423000 ns 2250000000 ns [m[0;36m         1[m
+[m[0;32mmultiplication/512/repeats:5_stddev  [m[0;33m  18786747 ns   23175620 ns [m[0;36m         1[m
+[m[0;32mmultiplication/1024/repeats:5_mean   [m[0;33m18121896000 ns 18115625000 ns [m[0;36m         1[m
+[m[0;32mmultiplication/1024/repeats:5_median [m[0;33m18126249000 ns 18125000000 ns [m[0;36m         1[m
+[m[0;32mmultiplication/1024/repeats:5_stddev [m[0;33m  91915843 ns   89486382 ns [m[0;36m         1[m
+[m[0;34mmultiplication_BigO                  [m[0;33m     16.87 N^3      16.87 N^3 [m
+[m[0;34mmultiplication_RMS                   [m[0;33m         1 %          1 % [m
+[m
+<end of output>
+Test time = 120.72 sec
+----------------------------------------------------------
+Test Passed.
+"Benchmark_contiguous_with_indirection" end time: Oct 22 19:30 DST
+"Benchmark_contiguous_with_indirection" time elapsed: 00:02:00
+----------------------------------------------------------
+
+2/3 Testing: Benchmark_contiguous_with_multiplication
+2/3 Test: Benchmark_contiguous_with_multiplication
+Command: "/mnt/c/Users/Florian/Dev/projects/ParallelSystems/Exercise2/build/bench/contiguous_with_multiplication" "--benchmark_out=/mnt/c/Users/Florian/Dev/projects/ParallelSystems/Exercise2/bench/lastrun/contiguous_with_multiplication.json" "--benchmark_out_format=json"
+Directory: /mnt/c/Users/Florian/Dev/projects/ParallelSystems/Exercise2/build/bench
+"Benchmark_contiguous_with_multiplication" start time: Oct 22 19:30 DST
+Output:
+----------------------------------------------------------
+Run on (8 X 2494 MHz CPU s)
+2017-10-22 19:30:26
+***WARNING*** Library was built as DEBUG. Timings may be affected.
+----------------------------------------------------------------------------
+Benchmark                                     Time           CPU Iterations
+----------------------------------------------------------------------------
+[0;32mmultiplication/16/repeats:5_mean     [m[0;33m     81878 ns      81609 ns [m[0;36m      7467[m
+[m[0;32mmultiplication/16/repeats:5_median   [m[0;33m     80517 ns      81609 ns [m[0;36m      7467[m
+[m[0;32mmultiplication/16/repeats:5_stddev   [m[0;33m      3139 ns       3309 ns [m[0;36m      7467[m
+[m[0;32mmultiplication/32/repeats:5_mean     [m[0;33m    608882 ns     609375 ns [m[0;36m      1000[m
+[m[0;32mmultiplication/32/repeats:5_median   [m[0;33m    608014 ns     609375 ns [m[0;36m      1000[m
+[m[0;32mmultiplication/32/repeats:5_stddev   [m[0;33m     10493 ns      11049 ns [m[0;36m      1000[m
+[m[0;32mmultiplication/64/repeats:5_mean     [m[0;33m   4728639 ns    4739933 ns [m[0;36m       149[m
+[m[0;32mmultiplication/64/repeats:5_median   [m[0;33m   4712309 ns    4718960 ns [m[0;36m       149[m
+[m[0;32mmultiplication/64/repeats:5_stddev   [m[0;33m     41277 ns      46897 ns [m[0;36m       149[m
+[m[0;32mmultiplication/128/repeats:5_mean    [m[0;33m  37841689 ns   37847222 ns [m[0;36m        18[m
+[m[0;32mmultiplication/128/repeats:5_median  [m[0;33m  37702778 ns   38194444 ns [m[0;36m        18[m
+[m[0;32mmultiplication/128/repeats:5_stddev  [m[0;33m    598099 ns     475454 ns [m[0;36m        18[m
+[m[0;32mmultiplication/256/repeats:5_mean    [m[0;33m 301789100 ns  301562500 ns [m[0;36m         2[m
+[m[0;32mmultiplication/256/repeats:5_median  [m[0;33m 304519000 ns  304687500 ns [m[0;36m         2[m
+[m[0;32mmultiplication/256/repeats:5_stddev  [m[0;33m   6635114 ns    4279082 ns [m[0;36m         2[m
+[m[0;32mmultiplication/512/repeats:5_mean    [m[0;33m2421937600 ns 2421875000 ns [m[0;36m         1[m
+[m[0;32mmultiplication/512/repeats:5_median  [m[0;33m2420875000 ns 2421875000 ns [m[0;36m         1[m
+[m[0;32mmultiplication/512/repeats:5_stddev  [m[0;33m  22841448 ns   22097087 ns [m[0;36m         1[m
+[m[0;32mmultiplication/1024/repeats:5_mean   [m[0;33m19369853800 ns 19375000000 ns [m[0;36m         1[m
+[m[0;32mmultiplication/1024/repeats:5_median [m[0;33m19362310000 ns 19375000000 ns [m[0;36m         1[m
+[m[0;32mmultiplication/1024/repeats:5_stddev [m[0;33m  69448087 ns   72450144 ns [m[0;36m         1[m
+[m[0;34mmultiplication_BigO                  [m[0;33m     18.04 N^3      18.04 N^3 [m
+[m[0;34mmultiplication_RMS                   [m[0;33m         1 %          1 % [m
+[m
+<end of output>
+Test time = 126.64 sec
+----------------------------------------------------------
+Test Passed.
+"Benchmark_contiguous_with_multiplication" end time: Oct 22 19:32 DST
+"Benchmark_contiguous_with_multiplication" time elapsed: 00:02:06
+----------------------------------------------------------
+
+3/3 Testing: Benchmark_nested_vector
+3/3 Test: Benchmark_nested_vector
+Command: "/mnt/c/Users/Florian/Dev/projects/ParallelSystems/Exercise2/build/bench/nested_vector" "--benchmark_out=/mnt/c/Users/Florian/Dev/projects/ParallelSystems/Exercise2/bench/lastrun/nested_vector.json" "--benchmark_out_format=json"
+Directory: /mnt/c/Users/Florian/Dev/projects/ParallelSystems/Exercise2/build/bench
+"Benchmark_nested_vector" start time: Oct 22 19:32 DST
+Output:
+----------------------------------------------------------
+Run on (8 X 2494 MHz CPU s)
+2017-10-22 19:32:33
+***WARNING*** Library was built as DEBUG. Timings may be affected.
+----------------------------------------------------------------------------
+Benchmark                                     Time           CPU Iterations
+----------------------------------------------------------------------------
+[0;32mmultiplication/16/repeats:5_mean     [m[0;33m     96596 ns      96680 ns [m[0;36m      6400[m
+[m[0;32mmultiplication/16/repeats:5_median   [m[0;33m     95432 ns      95215 ns [m[0;36m      6400[m
+[m[0;32mmultiplication/16/repeats:5_stddev   [m[0;33m      3465 ns       3703 ns [m[0;36m      6400[m
+[m[0;32mmultiplication/32/repeats:5_mean     [m[0;33m    726481 ns     728934 ns [m[0;36m       896[m
+[m[0;32mmultiplication/32/repeats:5_median   [m[0;33m    727715 ns     732422 ns [m[0;36m       896[m
+[m[0;32mmultiplication/32/repeats:5_stddev   [m[0;33m     14580 ns       7799 ns [m[0;36m       896[m
+[m[0;32mmultiplication/64/repeats:5_mean     [m[0;33m   5563070 ns    5552455 ns [m[0;36m       112[m
+[m[0;32mmultiplication/64/repeats:5_median   [m[0;33m   5554804 ns    5580357 ns [m[0;36m       112[m
+[m[0;32mmultiplication/64/repeats:5_stddev   [m[0;33m     98310 ns      62390 ns [m[0;36m       112[m
+[m[0;32mmultiplication/128/repeats:5_mean    [m[0;33m  44291313 ns   44335938 ns [m[0;36m        16[m
+[m[0;32mmultiplication/128/repeats:5_median  [m[0;33m  44393687 ns   43945312 ns [m[0;36m        16[m
+[m[0;32mmultiplication/128/repeats:5_stddev  [m[0;33m    411851 ns     534885 ns [m[0;36m        16[m
+[m[0;32mmultiplication/256/repeats:5_mean    [m[0;33m 363968700 ns  364062500 ns [m[0;36m         2[m
+[m[0;32mmultiplication/256/repeats:5_median  [m[0;33m 363369500 ns  359375000 ns [m[0;36m         2[m
+[m[0;32mmultiplication/256/repeats:5_stddev  [m[0;33m   5316154 ns    6987712 ns [m[0;36m         2[m
+[m[0;32mmultiplication/512/repeats:5_mean    [m[0;33m2840737800 ns 2840625000 ns [m[0;36m         1[m
+[m[0;32mmultiplication/512/repeats:5_median  [m[0;33m2833031000 ns 2828125000 ns [m[0;36m         1[m
+[m[0;32mmultiplication/512/repeats:5_stddev  [m[0;33m  31131459 ns   33874193 ns [m[0;36m         1[m
+[m[0;32mmultiplication/1024/repeats:5_mean   [m[0;33m23029470000 ns 23018750000 ns [m[0;36m         1[m
+[m[0;32mmultiplication/1024/repeats:5_median [m[0;33m22818100000 ns 22812500000 ns [m[0;36m         1[m
+[m[0;32mmultiplication/1024/repeats:5_stddev [m[0;33m 382277651 ns  379272536 ns [m[0;36m         1[m
+[m[0;34mmultiplication_BigO                  [m[0;33m     21.44 N^3      21.43 N^3 [m
+[m[0;34mmultiplication_RMS                   [m[0;33m         3 %          3 % [m
+[m
+<end of output>
+Test time = 147.37 sec
+----------------------------------------------------------
+Test Passed.
+"Benchmark_nested_vector" end time: Oct 22 19:35 DST
+"Benchmark_nested_vector" time elapsed: 00:02:27
+----------------------------------------------------------
+
+End testing: Oct 22 19:35 DST

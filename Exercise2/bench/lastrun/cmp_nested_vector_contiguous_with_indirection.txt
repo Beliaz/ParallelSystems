@@ -1,0 +1,24 @@
+Comparing ./bench/lastrun/nested_vector.json to ./bench/lastrun/contiguous_with_indirection.json
+Benchmark                                       Time             CPU      Time Old      Time New       CPU Old       CPU New
+----------------------------------------------------------------------------------------------------------------------------
+[92mmultiplication/16/repeats:5_mean    [0m[96m         -0.2138[0m[96m         -0.2172[0m         96596         75941[0m         96680         75684
+[92mmultiplication/16/repeats:5_median  [0m[96m         -0.2056[0m[96m         -0.1941[0m         95432         75812[0m         95215         76730
+[92mmultiplication/16/repeats:5_stddev  [0m[96m         -0.7822[0m[96m         -0.5787[0m          3465           755[0m          3703          1560
+[92mmultiplication/32/repeats:5_mean    [0m[96m         -0.2135[0m[96m         -0.2155[0m        726481        571398[0m        728934        571875
+[92mmultiplication/32/repeats:5_median  [0m[96m         -0.2157[0m[96m         -0.2107[0m        727715        570775[0m        732422        578125
+[92mmultiplication/32/repeats:5_stddev  [0m[96m         -0.5638[0m[91m         +0.0974[0m         14580          6359[0m          7799          8558
+[92mmultiplication/64/repeats:5_mean    [0m[96m         -0.2033[0m[96m         -0.2033[0m       5563070       4432291[0m       5552455       4423701
+[92mmultiplication/64/repeats:5_median  [0m[96m         -0.2032[0m[96m         -0.2000[0m       5554804       4425955[0m       5580357       4464286
+[92mmultiplication/64/repeats:5_stddev  [0m[96m         -0.5667[0m[96m         -0.1093[0m         98310         42594[0m         62390         55572
+[92mmultiplication/128/repeats:5_mean   [0m[96m         -0.2084[0m[96m         -0.2106[0m      44291313      35059350[0m      44335938      35000000
+[92mmultiplication/128/repeats:5_median [0m[96m         -0.2112[0m[96m         -0.2000[0m      44393687      35018400[0m      43945312      35156250
+[92mmultiplication/128/repeats:5_stddev [0m[96m         -0.6192[0m[96m         -0.3468[0m        411851        156813[0m        534885        349386
+[92mmultiplication/256/repeats:5_mean   [0m[96m         -0.2301[0m[96m         -0.2275[0m     363968700     280233000[0m     364062500     281250000
+[92mmultiplication/256/repeats:5_median [0m[96m         -0.2318[0m[96m         -0.2174[0m     363369500     279151667[0m     359375000     281250000
+[92mmultiplication/256/repeats:5_stddev [0m[96m         -0.3637[0m[96m         -0.4730[0m       5316154       3382789[0m       6987712       3682848
+[92mmultiplication/512/repeats:5_mean   [0m[96m         -0.2103[0m[96m         -0.2090[0m    2840737800    2243419200[0m    2840625000    2246875000
+[92mmultiplication/512/repeats:5_median [0m[96m         -0.2106[0m[96m         -0.2044[0m    2833031000    2236423000[0m    2828125000    2250000000
+[92mmultiplication/512/repeats:5_stddev [0m[96m         -0.3965[0m[96m         -0.3158[0m      31131459      18786747[0m      33874193      23175620
+[92mmultiplication/1024/repeats:5_mean  [0m[96m         -0.2131[0m[96m         -0.2130[0m   23029470000   18121896000[0m   23018750000   18115625000
+[92mmultiplication/1024/repeats:5_median[0m[96m         -0.2056[0m[96m         -0.2055[0m   22818100000   18126249000[0m   22812500000   18125000000
+[92mmultiplication/1024/repeats:5_stddev[0m[96m         -0.7596[0m[96m         -0.7641[0m     382277651      91915843[0m     379272536      89486382
