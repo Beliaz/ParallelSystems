@@ -89,6 +89,9 @@ Matrix operator*(const Matrix& a, const Matrix& b) {
             //Upper triangle matrix only -> j = k
             //Results in a speedup of approx. x2 (sequential as well as parallel) as only half the multiplications are needed
             for(unsigned j = k; j < n; ++j) {
+                //Check if value of right matrix equals zero and skip if so
+                if (b(k,j) == 0)
+                    continue;
                 c(i,j) += a(i,k) * b(k,j);
             }
         }
