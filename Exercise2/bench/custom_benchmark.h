@@ -6,7 +6,7 @@
 
 #define CUSTOM_BENCHMARK(f) BENCHMARK(f) \
 ->RangeMultiplier(2) \
-->Range(16, 8 << 7) \
+->Range(16, 8 << 5) \
 ->ReportAggregatesOnly() \
 ->Repetitions(5) \
 ->Complexity() \
