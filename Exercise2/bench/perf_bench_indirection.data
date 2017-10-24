@@ -1,0 +1,43 @@
+----------------------------------------------------------------------------
+Benchmark                                     Time           CPU Iterations
+----------------------------------------------------------------------------
+[0;32mmultiplication/16/repeats:5_mean     [m[0;33m      2272 ns       2272 ns [m[0;36m    310827[m
+[m[0;32mmultiplication/16/repeats:5_median   [m[0;33m      2253 ns       2253 ns [m[0;36m    310827[m
+[m[0;32mmultiplication/16/repeats:5_stddev   [m[0;33m        32 ns         32 ns [m[0;36m    310827[m
+[m[0;32mmultiplication/32/repeats:5_mean     [m[0;33m     12965 ns      12963 ns [m[0;36m     54063[m
+[m[0;32mmultiplication/32/repeats:5_median   [m[0;33m     12963 ns      12961 ns [m[0;36m     54063[m
+[m[0;32mmultiplication/32/repeats:5_stddev   [m[0;33m        25 ns         25 ns [m[0;36m     54063[m
+[m[0;32mmultiplication/64/repeats:5_mean     [m[0;33m     92586 ns      92574 ns [m[0;36m      7703[m
+[m[0;32mmultiplication/64/repeats:5_median   [m[0;33m     92403 ns      92392 ns [m[0;36m      7703[m
+[m[0;32mmultiplication/64/repeats:5_stddev   [m[0;33m      1419 ns       1420 ns [m[0;36m      7703[m
+[m[0;32mmultiplication/128/repeats:5_mean    [m[0;33m    973898 ns     973774 ns [m[0;36m       818[m
+[m[0;32mmultiplication/128/repeats:5_median  [m[0;33m    941304 ns     941192 ns [m[0;36m       818[m
+[m[0;32mmultiplication/128/repeats:5_stddev  [m[0;33m    101080 ns     101068 ns [m[0;36m       818[m
+[m[0;32mmultiplication/256/repeats:5_mean    [m[0;33m   7082177 ns    7081285 ns [m[0;36m        98[m
+[m[0;32mmultiplication/256/repeats:5_median  [m[0;33m   7147515 ns    7146604 ns [m[0;36m        98[m
+[m[0;32mmultiplication/256/repeats:5_stddev  [m[0;33m    146999 ns     146962 ns [m[0;36m        98[m
+[m[0;32mmultiplication/512/repeats:5_mean    [m[0;33m  53905394 ns   53898330 ns [m[0;36m        10[m
+[m[0;32mmultiplication/512/repeats:5_median  [m[0;33m  53946178 ns   53939210 ns [m[0;36m        10[m
+[m[0;32mmultiplication/512/repeats:5_stddev  [m[0;33m    556838 ns     556468 ns [m[0;36m        10[m
+[m[0;32mmultiplication/1024/repeats:5_mean   [m[0;33m 592766365 ns  592685235 ns [m[0;36m         1[m
+[m[0;32mmultiplication/1024/repeats:5_median [m[0;33m 588621486 ns  588527009 ns [m[0;36m         1[m
+[m[0;32mmultiplication/1024/repeats:5_stddev [m[0;33m  51105284 ns   51100982 ns [m[0;36m         1[m
+[m[0;34mmultiplication_BigO                  [m[0;33m      0.55 N^3       0.55 N^3 [m
+[m[0;34mmultiplication_RMS                   [m[0;33m        20 %         20 % [m
+[m
+
+
+
+
+ Performance counter stats for 'system wide':
+
+     195696,770342      cpu-clock (msec)          #    7,999 CPUs utilized
+            63.192      context-switches          #    0,323 K/sec
+             3.346      cpu-migrations            #    0,017 K/sec
+            24.515      page-faults               #    0,125 K/sec
+   130.204.199.115      cycles                    #    0,665 GHz
+   310.884.294.090      instructions              #    2,39  insn per cycle
+    44.687.929.159      branches                  #  228,353 M/sec
+       412.983.314      branch-misses             #    0,92% of all branches
+
+      24,465382703 seconds time elapsed
