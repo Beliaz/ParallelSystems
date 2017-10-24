@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.5.2)
 project(Exercise2 LANGUAGES CXX)
 
 # cmake module directory
