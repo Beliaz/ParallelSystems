@@ -13,3 +13,24 @@ Ret: 0
          1.075.573      branch-misses             #    0,20% of all branches
 
        0,491280895 seconds time elapsed
+
+#Added another execution showing stalled CPU time as well as this is probably the most interesting part of perf
+
+Timer - Multiplication: 3086 ms
+Ret: 0
+
+ Performance counter stats for './a.out 500':
+
+      30955,037389      task-clock (msec)         #    0,999 CPUs utilized
+             1.120      context-switches          #    0,036 K/sec
+                 2      cpu-migrations            #    0,000 K/sec
+             3.931      page-faults               #    0,127 K/sec
+    97.638.457.817      cycles                    #    3,154 GHz
+    33.909.918.256      stalled-cycles-frontend   #   34,73% frontend cycles idle
+     1.648.315.126      stalled-cycles-backend    #    1,69% backend cycles idle
+   207.831.362.113      instructions              #    2,13  insn per cycle
+                                                  #    0,16  stalled cycles per insn
+    25.056.010.037      branches                  #  809,432 M/sec
+         2.658.243      branch-misses             #    0,01% of all branches
+
+      30,975918709 seconds time elapsed
