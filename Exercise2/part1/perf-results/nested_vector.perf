@@ -34,3 +34,32 @@ Ret: 0
          2.658.243      branch-misses             #    0,01% of all branches
 
       30,975918709 seconds time elapsed
+
+
+#Added another execution showing everything from the cache
+
+ Performance counter stats for './Exercise2_nested 1024':
+
+       138.737.797      L1-dcache-load-misses     #    0,20% of all L1-dcache hits    (15,00%)
+    69.638.965.750      L1-dcache-loads                                               (15,02%)
+    49.323.235.454      L1-dcache-stores                                              (15,01%)
+           794.352      L1-icache-load-misses                                         (10,03%)
+         2.850.261      LLC-load-misses           #   49,89% of all LL-cache hits     (10,03%)
+         5.712.534      LLC-loads                                                     (15,05%)
+            76.137      LLC-store-misses                                              (10,03%)
+           171.005      LLC-stores                                                    (10,03%)
+         1.153.341      branch-load-misses                                            (15,04%)
+    21.492.366.240      branch-loads                                                  (20,04%)
+           400.831      dTLB-load-misses          #    0,00% of all dTLB cache hits   (20,04%)
+    69.806.222.873      dTLB-loads                                                    (19,95%)
+            12.670      dTLB-store-misses                                             (10,02%)
+    49.607.570.681      dTLB-stores                                                   (10,01%)
+             7.640      iTLB-load-misses          #   70,75% of all iTLB cache hits   (10,01%)
+            10.799      iTLB-loads                                                    (10,01%)
+                 0      node-load-misses                                              (15,01%)
+         3.008.653      node-loads                                                    (20,00%)
+                 0      node-store-misses                                             (9,97%)
+             6.933      node-stores                                                   (9,97%)
+
+      19,585260278 seconds time elapsed
+
