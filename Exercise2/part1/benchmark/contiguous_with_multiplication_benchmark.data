@@ -1,0 +1,27 @@
+----------------------------------------------------------------------------
+Benchmark                                     Time           CPU Iterations
+----------------------------------------------------------------------------
+[0;32mmultiplication/16/repeats:5_mean     [m[0;33m      4043 ns       4044 ns [m[0;36m    171163[m
+[m[0;32mmultiplication/16/repeats:5_median   [m[0;33m      4027 ns       4028 ns [m[0;36m    171163[m
+[m[0;32mmultiplication/16/repeats:5_stddev   [m[0;33m        37 ns         37 ns [m[0;36m    171163[m
+[m[0;32mmultiplication/32/repeats:5_mean     [m[0;33m     29723 ns      29726 ns [m[0;36m     23694[m
+[m[0;32mmultiplication/32/repeats:5_median   [m[0;33m     29599 ns      29601 ns [m[0;36m     23694[m
+[m[0;32mmultiplication/32/repeats:5_stddev   [m[0;33m       314 ns        314 ns [m[0;36m     23694[m
+[m[0;32mmultiplication/64/repeats:5_mean     [m[0;33m    237950 ns     237966 ns [m[0;36m      2946[m
+[m[0;32mmultiplication/64/repeats:5_median   [m[0;33m    237275 ns     237293 ns [m[0;36m      2946[m
+[m[0;32mmultiplication/64/repeats:5_stddev   [m[0;33m      1230 ns       1228 ns [m[0;36m      2946[m
+[m[0;32mmultiplication/128/repeats:5_mean    [m[0;33m   1765825 ns    1765951 ns [m[0;36m       396[m
+[m[0;32mmultiplication/128/repeats:5_median  [m[0;33m   1762778 ns    1762907 ns [m[0;36m       396[m
+[m[0;32mmultiplication/128/repeats:5_stddev  [m[0;33m      6289 ns       6279 ns [m[0;36m       396[m
+[m[0;32mmultiplication/256/repeats:5_mean    [m[0;33m  13824465 ns   13825407 ns [m[0;36m        51[m
+[m[0;32mmultiplication/256/repeats:5_median  [m[0;33m  13768842 ns   13769867 ns [m[0;36m        51[m
+[m[0;32mmultiplication/256/repeats:5_stddev  [m[0;33m    130773 ns     130828 ns [m[0;36m        51[m
+[m[0;32mmultiplication/512/repeats:5_mean    [m[0;33m 113417560 ns  113424435 ns [m[0;36m         7[m
+[m[0;32mmultiplication/512/repeats:5_median  [m[0;33m 112976375 ns  112981684 ns [m[0;36m         7[m
+[m[0;32mmultiplication/512/repeats:5_stddev  [m[0;33m    888924 ns     889715 ns [m[0;36m         7[m
+[m[0;32mmultiplication/1024/repeats:5_mean   [m[0;33m 977994422 ns  978057123 ns [m[0;36m         1[m
+[m[0;32mmultiplication/1024/repeats:5_median [m[0;33m 994145140 ns  994218364 ns [m[0;36m         1[m
+[m[0;32mmultiplication/1024/repeats:5_stddev [m[0;33m  39436762 ns   39434254 ns [m[0;36m         1[m
+[m[0;34mmultiplication_BigO                  [m[0;33m      0.91 N^3       0.91 N^3 [m
+[m[0;34mmultiplication_RMS                   [m[0;33m         9 %          9 % [m
+[m

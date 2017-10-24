@@ -19,6 +19,12 @@ foreach(ONE_BENCH_CPP ${ALL_BENCH_CPP})
 		benchmark
 		${CMAKE_THREAD_LIBS_INIT})
 
+  # add_test(NAME ${TARGET_NAME} COMMAND ${ONE_BENCH_EXEC})
+
+ #  message(NAME ${TARGET_NAME}
+   #        COMMAND ${TARGET_NAME} --benchmark_out=${LOG_NAME}
+   #        --benchmark_out_format=json)
+
    add_test(NAME ${TARGET_NAME}
 		    COMMAND ${TARGET_NAME} --benchmark_out=${LOG_NAME} 
 								   --benchmark_out_format=json)

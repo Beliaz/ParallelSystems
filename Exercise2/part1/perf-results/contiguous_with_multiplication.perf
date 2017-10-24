@@ -1,0 +1,16 @@
+Timer - Multiplication: 940 ms
+Ret: 0
+
+ Performance counter stats for './Exercise2 1024':
+
+        951,592042      task-clock (msec)         #    1,000 CPUs utilized
+                 2      context-switches          #    0,002 K/sec
+                 0      cpu-migrations            #    0,000 K/sec
+             1.670      page-faults               #    0,002 M/sec
+     3.229.105.073      cycles                    #    3,393 GHz
+    10.788.076.497      instructions              #    3,34  insn per cycle
+     1.084.679.013      branches                  # 1139,857 M/sec
+         1.075.567      branch-misses             #    0,10% of all branches
+
+       0,951925756 seconds time elapsed
+
