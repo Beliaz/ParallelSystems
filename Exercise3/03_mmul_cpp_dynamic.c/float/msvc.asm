@@ -36,7 +36,7 @@ $LL7@operator:
         mov      rax, QWORD PTR [rdi]
         xor      ebx, ebx
         mov      rcx, QWORD PTR [rax+r9]
-        mov      QWORD PTR [r8+rcx], 0
+        mov      DWORD PTR [r8+rcx], 0
         cmp      ebp, 4
         jb       $LC100@operator
         mov      r10, QWORD PTR [r12]
@@ -50,43 +50,43 @@ $LL7@operator:
         npad     3
 $LL101@operator:
         mov      rax, QWORD PTR [rdi]
-        lea      r11, QWORD PTR [r11+32]
+        lea      r11, QWORD PTR [r11+16]
         lea      r10, QWORD PTR [r10+96]
         mov      rdx, QWORD PTR [rax+r9]
         mov      rax, QWORD PTR [rsi]
         mov      rcx, QWORD PTR [rax+r9]
         mov      rax, QWORD PTR [r10-144]
-        vmovsd   xmm0, QWORD PTR [rcx+r11-32]
-        vmulsd   xmm1, xmm0, QWORD PTR [rax+r8]
-        vaddsd   xmm2, xmm1, QWORD PTR [rdx+r8]
-        vmovsd   QWORD PTR [rdx+r8], xmm2
+        vmovss   xmm0, DWORD PTR [rcx+r11-16]
+        vmulss   xmm1, xmm0, DWORD PTR [rax+r8]
+        vaddss   xmm2, xmm1, DWORD PTR [rdx+r8]
+        vmovss   DWORD PTR [rdx+r8], xmm2
         mov      rax, QWORD PTR [rdi]
         mov      rdx, QWORD PTR [rax+r9]
         mov      rax, QWORD PTR [rsi]
         mov      rcx, QWORD PTR [rax+r9]
         mov      rax, QWORD PTR [r10-120]
-        vmovsd   xmm0, QWORD PTR [rcx+r11-24]
-        vmulsd   xmm1, xmm0, QWORD PTR [rax+r8]
-        vaddsd   xmm2, xmm1, QWORD PTR [rdx+r8]
-        vmovsd   QWORD PTR [rdx+r8], xmm2
+        vmovss   xmm0, DWORD PTR [rcx+r11-12]
+        vmulss   xmm1, xmm0, DWORD PTR [rax+r8]
+        vaddss   xmm2, xmm1, DWORD PTR [rdx+r8]
+        vmovss   DWORD PTR [rdx+r8], xmm2
         mov      rax, QWORD PTR [rdi]
         mov      rdx, QWORD PTR [rax+r9]
         mov      rax, QWORD PTR [rsi]
         mov      rcx, QWORD PTR [rax+r9]
         mov      rax, QWORD PTR [r10-96]
-        vmovsd   xmm0, QWORD PTR [rcx+r11-16]
-        vmulsd   xmm1, xmm0, QWORD PTR [r8+rax]
-        vaddsd   xmm2, xmm1, QWORD PTR [rdx+r8]
-        vmovsd   QWORD PTR [rdx+r8], xmm2
+        vmovss   xmm0, DWORD PTR [rcx+r11-8]
+        vmulss   xmm1, xmm0, DWORD PTR [r8+rax]
+        vaddss   xmm2, xmm1, DWORD PTR [rdx+r8]
+        vmovss   DWORD PTR [rdx+r8], xmm2
         mov      rax, QWORD PTR [rdi]
         mov      rdx, QWORD PTR [rax+r9]
         mov      rax, QWORD PTR [rsi]
         mov      rcx, QWORD PTR [rax+r9]
         mov      rax, QWORD PTR [r10-72]
-        vmovsd   xmm0, QWORD PTR [rcx+r11-8]
-        vmulsd   xmm1, xmm0, QWORD PTR [rax+r8]
-        vaddsd   xmm2, xmm1, QWORD PTR [rdx+r8]
-        vmovsd   QWORD PTR [rdx+r8], xmm2
+        vmovss   xmm0, DWORD PTR [rcx+r11-4]
+        vmulss   xmm1, xmm0, DWORD PTR [rax+r8]
+        vaddss   xmm2, xmm1, DWORD PTR [rdx+r8]
+        vmovss   DWORD PTR [rdx+r8], xmm2
         sub      r14, 1
         jne      $LL101@operator
 $LC100@operator:
@@ -94,27 +94,27 @@ $LC100@operator:
         jae      SHORT $LN5@operator
         mov      rax, QWORD PTR [r12]
         lea      rcx, QWORD PTR [rbx+rbx*2]
-        lea      r10, QWORD PTR [rbx*8]
+        lea      r10, QWORD PTR [rbx*4]
         lea      r11, QWORD PTR [rax+rcx*8]
         mov      eax, ebp
         sub      eax, ebx
         mov      ebx, eax
 $LC10@operator:
         mov      rax, QWORD PTR [rdi]
-        lea      r10, QWORD PTR [r10+8]
+        lea      r10, QWORD PTR [r10+4]
         lea      r11, QWORD PTR [r11+24]
         mov      rdx, QWORD PTR [rax+r9]
         mov      rax, QWORD PTR [rsi]
         mov      rcx, QWORD PTR [rax+r9]
         mov      rax, QWORD PTR [r11-24]
-        vmovsd   xmm0, QWORD PTR [rcx+r10-8]
-        vmulsd   xmm1, xmm0, QWORD PTR [r8+rax]
-        vaddsd   xmm2, xmm1, QWORD PTR [rdx+r8]
-        vmovsd   QWORD PTR [rdx+r8], xmm2
+        vmovss   xmm0, DWORD PTR [rcx+r10-4]
+        vmulss   xmm1, xmm0, DWORD PTR [r8+rax]
+        vaddss   xmm2, xmm1, DWORD PTR [rdx+r8]
+        vmovss   DWORD PTR [rdx+r8], xmm2
         sub      rbx, 1
         jne      SHORT $LC10@operator
 $LN5@operator:
-        add      r8, 8
+        add      r8, 4
         sub      r15, 1
         jne      $LL7@operator
         mov      rax, QWORD PTR tv1044[rsp]
