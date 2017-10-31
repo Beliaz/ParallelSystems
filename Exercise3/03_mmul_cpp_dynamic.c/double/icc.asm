@@ -24,7 +24,7 @@ xor eax, eax #25.2
   lea r13, QWORD PTR [r13+r13*2] #796.18
   mov r13, QWORD PTR [r9+r13*8] #796.18
   vmovsd xmm0, QWORD PTR [r13+r10*8] #29.30
-  vfmadd213sd xmm1, xmm0, QWORD PTR [r14+r10*8] #29.9
+  vfmadd213sd xmm1, xmm0, QWORD PTR [r14+r10*8] #29.9			// SIMD instruction
   vmovsd QWORD PTR [r14+r10*8], xmm1 #29.9
   mov r13, QWORD PTR [rdi+r11*8] #781.18
   lea r14d, DWORD PTR [1+rax+rax] #29.28
@@ -33,7 +33,7 @@ xor eax, eax #25.2
   lea r14, QWORD PTR [r14+r14*2] #796.18
   mov r14, QWORD PTR [r9+r14*8] #796.18
   vmovsd xmm2, QWORD PTR [r14+r10*8] #29.30
-  vfmadd213sd xmm3, xmm2, QWORD PTR [r13+r10*8] #29.9
+  vfmadd213sd xmm3, xmm2, QWORD PTR [r13+r10*8] #29.9			// SIMD instruction
   vmovsd QWORD PTR [r13+r10*8], xmm3 #29.9
   cmp eax, r15d #28.4
   jb ..B1.76 # Prob 64% #28.4

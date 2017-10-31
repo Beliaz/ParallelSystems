@@ -48,7 +48,7 @@ operator*(std::vector<std::vector<double, std::allocator<double> >, std::allocat
   add rax, 24
   add rdx, 8
   vmovsd xmm0, QWORD PTR [rcx+r15]
-  vmulsd xmm0, xmm0, QWORD PTR [rdx-8]
+  vmulsd xmm0, xmm0, QWORD PTR [rdx-8]				// only multiplycation -> SISD
   cmp r8, rax
   vaddsd xmm1, xmm1, xmm0
   vmovsd QWORD PTR [rsi], xmm1

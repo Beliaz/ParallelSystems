@@ -45,15 +45,15 @@ operator*(std::vector<std::vector<double, std::allocator<double> >, std::allocat
 .LBB1_11: # Parent Loop BB1_2 Depth=1
   vmovsd xmm1, qword ptr [rax + 8*rcx] # xmm1 = mem[0],zero
   mov rdi, qword ptr [rsi]
-  vmulsd xmm1, xmm1, qword ptr [rdi + 8*rbx]
+  vmulsd xmm1, xmm1, qword ptr [rdi + 8*rbx]	// Multiply1
   vaddsd xmm0, xmm0, xmm1
   vmovsd qword ptr [rdx + 8*rbx], xmm0
   vmovsd xmm1, qword ptr [rax + 8*rcx + 8] # xmm1 = mem[0],zero
   mov rdi, qword ptr [rsi + 24]
-  vmulsd xmm1, xmm1, qword ptr [rdi + 8*rbx]
+  vmulsd xmm1, xmm1, qword ptr [rdi + 8*rbx]	// MuLtiply2
   vaddsd xmm0, xmm0, xmm1
   vmovsd qword ptr [rdx + 8*rbx], xmm0
-  add rcx, 2
+  add rcx, 2								// unroll k+=2
   add rsi, 48
   cmp r12, rcx
   jne .LBB1_11
@@ -67,11 +67,11 @@ operator*(std::vector<std::vector<double, std::allocator<double> >, std::allocat
   vaddsd xmm0, xmm0, xmm1
   vmovsd qword ptr [rdx + 8*rbx], xmm0
 .LBB1_7: # in Loop: Header=BB1_3 Depth=2
-  inc rbx
-  cmp rbx, r15
+  inc rbx									// ++j
+  cmp rbx, r15								// i<n
   jne .LBB1_3
-  inc r10
-  cmp r10, r15
+  inc r10                  					// ++i
+  cmp r10, r15								// j<n
   jne .LBB1_2
 .LBB1_9:
   mov rax, r14

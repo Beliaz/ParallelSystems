@@ -57,7 +57,7 @@ $LL101@operator:
         mov      rcx, QWORD PTR [rax+r9]
         mov      rax, QWORD PTR [r10-144]
         vmovsd   xmm0, QWORD PTR [rcx+r11-32]
-        vmulsd   xmm1, xmm0, QWORD PTR [rax+r8]
+        vmulsd   xmm1, xmm0, QWORD PTR [rax+r8]				//unroll 1
         vaddsd   xmm2, xmm1, QWORD PTR [rdx+r8]
         vmovsd   QWORD PTR [rdx+r8], xmm2
         mov      rax, QWORD PTR [rdi]
@@ -66,7 +66,7 @@ $LL101@operator:
         mov      rcx, QWORD PTR [rax+r9]
         mov      rax, QWORD PTR [r10-120]
         vmovsd   xmm0, QWORD PTR [rcx+r11-24]
-        vmulsd   xmm1, xmm0, QWORD PTR [rax+r8]
+        vmulsd   xmm1, xmm0, QWORD PTR [rax+r8]				//unroll 2
         vaddsd   xmm2, xmm1, QWORD PTR [rdx+r8]
         vmovsd   QWORD PTR [rdx+r8], xmm2
         mov      rax, QWORD PTR [rdi]
@@ -75,7 +75,7 @@ $LL101@operator:
         mov      rcx, QWORD PTR [rax+r9]
         mov      rax, QWORD PTR [r10-96]
         vmovsd   xmm0, QWORD PTR [rcx+r11-16]
-        vmulsd   xmm1, xmm0, QWORD PTR [r8+rax]
+        vmulsd   xmm1, xmm0, QWORD PTR [r8+rax]				//unroll 3
         vaddsd   xmm2, xmm1, QWORD PTR [rdx+r8]
         vmovsd   QWORD PTR [rdx+r8], xmm2
         mov      rax, QWORD PTR [rdi]
@@ -84,7 +84,7 @@ $LL101@operator:
         mov      rcx, QWORD PTR [rax+r9]
         mov      rax, QWORD PTR [r10-72]
         vmovsd   xmm0, QWORD PTR [rcx+r11-8]
-        vmulsd   xmm1, xmm0, QWORD PTR [rax+r8]
+        vmulsd   xmm1, xmm0, QWORD PTR [rax+r8]				//unroll 4
         vaddsd   xmm2, xmm1, QWORD PTR [rdx+r8]
         vmovsd   QWORD PTR [rdx+r8], xmm2
         sub      r14, 1
