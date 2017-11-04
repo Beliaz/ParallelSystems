@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
 
     }
-    if (atoi(argv[1]) > 11) {
+    if (atoi(argv[1]) > 17) {
         printf("Please enter a smaller problem size as yours might take too long");
         return EXIT_FAILURE;
     }
@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
     int problemSize = atoi(argv[1]);
     int foundPermutations = 0;
     int permutationCount = factorial(problemSize);
-    int *permutations = new int[problemSize * permutationCount] ;
+    int *permutations = new int[problemSize * permutationCount * 10] ;
 
     createPermutations(problemSize, permutations);
     foundPermutations = checkPermutations(problemSize, permutationCount, permutations);
