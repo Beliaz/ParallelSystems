@@ -15,7 +15,7 @@ std::vector<double> init(unsigned n) {
     std::vector<double> retval = std::vector<double>(n);
     static std::default_random_engine rng;
     static std::uniform_real_distribution<> rnd(0,100);
-    for(int i=0;i<n;i++)
+    for(unsigned int i=0;i<n;i++)
         retval[i]=rnd(rng);
     return retval;
 }
@@ -41,7 +41,7 @@ std::vector<double> insertion_sort (const std::vector<double> _arr){
     int j, temp;
     std::vector<double> retval = _arr;
 
-    for (int i = 0; i < retval.size(); i++){
+    for (unsigned int i = 0; i < retval.size(); i++){
         j = i;
 
         while (j > 0 && retval[j] < retval[j-1]){
@@ -103,7 +103,7 @@ std::vector<double> sort(const std::vector<double> _arr)
 
 bool is_sorted(const std::vector<double> _arr)
 {
-    for(int i=1;i<_arr.size();i++)
+    for(unsigned int i=1;i<_arr.size();i++)
         if(_arr[i]<_arr[i-1])
             return false;
     return true;

@@ -44,3 +44,4 @@ Exercise1/.vs/VSWorkspaceState.json
 **/cmake-build-debug/*
 /CMakeLists.txt
 **/.vs/VSWorkspaceState.json
+/cmake-build-release/*

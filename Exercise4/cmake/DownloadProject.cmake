@@ -89,7 +89,7 @@
 #========================================================================================
 
 
-set(_DownloadProjectDir "cmake")
+set(_DownloadProjectDir "${CMAKE_CURRENT_LIST_DIR}")
 
 include(CMakeParseArguments)
 
@@ -162,7 +162,7 @@ function(download_project)
                    "${DL_ARGS_DOWNLOAD_DIR}/CMakeLists.txt")
     execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}"
                         -D "CMAKE_MAKE_PROGRAM:FILE=${CMAKE_MAKE_PROGRAM}"
-            cmake
+                        .
                     RESULT_VARIABLE result
                     ${OUTPUT_QUIET}
                     WORKING_DIRECTORY "${DL_ARGS_DOWNLOAD_DIR}"
@@ -170,7 +170,7 @@ function(download_project)
     if(result)
         message(FATAL_ERROR "CMake step for ${DL_ARGS_PROJ} failed: ${result}")
     endif()
-    execute_process(COMMAND ${CMAKE_COMMAND} --build cmake
+    execute_process(COMMAND ${CMAKE_COMMAND} --build .
                     RESULT_VARIABLE result
                     ${OUTPUT_QUIET}
                     WORKING_DIRECTORY "${DL_ARGS_DOWNLOAD_DIR}"

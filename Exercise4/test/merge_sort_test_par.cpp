@@ -2,6 +2,9 @@
 // Created by ivan on 03/11/17.
 //
 
+#define PAR_OPT
+
+
 #include "../merge_sort.h"
 #include "../chrono_timer.h"
 #include <cstdlib>
