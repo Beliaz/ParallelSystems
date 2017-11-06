@@ -16,4 +16,8 @@ class ChronoTimer {
 		auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
 		std::cout << "Timer - " << name << ": " << elapsed.count() << " ms " << std::endl;
 	}
+	long getTime()
+	{
+		return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count();
+	}
 };

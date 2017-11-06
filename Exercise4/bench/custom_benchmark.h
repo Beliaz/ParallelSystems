@@ -4,7 +4,6 @@
 
 #include "benchmark/benchmark.h"
 #include "../merge_sort.h"
-#include <iostream>
 
 #define CUSTOM_BENCHMARK(f) BENCHMARK(f) \
 ->RangeMultiplier(2) \
@@ -13,7 +12,7 @@
 ->Repetitions(5) \
 ->Complexity() \
 
-static void mergesort(benchmark::State& state)
+static void merge_sort(benchmark::State& state)
 {
     const auto n = state.range(0);
 
@@ -25,7 +24,6 @@ static void mergesort(benchmark::State& state)
      {
         if (is_sorted(sort(_arr)))
         {
-            std::cout<<"run with "<<n<<std::endl;
           state.SkipWithError("result incorrect");
         }
     }

@@ -13,7 +13,8 @@
 
 int main(int args, char** argv){
 
-    if(args>1) {
+    if(args==2) {
+        std::cout<<"Num Threads: "<<omp_get_num_threads() <<"   max threads: "<< omp_get_max_threads()<<std::endl;
         std::vector<double> _arr = init(atoi(argv[1]));
         {
             ChronoTimer t("Sort");

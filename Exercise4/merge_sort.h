@@ -9,6 +9,7 @@
 #include <random>
 #include <iostream>
 #include <omp.h>
+#include <string>
 
 
 std::vector<double> init(unsigned n) {
@@ -55,27 +56,38 @@ std::vector<double> insertion_sort (const std::vector<double> _arr){
 }
 
 #if defined(PAR_OPT)
-
-std::vector<double> sort(const std::vector<double> _arr)
-{
+bool split=true;
+std::vector<double> sort_rec(const std::vector<double> _arr) {
     if(_arr.size()>7) {
-        if (omp_get_max_threads() > 1) {
+        if(split) {
+            return merge(sort_rec(std::vector<double>(_arr.begin(), _arr.begin() + (_arr.size() / 2))),
+                         sort_rec(std::vector<double>(_arr.begin() + (_arr.size() / 2), _arr.end())));
+        } else {
+            split=false;
             std::vector<double> result1, result2;
-#pragma omp parallel sections
+#pragma omp parallel sections num_threads(2)
             {
-#pragma omp section
-                result1 = sort(std::vector<double>(_arr.begin(), _arr.begin() + (_arr.size() / 2)));
-#pragma omp section
-                result2 = sort(std::vector<double>(_arr.begin() + (_arr.size() / 2), _arr.end()));
 
+#pragma omp section
+                {
+                    result1 = sort_rec(std::vector<double>(_arr.begin(), _arr.begin() + (_arr.size() / 2)));
+                }
+#pragma omp section
+                {
+                    result2 = sort_rec(std::vector<double>(_arr.begin() + (_arr.size() / 2), _arr.end()));
+                }
             }
             return merge(result1, result2);
-        } else
-            return merge(sort(std::vector<double>(_arr.begin(), _arr.begin() + (_arr.size() / 2))),
-                         sort(std::vector<double>(_arr.begin() + (_arr.size() / 2), _arr.end())));
+        }
     } else if (_arr.size()>1)
         return insertion_sort(_arr);
     else return _arr;
+}
+
+std::vector<double> sort(const std::vector<double> _arr) {
+
+    omp_set_nested(1);
+    return sort_rec(_arr);
 }
 
 
