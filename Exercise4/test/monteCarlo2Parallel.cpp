@@ -11,6 +11,10 @@ int throwLoop(int throwCount) {
     {
         int hitCount = 0;
 
+#ifndef WIN32
+        unsigned int myseed = omp_get_thread_num();
+#endif
+
 #pragma omp for schedule(static)
         for (int i = 0; i < throwCount; i++) {
 
