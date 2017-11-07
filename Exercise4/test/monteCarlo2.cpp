@@ -21,7 +21,7 @@ double getResult(int throwCount, int hitCount) {
 }
 
 int main(void) {
-    srand (time(NULL));
+    srand (static_cast<unsigned>(time(nullptr)));
     int throwCount = 10000000;
     int hitCount = throwLoop(throwCount);
     printf("Pi seems to be %f\n", getResult(throwCount, hitCount));

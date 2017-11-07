@@ -53,4 +53,4 @@ add_executable(monte_carlo test/monteCarlo2.cpp)
 
 add_executable(monte_carlo_par test/monteCarlo2Parallel.cpp)
 
-add_executable(n_queens test/nQueens.cpp)
+add_executable(n_queens src/nQueens.cpp)
