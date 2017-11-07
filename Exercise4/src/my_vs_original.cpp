@@ -15,10 +15,10 @@
 int main(int args, char** argv){
 
     if(args==2) {
-        std::vector<double> _arr = init(atoi(argv[1]));
-        std::vector<double> _result =std::vector<double>();
-        long my_sort_time;
-        long original_sort_time;
+        auto _arr = init(atoi(argv[1]));
+        auto _result =std::vector<double>();
+        long long my_sort_time;
+        long long original_sort_time;
         std::cout<<"Num Threads: "<<omp_get_num_threads() <<"   max threads: "<< omp_get_max_threads()<<std::endl;
 
         {

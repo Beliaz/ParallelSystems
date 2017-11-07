@@ -17,8 +17,8 @@ These algorithms should be implemented:
 1. Calculating the number of solutions to the N-Queens problem. 
 The input parameter for the program is the number N, and its output is the number of possible solutions.
 2. Merge Sort.
-The input for your program should be the size of the my_array to sort. The generated my_array should be filled randomly.
-The output is the result of a check that the my_array is actually sorted.
+The input for your program should be the size of the array to sort. The generated array should be filled randomly. 
+The output is the result of a check that the array is actually sorted.
 3. A Monte Carlo estimator for pi.
 The input should be the number of samples to use in the estimation, the output is the approximation of pi which was computed.
 

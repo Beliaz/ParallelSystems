@@ -1,6 +1,5 @@
-#ifndef CUSTOM_BENCHMARK_H
-#define CUSTOM_BENCHMARK_H
-
+#ifndef MERGE_SORT_BENCHMARK_H
+#define MERGE_SORT_BENCHMARK_H
 
 #include "benchmark/benchmark.h"
 #include "../merge_sort.h"
@@ -18,15 +17,15 @@ static void merge_sort(benchmark::State& state)
 
     state.SetComplexityN(n);
 
-    std::vector<double> _arr = init(n);
+    const auto arr = init(n);
 
      while (state.KeepRunning())
      {
-        if (is_sorted(sort(_arr)))
+        if (!is_sorted(sort(arr)))
         {
-          state.SkipWithError("result incorrect");
+            state.SkipWithError("result incorrect");
         }
     }
 }
 
-#endif // CUSTOM_BENCHMARK_H
+#endif // MERGE_SORT_BENCHMARK_H

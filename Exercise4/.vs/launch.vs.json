@@ -1,0 +1,40 @@
+{
+  "version": "0.2.1",
+  "defaults": {},
+  "configurations": [
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "${buildRoot}\\pi.exe",
+      "name": "exercise4_pi.exe 1000",
+      "args": [
+        "1000"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "${buildRoot}\\pi.exe",
+      "name": "pi.exe 10'000",
+      "args": [
+        "10000"
+      ]
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "${buildRoot}\\pi.exe",
+      "name": "pi.exe 10'000'000",
+      "args": [
+        "10000000"
+      ]
+    },
+    {
+      "project": "CMakeLists.txt",
+      "projectTarget": "${buildRoot}\\pi.exe",
+      "name": "pi.exe 1'000'000'000",
+      "args": [
+        "1000000000"
+      ]
+    }
+
+  ]
+}

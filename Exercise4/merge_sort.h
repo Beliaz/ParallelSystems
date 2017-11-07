@@ -46,7 +46,7 @@ std::vector<double> insertion_sort (const std::vector<double> _arr){
         j = i;
 
         while (j > 0 && retval[j] < retval[j-1]){
-            temp = retval[j];
+            temp = static_cast<int>(retval[j]);
             retval[j] = retval[j-1];
             retval[j-1] = temp;
             j--;
