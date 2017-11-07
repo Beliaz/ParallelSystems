@@ -10,10 +10,14 @@
 
 int main(int args, char** argv)
 {
-    constexpr auto problem_size = 1000;
+    constexpr auto problem_size = 100000;
 
     auto arr = init(problem_size);
-    arr = sort(arr);
+    {
+        ChronoTimer t("Start");
+        arr = sort(arr);
+    }
+
 
     return is_sorted(arr)
         ? EXIT_SUCCESS

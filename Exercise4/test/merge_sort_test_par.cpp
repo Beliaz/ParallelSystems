@@ -15,10 +15,15 @@ int main(int, char**)
 {
     std::cout<<"Num Threads: " <<omp_get_num_threads() << "   max threads: "<< omp_get_max_threads() << std::endl;
     
-    constexpr auto problem_size = 1000;
+    constexpr auto problem_size = 100000;
 
     auto arr = init(problem_size);
-    arr = sort(arr);
+
+    {
+        ChronoTimer t("Start");
+        arr = sort(arr);
+    }
+
 
     return is_sorted(arr)
         ? EXIT_SUCCESS

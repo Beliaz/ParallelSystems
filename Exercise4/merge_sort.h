@@ -56,35 +56,31 @@ std::vector<double> insertion_sort (const std::vector<double> _arr){
 }
 
 #if defined(PAR_OPT)
-bool split=true;
 
-std::vector<double> sort(const std::vector<double> _arr) {
-    if(_arr.size()>7) {
-        if(split) {
-            return merge(sort(std::vector<double>(_arr.begin(), _arr.begin() + (_arr.size() / 2))),
-                         sort(std::vector<double>(_arr.begin() + (_arr.size() / 2), _arr.end())));
-        } else {
-            split=false;
-            std::vector<double> result1, result2;
-#pragma omp parallel sections num_threads(2)
-            {
+std::vector<double> par_sort(const std::vector<double> _arr) {
+    if(_arr.size()>15) {
+        std::vector<double> result1, result2;
 
-#pragma omp section
-                {
-                    result1 = sort(std::vector<double>(_arr.begin(), _arr.begin() + (_arr.size() / 2)));
-                }
-#pragma omp section
-                {
-                    result2 = sort(std::vector<double>(_arr.begin() + (_arr.size() / 2), _arr.end()));
-                }
-            }
-            return merge(result1, result2);
-        }
+#pragma omp task firstprivate(result1,_arr)
+        result1 = par_sort(std::vector<double>(_arr.begin(), _arr.begin() + (_arr.size() / 2)));
+#pragma omp task firstprivate(result2,_arr)
+        result2 = par_sort(std::vector<double>(_arr.begin() + (_arr.size() / 2), _arr.end()));
+#pragma omp taskwait
+
+        return merge(result1, result2);
     } else if (_arr.size()>1)
         return insertion_sort(_arr);
     else return _arr;
 }
-
+std::vector<double> sort(const std::vector<double> _arr) {
+    std::vector<double> retval;
+#pragma omp parallel
+    {
+#pragma omp single
+        retval=par_sort(_arr);
+    }
+    return retval;
+}
 
 #elif defined(SEQ_OPT)
 
