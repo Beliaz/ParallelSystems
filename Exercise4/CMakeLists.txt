@@ -14,8 +14,8 @@ enable_testing()
 set(BENCHMARK_ENABLE_TESTING OFF)
 
 if(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest /wd4141 /WX")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O3 /DNDEBUG")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest /wd4141 /WX /arch:AVX2")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O3 /arch:AVX2 /DNDEBUG")
 else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z -Wall")
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG ")
@@ -34,6 +34,8 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/test/)
 add_subdirectory(${PROJECT_SOURCE_DIR}/bench/)
 
 aux_source_directory(. SRC_LIST)
+
+add_executable(pi src/pi/main.cpp)
 
 add_executable(merge_sort test/merge_sort_test.cpp)
 target_link_libraries(merge_sort ${SRC_LIST})

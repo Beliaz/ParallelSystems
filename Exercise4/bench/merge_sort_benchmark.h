@@ -1,6 +1,5 @@
-#ifndef CUSTOM_BENCHMARK_H
-#define CUSTOM_BENCHMARK_H
-
+#ifndef MERGE_SORT_BENCHMARK_H
+#define MERGE_SORT_BENCHMARK_H
 
 #include "benchmark/benchmark.h"
 #include "../merge_sort.h"
@@ -29,4 +28,4 @@ static void merge_sort(benchmark::State& state)
     }
 }
 
-#endif // CUSTOM_BENCHMARK_H
+#endif // MERGE_SORT_BENCHMARK_H
