@@ -1,24 +1,25 @@
 #include <stdio.h>
 #include <cstdlib>
 #include <ctime>
+#include <omp.h>
 
 int throwLoop(int throwCount) {
     double x, y;
 
     int totalHits = 0;
-#pragma omp parallel
+#pragma omp parallel reduction(+:totalHits)
     {
         int hitCount = 0;
+        unsigned int myseed = omp_get_thread_num();
 #pragma omp for schedule(static)
         for (int i = 0; i < throwCount; i++) {
-            x = (double) (double) rand() / RAND_MAX;
-            y = (double) (double) rand() / RAND_MAX;
+            x = (double) (double) rand_r(&myseed) / RAND_MAX;
+            y = (double) (double) rand_r(&myseed) / RAND_MAX;
 
             if ((x * x + y * y <= 1))
                 hitCount++;
         }
         printf("found %d hits\n", hitCount);
-#pragma omp critical
         totalHits+=hitCount;
     }
     return totalHits;
@@ -29,7 +30,6 @@ double getResult(int throwCount, int hitCount) {
 }
 
 int main(void) {
-    srand (time(NULL));
     int throwCount = 10000000;
     int hitCount = throwLoop(throwCount);
     printf("Pi seems to be %f\n", getResult(throwCount, hitCount));
