@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.5.2)
 project(Exercise4 LANGUAGES CXX)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/Exercise4/cmake/")
+
+# cmake module directory
+set(CMAKE_MODULE_PATH
+    ${CMAKE_MODULE_PATH}
+    ${PROJECT_SOURCE_DIR}/cmake)
 
 
 include(CTest)
@@ -10,8 +14,8 @@ enable_testing()
 set(BENCHMARK_ENABLE_TESTING OFF)
 
 if(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest /wd4141 /WX")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O3 /DNDEBUG")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest /wd4141 /WX /arch:AVX2")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O3 /arch:AVX2 /DNDEBUG")
 else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z -Wall")
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG ")
@@ -26,9 +30,12 @@ ENDIF()
 
 include(ConfigGBench)
 
+add_subdirectory(${PROJECT_SOURCE_DIR}/test/)
 add_subdirectory(${PROJECT_SOURCE_DIR}/bench/)
 
 aux_source_directory(. SRC_LIST)
+
+add_executable(pi src/pi/main.cpp)
 
 add_executable(merge_sort test/merge_sort_test.cpp)
 target_link_libraries(merge_sort ${SRC_LIST})
@@ -39,7 +46,7 @@ target_link_libraries(merge_sort ${SRC_LIST})
 add_executable(merge_sort_seq test/merge_sort_test_seq.cpp)
 target_link_libraries(merge_sort ${SRC_LIST})
 
-add_executable(my_vs_std test/my_vs_original.cpp)
+add_executable(my_vs_std src/my_vs_original.cpp)
 target_link_libraries(my_vs_std ${SRC_LIST})
 
 add_executable(monte_carlo test/monteCarlo2.cpp)

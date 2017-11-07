@@ -1,10 +1,10 @@
 #include <malloc.h>
 #include <iostream>
-#include <bits/stl_algo.h>
 #include <stdlib.h>
-#include <libltdl/lt_system.h>
+#include <algorithm>
 
-int factorial(int num) {
+int factorial(int num) 
+{
     int sum = 1;
     for (int i = 1;i<=num;i++) {
         sum*=i;
@@ -65,12 +65,11 @@ int main(int argc, char** argv) {
 
 
     int problemSize = atoi(argv[1]);
-    int foundPermutations = 0;
     int permutationCount = factorial(problemSize);
     int *permutations = new int[problemSize * permutationCount * 10] ;
 
     createPermutations(problemSize, permutations);
-    foundPermutations = checkPermutations(problemSize, permutationCount, permutations);
+    int foundPermutations = checkPermutations(problemSize, permutationCount, permutations);
 
     printf("found %d possibilities\n", foundPermutations);
 

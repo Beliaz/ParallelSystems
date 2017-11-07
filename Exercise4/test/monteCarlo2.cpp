@@ -13,7 +13,6 @@ int throwLoop(int throwCount) {
             if ((x * x + y * y <= 1))
                 hitCount++;
         }
-        printf("found %d hits\n", hitCount);
     return hitCount;
 }
 
@@ -23,7 +22,7 @@ double getResult(int throwCount, int hitCount) {
 
 int main(void) {
     srand (time(NULL));
-    int throwCount = 1000000;
+    int throwCount = 10000000;
     int hitCount = throwLoop(throwCount);
     printf("Pi seems to be %f\n", getResult(throwCount, hitCount));
 }
