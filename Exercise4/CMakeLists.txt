@@ -49,5 +49,8 @@ target_link_libraries(merge_sort ${SRC_LIST})
 add_executable(my_vs_std src/my_vs_original.cpp)
 target_link_libraries(my_vs_std ${SRC_LIST})
 
-#add_executable(monte_carlo test/monte_carlo_test.cpp)
-#target_link_libraries(monte_carlo ${SRC_LIST})
+add_executable(monte_carlo test/monteCarlo2.cpp)
+
+add_executable(monte_carlo_par test/monteCarlo2Parallel.cpp)
+
+add_executable(n_queens src/nQueens.cpp)

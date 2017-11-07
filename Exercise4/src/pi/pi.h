@@ -99,7 +99,7 @@ namespace pi
 
             inline double do_calculate(const uint64_t samples)
             {
-                auto num_inside = 0ui64;
+                auto num_inside = 0ull;
 
                 if (samples > static_cast<uint64_t>(std::numeric_limits<int64_t>::max()))
                     throw std::runtime_error("argument out of range");
@@ -112,7 +112,7 @@ namespace pi
                     rnd.seed(omp_get_thread_num());
 
                     #pragma omp for reduction(+: num_inside)
-                    for (auto i = 0i64; i < static_cast<int64_t>(samples); i++)
+                    for (auto i = 0ll; i < static_cast<int64_t>(samples); i++)
                     {
                         //const auto [x, y] = generate_point(rnd, rng);
                         const auto point = generate_point(rnd, rng);

@@ -10,12 +10,21 @@ int throwLoop(int throwCount) {
 #pragma omp parallel reduction(+:totalHits)
     {
         int hitCount = 0;
+
+#ifndef WIN32
         unsigned int myseed = omp_get_thread_num();
+#endif
+
 #pragma omp for schedule(static)
         for (int i = 0; i < throwCount; i++) {
+
+#ifdef WIN32
+            x = (double)(double)rand() / RAND_MAX;
+            y = (double)(double)rand() / RAND_MAX;
+#else
             x = (double) (double) rand_r(&myseed) / RAND_MAX;
             y = (double) (double) rand_r(&myseed) / RAND_MAX;
-
+#endif
             if ((x * x + y * y <= 1))
                 hitCount++;
         }
