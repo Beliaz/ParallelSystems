@@ -25,7 +25,7 @@ std::vector<double> merge(std::vector<double> left, std::vector<double> right)
 {
     std::vector<double> result = std::vector<double>(left.size()+right.size());
     for(unsigned int i=0;i<result.size();i++)
-        if(left[0]>right[0] && !right.empty()) {
+        if( !right.empty() && left[0]>right[0]) {
             result[i]=right[0];
             right.erase(right.begin());
         } else if(!left.empty()){
@@ -57,11 +57,12 @@ std::vector<double> insertion_sort (const std::vector<double> _arr){
 
 #if defined(PAR_OPT)
 bool split=true;
-std::vector<double> sort_rec(const std::vector<double> _arr) {
+
+std::vector<double> sort(const std::vector<double> _arr) {
     if(_arr.size()>7) {
         if(split) {
-            return merge(sort_rec(std::vector<double>(_arr.begin(), _arr.begin() + (_arr.size() / 2))),
-                         sort_rec(std::vector<double>(_arr.begin() + (_arr.size() / 2), _arr.end())));
+            return merge(sort(std::vector<double>(_arr.begin(), _arr.begin() + (_arr.size() / 2))),
+                         sort(std::vector<double>(_arr.begin() + (_arr.size() / 2), _arr.end())));
         } else {
             split=false;
             std::vector<double> result1, result2;
@@ -70,11 +71,11 @@ std::vector<double> sort_rec(const std::vector<double> _arr) {
 
 #pragma omp section
                 {
-                    result1 = sort_rec(std::vector<double>(_arr.begin(), _arr.begin() + (_arr.size() / 2)));
+                    result1 = sort(std::vector<double>(_arr.begin(), _arr.begin() + (_arr.size() / 2)));
                 }
 #pragma omp section
                 {
-                    result2 = sort_rec(std::vector<double>(_arr.begin() + (_arr.size() / 2), _arr.end()));
+                    result2 = sort(std::vector<double>(_arr.begin() + (_arr.size() / 2), _arr.end()));
                 }
             }
             return merge(result1, result2);
@@ -82,12 +83,6 @@ std::vector<double> sort_rec(const std::vector<double> _arr) {
     } else if (_arr.size()>1)
         return insertion_sort(_arr);
     else return _arr;
-}
-
-std::vector<double> sort(const std::vector<double> _arr) {
-
-    omp_set_nested(1);
-    return sort_rec(_arr);
 }
 
 
