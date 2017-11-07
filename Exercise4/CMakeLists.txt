@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.5.2)
 project(Exercise4 LANGUAGES CXX)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/Exercise4/cmake/")
+
+# cmake module directory
+set(CMAKE_MODULE_PATH
+    ${CMAKE_MODULE_PATH}
+    ${PROJECT_SOURCE_DIR}/cmake)
 
 
 include(CTest)
@@ -26,6 +30,7 @@ ENDIF()
 
 include(ConfigGBench)
 
+add_subdirectory(${PROJECT_SOURCE_DIR}/test/)
 add_subdirectory(${PROJECT_SOURCE_DIR}/bench/)
 
 aux_source_directory(. SRC_LIST)
@@ -39,7 +44,7 @@ target_link_libraries(merge_sort ${SRC_LIST})
 add_executable(merge_sort_seq test/merge_sort_test_seq.cpp)
 target_link_libraries(merge_sort ${SRC_LIST})
 
-add_executable(my_vs_std test/my_vs_original.cpp)
+add_executable(my_vs_std src/my_vs_original.cpp)
 target_link_libraries(my_vs_std ${SRC_LIST})
 
 #add_executable(monte_carlo test/monte_carlo_test.cpp)

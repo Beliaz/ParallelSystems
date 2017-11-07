@@ -11,19 +11,16 @@
 #include <iostream>
 
 
-int main(int args, char** argv){
+int main(int, char**)
+{
+    std::cout<<"Num Threads: " <<omp_get_num_threads() << "   max threads: "<< omp_get_max_threads() << std::endl;
+    
+    constexpr auto problem_size = 1000;
 
-    if(args==2) {
-        std::cout<<"Num Threads: "<<omp_get_num_threads() <<"   max threads: "<< omp_get_max_threads()<<std::endl;
-        std::vector<double> _arr = init(atoi(argv[1]));
-        {
-            ChronoTimer t("Sort");
-            _arr = sort(_arr);
-        }
-        if (is_sorted(_arr)) return EXIT_SUCCESS;
-        else return EXIT_FAILURE;
-    } else {
-        std::cout<<"Usage: ./merge_sort [num_of_elements]"<<std::endl;
-        return EXIT_FAILURE;
-    }
+    auto arr = init(problem_size);
+    arr = sort(arr);
+
+    return is_sorted(arr)
+        ? EXIT_SUCCESS
+        : EXIT_FAILURE;
 }

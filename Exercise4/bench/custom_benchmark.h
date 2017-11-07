@@ -18,13 +18,13 @@ static void merge_sort(benchmark::State& state)
 
     state.SetComplexityN(n);
 
-    std::vector<double> _arr = init(n);
+    const auto arr = init(n);
 
      while (state.KeepRunning())
      {
-        if (is_sorted(sort(_arr)))
+        if (!is_sorted(sort(arr)))
         {
-          state.SkipWithError("result incorrect");
+            state.SkipWithError("result incorrect");
         }
     }
 }
