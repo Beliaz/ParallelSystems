@@ -12,7 +12,7 @@ int main(const int argc, char** argv)
     }
 
     const auto samples = std::stoull(argv[1]);
-    const auto pi_approx = pi::calculate<pi::method::seq_optimized>(samples);
+    const auto pi_approx = pi::calculate<pi::method::seq_2>(samples);
     
     std::cout << "result using " << samples << " : " << pi_approx << std::endl;
 

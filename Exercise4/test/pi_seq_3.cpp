@@ -8,7 +8,7 @@ int main(int, char**)
 {
     constexpr auto samples = 10'000'000;
 
-    const auto estimated_pi = pi::calculate<pi::method::seq>(samples);
+    const auto estimated_pi = pi::calculate<pi::method::seq_3>(samples);
 
     std::cout << estimated_pi << std::endl;
 

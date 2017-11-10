@@ -6,10 +6,12 @@
 #include <chrono>
 #include <thread>
 #include <omp.h>  
+#include <array>
+#include <numeric>
 
 namespace pi
 {
-    using value_t = double;
+    using value_t = float;
     using point_t = std::tuple<value_t, value_t>;
 
     namespace detail
@@ -22,10 +24,10 @@ namespace pi
                 return { rng(rnd), rng(rnd) };
             }
 
-            inline double do_calculate(const uint64_t samples)
+            inline value_t do_calculate(const uint64_t samples)
             {
                 std::default_random_engine rnd;
-                std::uniform_real_distribution<double> rng(-1, 1);
+                std::uniform_real_distribution<value_t> rng(-1, 1);
 
                 auto num_inside = 0ull;
 
@@ -50,10 +52,10 @@ namespace pi
                 return { rng(rnd), rng(rnd) };
             }
 
-            inline double do_calculate(const uint64_t samples)
+            inline value_t do_calculate(const uint64_t samples)
             {
                 std::default_random_engine rnd;
-                std::uniform_real_distribution<double> rng(-1, 1);
+                std::uniform_real_distribution<value_t> rng(-1, 1);
 
                 auto num_inside = 0ull;
 
@@ -89,6 +91,57 @@ namespace pi
             }
         }
 
+        namespace seq_3
+        {
+            inline value_t do_calculate(const uint64_t samples)
+            {
+                std::default_random_engine rnd_x;
+                std::uniform_real_distribution<value_t> rng_x(-1, 1);
+
+                std::default_random_engine rnd_y;
+                std::uniform_real_distribution<value_t> rng_y(-1, 1);
+
+                rnd_x.seed(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
+                rnd_y.seed(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
+
+                std::vector<value_t> xs;
+                std::vector<value_t> ys;
+
+                xs.reserve(samples);
+                ys.reserve(samples);
+
+                #ifndef _MSC_VER 
+                #pragma omp simd
+                #endif
+                for (auto i = 0ull; i < samples; i++)
+                {
+                    xs[i] = rng_x(rnd_x);
+                    ys[i] = rng_y(rnd_y);
+                }
+
+                constexpr auto num_buffers = 8;
+                std::array<std::array<unsigned long long, 3>, num_buffers> nums_inside;
+
+                #ifndef _MSC_VER 
+                #pragma omp simd
+                #endif
+                for (auto i = 0ull; i < samples; i++)
+                {
+                    const auto j = static_cast<int>(xs[i] * xs[i] + ys[i] * ys[i]);
+
+                    ++nums_inside[i % num_buffers][j];
+                }
+
+                auto num_inside = 0ull;
+                for (const auto& n : nums_inside)
+                {
+                    num_inside += n[0];
+                }
+
+                return num_inside * 4 / static_cast<value_t>(samples);
+            }
+        }
+
         namespace par
         {
             template<class RandomEngineType, class RandomDistributionType>
@@ -97,7 +150,7 @@ namespace pi
                 return { rng(rnd), rng(rnd) };
             }
 
-            inline double do_calculate(const uint64_t samples)
+            inline value_t do_calculate(const uint64_t samples)
             {
                 auto num_inside = 0ull;
 
@@ -107,7 +160,7 @@ namespace pi
                 #pragma omp parallel
                 {
                     thread_local std::default_random_engine rnd;
-                    thread_local std::uniform_real_distribution<double> rng(-1, 1);
+                    thread_local std::uniform_real_distribution<value_t> rng(-1, 1);
             
                     rnd.seed(omp_get_thread_num());
 
@@ -144,13 +197,77 @@ namespace pi
                 return 4 * num_inside / static_cast<value_t>(samples);
             }
         }
+
+        namespace par_2
+        {
+            inline value_t do_calculate(const uint64_t samples)
+            {
+                if (samples > static_cast<uint64_t>(std::numeric_limits<int64_t>::max()))
+                    throw std::runtime_error("argument out of range");
+
+                auto num_inside = 0ull;
+
+                #pragma omp parallel reduction(+: num_inside)
+                {
+                    thread_local std::default_random_engine rnd_x;
+                    thread_local std::uniform_real_distribution<value_t> rng_x(-1, 1);
+
+                    thread_local  std::default_random_engine rnd_y;
+                    thread_local std::uniform_real_distribution<value_t> rng_y(-1, 1);
+
+                    rnd_x.seed(omp_get_thread_num());
+                    rnd_y.seed(2 * omp_get_num_threads() - omp_get_thread_num());
+
+                    std::vector<value_t> xs;
+                    std::vector<value_t> ys;
+
+                    xs.reserve(samples);
+                    ys.reserve(samples);
+
+                    #ifndef _MSC_VER 
+                    #pragma omp for simd
+                    #else
+                    #pragma omp for
+                    #endif
+                    for (auto i = 0ll; i < static_cast<int64_t>(samples); i++)
+                    {
+                        xs[i] = rng_x(rnd_x);
+                        ys[i] = rng_y(rnd_y);
+                    }
+
+                    constexpr auto num_buffers = 8;
+                    thread_local std::array<std::array<unsigned long long, 3>, num_buffers> nums_inside;
+
+                    #ifndef _MSC_VER 
+                    #pragma omp for simd
+                    #else
+                    #pragma omp for
+                    #endif
+                    for (auto i = 0ll; i < static_cast<int64_t>(samples); i++)
+                    {
+                        const auto j = static_cast<int>(xs[i] * xs[i] + ys[i] * ys[i]);
+
+                        ++nums_inside[i % num_buffers][j];
+                    }
+
+                    for (const auto& n : nums_inside)
+                    {
+                        num_inside += n[0];
+                    }
+                }
+
+                return 4 * num_inside / static_cast<value_t>(samples);
+            }
+        }
     }
 
     enum method
     {
         seq,
-        seq_optimized,
-        parallel
+        seq_2,
+        seq_3,
+        par,
+        par_2
     };
 
     template<method Method>
@@ -160,13 +277,21 @@ namespace pi
         {
             return detail::seq_1::do_calculate(samples);
         }
-        else if constexpr(Method == seq_optimized)
+        else if constexpr(Method == seq_2)
         {
             return detail::seq_2::do_calculate(samples);
         }
-        else if constexpr(Method == parallel)
+        else if constexpr(Method == seq_3)
+        {
+            return detail::seq_3::do_calculate(samples);
+        }
+        else if constexpr(Method == par)
         {
             return detail::par::do_calculate(samples);
+        }
+        else if constexpr(Method == par_2)
+        {
+            return detail::par_2::do_calculate(samples);
         }
         else
         {

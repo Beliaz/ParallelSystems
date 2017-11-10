@@ -8,7 +8,7 @@ static void pi_seq(benchmark::State& state)
 
     while (state.KeepRunning())
     {
-        benchmark::DoNotOptimize(pi::calculate<pi::method::seq_optimized>(n));
+        benchmark::DoNotOptimize(pi::calculate<pi::method::seq_2>(n));
     }
 }
 

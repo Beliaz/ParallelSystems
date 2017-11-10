@@ -1,7 +1,7 @@
 #include <malloc.h>
 #include <iostream>
-#include <bits/stl_algo.h>
 #include <stdlib.h>
+#include <algorithm>
 
 int factorial(int num) {
     int sum = 1;
