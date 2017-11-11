@@ -173,24 +173,9 @@ namespace pi
                         const auto x = std::get<0>(point);
                         const auto y = std::get<1>(point);
 
-                        // 0 <= dist <= 2 
-                        const auto dist = static_cast<int>(x * x + y * y);
+                        if(x * x + y * y >= 1) continue;
 
-                        // is_two == 1 iff dist == 2
-                        const auto is_two = dist / 2;
-
-                        // inside:
-                        // (1 - dist) == 1  
-                        // (1 - is_two) == 1 
-                        //
-                        // outside:
-                        // (1 - dist) == 0  
-                        // (1 - is_two) == 1 
-                        //
-                        // on edge:
-                        // (1 - dist) == -1  
-                        // (1 - is_two) == 0 
-                        num_inside += (1 - dist) * (1 - is_two);
+                        ++num_inside;
                     }  
                 }
 
@@ -209,21 +194,27 @@ namespace pi
 
                 #pragma omp parallel reduction(+: num_inside)
                 {
+                    // use two independend random number devices and distributions
+                    // to reduce dependencies
                     thread_local std::default_random_engine rnd_x;
                     thread_local std::uniform_real_distribution<value_t> rng_x(-1, 1);
 
-                    thread_local  std::default_random_engine rnd_y;
+                    thread_local std::default_random_engine rnd_y;
                     thread_local std::uniform_real_distribution<value_t> rng_y(-1, 1);
 
                     rnd_x.seed(omp_get_thread_num());
                     rnd_y.seed(2 * omp_get_num_threads() - omp_get_thread_num());
-
+                    
                     std::vector<value_t> xs;
                     std::vector<value_t> ys;
 
+                    // use reserve() to allocate memory without
+                    // initializing the values
                     xs.reserve(samples);
                     ys.reserve(samples);
 
+                    // precompute points and put the into a
+                    // structure of arrays
                     #ifndef _MSC_VER 
                     #pragma omp for simd
                     #else
@@ -235,8 +226,13 @@ namespace pi
                         ys[i] = rng_y(rnd_y);
                     }
 
+                    // use multiple buffers to reduce direct data dependencies
                     constexpr auto num_buffers = 8;
-                    thread_local std::array<std::array<unsigned long long, 3>, num_buffers> nums_inside;
+                    using buffer_t = std::array<unsigned long long, num_buffers>;
+                                        
+                    // use array of buffers to remove branching by using
+                    // computed value as array index
+                    thread_local std::array<buffer_t, 3> buffers;
 
                     #ifndef _MSC_VER 
                     #pragma omp for simd
@@ -245,15 +241,23 @@ namespace pi
                     #endif
                     for (auto i = 0ll; i < static_cast<int64_t>(samples); i++)
                     {
+                        // j == 0 iff current point inside the circle
+                        // j == 1 iff current point outside the circle
+                        // j == 2 iff current point on the edge of the rectangle
                         const auto j = static_cast<int>(xs[i] * xs[i] + ys[i] * ys[i]);
 
-                        ++nums_inside[i % num_buffers][j];
+                        ++buffers[j][i % num_buffers];
                     }
 
-                    for (const auto& n : nums_inside)
-                    {
-                        num_inside += n[0];
-                    }
+                    // only count points for which the squared distance
+                    // was below 1 ( => j == 0)
+                    const auto& nums_inside = buffers[0];
+
+                    // accumulate values from all buffers
+                    num_inside = std::accumulate(
+                        nums_inside.begin(), 
+                        nums_inside.end(), 
+                        num_inside);
                 }
 
                 return 4 * num_inside / static_cast<value_t>(samples);
