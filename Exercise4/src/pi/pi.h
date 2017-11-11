@@ -299,7 +299,7 @@ namespace pi
             return detail::par_2::do_calculate(samples);
         }
 
-        throw std::exception("not supported");
+        throw std::runtime_error("not supported");
     }
 }
 
