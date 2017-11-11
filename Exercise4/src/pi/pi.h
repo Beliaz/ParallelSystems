@@ -38,54 +38,7 @@ namespace pi
                     const auto x = std::get<0>(point);
                     const auto y = std::get<1>(point);
 
-                    if(x * x + y * y < 1) ++num_inside;
-                }
-
-                return 4 * num_inside / static_cast<value_t>(samples);
-            }
-        }
-
-        namespace seq_2
-        {
-            template<class RandomEngineType, class RandomDistributionType>
-            point_t generate_point(RandomEngineType& rnd, RandomDistributionType& rng)
-            {
-                return point_t(rng(rnd), rng(rnd));
-            }
-
-            inline value_t do_calculate(const uint64_t samples)
-            {
-                std::default_random_engine rnd;
-                std::uniform_real_distribution<value_t> rng(-1, 1);
-
-                auto num_inside = 0ull;
-
-                for (auto i = 0ull; i < samples; i++)
-                {
-                    //const auto [x, y] = generate_point(rnd, rng);
-                    const auto point = generate_point(rnd, rng);
-
-                    const auto x = std::get<0>(point);
-                    const auto y = std::get<1>(point);
-
-                    // 0 <= dist <= 2 
-                    const auto dist = static_cast<int>(x * x + y * y);
-
-                    // is_two == 1 iff dist == 2
-                    const auto is_two = dist / 2;
-
-                    // inside:
-                    // (1 - dist) == 1  
-                    // (1 - is_two) == 1 
-                    //
-                    // outside:
-                    // (1 - dist) == 0  
-                    // (1 - is_two) == 1 
-                    //
-                    // on edge:
-                    // (1 - dist) == -1  
-                    // (1 - is_two) == 0 
-                    num_inside += (1 - dist) * (1 - is_two);
+                    if(x * x + y * y <= 1) ++num_inside;
                 }
 
                 return 4 * num_inside / static_cast<value_t>(samples);
@@ -174,7 +127,9 @@ namespace pi
                         const auto x = std::get<0>(point);
                         const auto y = std::get<1>(point);
 
-                        if(static_cast<int>(x * x + y * y) == 0) 
+                        constexpr auto epsilon = std::numeric_limits<value_t>::min();
+
+                        if(static_cast<int>(x * x + y * y - epsilon) == 0) 
                             ++num_inside;
                     }  
                 }
@@ -225,7 +180,8 @@ namespace pi
                         // j == 0 iff current point inside the circle
                         // j == 1 iff current point outside the circle
                         // j == 2 iff current point on the edge of the rectangle
-                        const auto j = static_cast<int>(x * x + y * y);
+                        constexpr auto epsilon = std::numeric_limits<value_t>::min();
+                        const auto j = static_cast<int>(x * x + y * y - epsilon);
 
                         ++buffers[j][i % num_buffers];
                     }
@@ -235,7 +191,7 @@ namespace pi
                     const auto& nums_inside = buffers[0];
 
                     // accumulate values from all buffers
-                    num_inside = std::accumulate(
+                    num_inside = accumulate(
                         nums_inside.begin(), 
                         nums_inside.end(), 
                         num_inside);
@@ -249,8 +205,6 @@ namespace pi
     enum method
     {
         seq,
-        seq_2,
-        seq_3,
         par,
         par_2
     };
@@ -261,14 +215,6 @@ namespace pi
         if (Method == seq)
         {
             return detail::seq_1::do_calculate(samples);
-        }
-        if (Method == seq_2)
-        {
-            return detail::seq_2::do_calculate(samples);
-        }
-        if (Method == seq_3)
-        {
-            return detail::seq_3::do_calculate(samples);
         }
         if (Method == par)
         {
@@ -282,9 +228,5 @@ namespace pi
         throw std::runtime_error("not supported");
     }
 }
-
-
-
-
 
 #endif // PI_H
