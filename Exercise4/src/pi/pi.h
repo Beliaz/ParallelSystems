@@ -188,8 +188,8 @@ namespace pi
         {
             inline value_t do_calculate(const uint64_t samples)
             {
-                if (samples > static_cast<uint64_t>(std::numeric_limits<int64_t>::max()))
-                    throw std::runtime_error("argument out of range");
+                //if (samples > static_cast<uint64_t>(std::numeric_limits<int64_t>::max()))
+                //    throw std::runtime_error("argument out of range");
 
                 auto num_inside = 0ull;
 
@@ -206,28 +206,6 @@ namespace pi
                     rnd_x.seed(omp_get_thread_num());
                     rnd_y.seed(2 * omp_get_num_threads() - omp_get_thread_num());
                     
-                    std::vector<value_t> xs;
-                    std::vector<value_t> ys;
-
-                    // use reserve() to allocate memory without
-                    // initializing the values
-                    xs.reserve(samples);
-                    ys.reserve(samples);
-
-                    // precompute points and put the into a
-                    // structure of arrays
-                    #ifndef _MSC_VER 
-                    #pragma omp for simd
-                    #else
-                    #pragma omp for
-                    #endif
-                    for (auto i = 0ll; i < static_cast<int64_t>(samples); i++)
-                    {
-                        xs[i] = rng_x(rnd_x);
-                        ys[i] = rng_y(rnd_y);
-                    }
-
-                    // use multiple buffers to reduce direct data dependencies
                     constexpr auto num_buffers = 8;
                     using buffer_t = std::array<unsigned long long, num_buffers>;
                                         
@@ -242,10 +220,13 @@ namespace pi
                     #endif
                     for (auto i = 0ll; i < static_cast<int64_t>(samples); i++)
                     {
+                        const auto x = rng_x(rnd_x);
+                        const auto y = rng_y(rnd_y);
+
                         // j == 0 iff current point inside the circle
                         // j == 1 iff current point outside the circle
                         // j == 2 iff current point on the edge of the rectangle
-                        const auto j = static_cast<int>(xs[i] * xs[i] + ys[i] * ys[i]);
+                        const auto j = static_cast<int>(x * x + y * y);
 
                         ++buffers[j][i % num_buffers];
                     }
