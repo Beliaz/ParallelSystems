@@ -276,7 +276,7 @@ namespace pi
     };
 
     template<method Method>
-    double calculate(const uint64_t samples)
+    value_t calculate(const uint64_t samples)
     {
         if (Method == seq)
         {
