@@ -16,13 +16,9 @@ int main(const int argc, char** argv)
     
     const auto pi_approx = [&]()
     {
-        ChronoTimer timer("PI");
+        ChronoTimer timer("PI_2");
         return pi::calculate<pi::method::par_2>(samples);
     }();
-
-    std::cout << "result using method::par_2 and " << samples << " samples : " << pi_approx << std::endl;
-
-    std::cin.get();
 
     return EXIT_SUCCESS;
 }

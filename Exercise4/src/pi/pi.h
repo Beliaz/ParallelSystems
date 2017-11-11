@@ -38,7 +38,7 @@ namespace pi
                     const auto x = std::get<0>(point);
                     const auto y = std::get<1>(point);
 
-                    ++num_inside;
+                    if(x * x + y * y < 1) ++num_inside;
                 }
 
                 return 4 * num_inside / static_cast<value_t>(samples);
@@ -174,9 +174,8 @@ namespace pi
                         const auto x = std::get<0>(point);
                         const auto y = std::get<1>(point);
 
-                        if(x * x + y * y >= 1) continue;
-
-                        ++num_inside;
+                        if(static_cast<int>(x * x + y * y) == 0) 
+                            ++num_inside;
                     }  
                 }
 

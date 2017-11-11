@@ -20,9 +20,5 @@ int main(const int argc, char** argv)
         return pi::calculate<pi::method::par>(samples);
     }();
     
-    std::cout << "result using method::par and " << samples << " samples : " << pi_approx << std::endl;
-
-    std::cin.get();
-
     return EXIT_SUCCESS;
 }
