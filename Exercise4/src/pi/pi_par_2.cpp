@@ -2,6 +2,7 @@
 #include "pi.h"
 #include <iostream>
 #include <string>
+#include "../../chrono_timer.h"
 
 int main(const int argc, char** argv)
 {
@@ -12,7 +13,12 @@ int main(const int argc, char** argv)
     }
 
     const auto samples = std::stoull(argv[1]);
-    const auto pi_approx = pi::calculate<pi::method::par_2>(samples);
+    
+    const auto pi_approx = [&]()
+    {
+        ChronoTimer timer("PI");
+        return pi::calculate<pi::method::par_2>(samples);
+    }();
 
     std::cout << "result using method::par_2 and " << samples << " samples : " << pi_approx << std::endl;
 
