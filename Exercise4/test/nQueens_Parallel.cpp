@@ -1,11 +1,14 @@
 #include <malloc.h>
 #include <iostream>
-#include <stdlib.h>
-#include <ctgmath>
-#include <vector>
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+int* initArray (int problemSize, int i, int j) {
+    auto* array = new int[problemSize];
+    for (int i = 0; i < problemSize; i++)
+        array[i] = -1;
+    array[0] = i + 1;
+    array[1] = j + 1;
+    return array;
+}
 
 bool checkValidity(int problemSize, int *permutation) {
     for (int i = 0; i < problemSize; i++) {
@@ -19,54 +22,47 @@ bool checkValidity(int problemSize, int *permutation) {
     return true;
 }
 
-bool checkValidity(int problemSize, std::vector<int> permutation) {
-    int *array = &permutation[0];
-    return checkValidity(problemSize, array);
+bool includes(int number, int *array, int problemSize) {
+    for (int i = 0; i < problemSize; i++)
+        if (number == array[i])
+            return true;
+    return false;
 }
 
-int findPermutations(int problemSize) {
-    std::vector<int> base((unsigned long) problemSize);
+int recursion(int *array, int remainingSize, int problemSize) {
+    int found = 0;
     for (int i = 0; i < problemSize; i++) {
-        base[i] = i+1;
-    }
-    int *foundPermutations = new int[problemSize];
-
-#pragma omp parallel for
-    for (int i = 0; i<problemSize;i++) {
-        int found = 0;
-        auto tmp = base;
-        std::rotate(tmp.begin(), tmp.begin() + i, tmp.begin() + i + 1);
-        do {
-            if (checkValidity(problemSize, tmp))
+        if (includes(i + 1, array, problemSize - remainingSize))
+            continue;
+        array[problemSize - remainingSize] = i + 1;
+        if (remainingSize == 1) {
+            if (checkValidity(problemSize, array))
                 found++;
-        } while (std::next_permutation(tmp.begin() + 1, tmp.end()));
-        foundPermutations[i] = found;
+            array[problemSize - remainingSize] = -1;
+        }
+        else
+            found += recursion(array, remainingSize - 1, problemSize);
     }
+    return found;
+}
 
-    //Count together all the found possibilities
-    int totalFound = 0;
-    for (int i = 0; i<problemSize;i++) {
-        totalFound+=foundPermutations[i];
+int findIterations(int problemSize) {
+    int sum = 0;
+#pragma omp parallel for shared(problemSize) reduction(+:sum)
+    for (int i = 0; i < problemSize; i++) {
+#pragma omp parallel for
+        for (int j = 0; j < problemSize; j++) {
+            if (i == j)
+                continue;
+            auto array = initArray(problemSize, i, j);
+            sum += recursion(array, problemSize - 2, problemSize);
+        }
     }
-    return totalFound;
+    return sum;
 }
 
-TEST_CASE( "standard chess" ) {
-    REQUIRE( findPermutations(8) == 92 );
-}
-
-TEST_CASE( "3x3 gives zero" ) {
-    REQUIRE( findPermutations(3) == 0 );
-}
-
-TEST_CASE( "field of 10") {
-    REQUIRE( findPermutations(10) == 724 );
-}
-
-TEST_CASE( "field of 9") {
-    REQUIRE( findPermutations(9) == 352 );
-}
-
-TEST_CASE( "field of 5") {
-    REQUIRE( findPermutations(5) == 10 );
+int main(void) {
+    int size = 10;
+    printf("Found %d iterations\n",findIterations(size));
+    return 0;
 }
