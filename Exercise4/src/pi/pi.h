@@ -21,7 +21,7 @@ namespace pi
             template<class RandomEngineType, class RandomDistributionType>
             point_t generate_point(RandomEngineType& rnd, RandomDistributionType& rng)
             {
-                return { rng(rnd), rng(rnd) };
+                return point_t( rng(rnd), rng(rnd) );
             }
 
             inline value_t do_calculate(const uint64_t samples)
@@ -33,9 +33,10 @@ namespace pi
 
                 for (auto i = 0ull; i < samples; i++)
                 {
-                    auto[x, y] = generate_point(rnd, rng);
+                    const auto point = generate_point(rnd, rng);
 
-                    if (x * x + y * y > 1) continue;
+                    const auto x = std::get<0>(point);
+                    const auto y = std::get<1>(point);
 
                     ++num_inside;
                 }
@@ -49,7 +50,7 @@ namespace pi
             template<class RandomEngineType, class RandomDistributionType>
             point_t generate_point(RandomEngineType& rnd, RandomDistributionType& rng)
             {
-                return { rng(rnd), rng(rnd) };
+                return point_t(rng(rnd), rng(rnd));
             }
 
             inline value_t do_calculate(const uint64_t samples)
@@ -277,30 +278,28 @@ namespace pi
     template<method Method>
     double calculate(const uint64_t samples)
     {
-        if constexpr(Method == seq)
+        if (Method == seq)
         {
             return detail::seq_1::do_calculate(samples);
         }
-        else if constexpr(Method == seq_2)
+        if (Method == seq_2)
         {
             return detail::seq_2::do_calculate(samples);
         }
-        else if constexpr(Method == seq_3)
+        if (Method == seq_3)
         {
             return detail::seq_3::do_calculate(samples);
         }
-        else if constexpr(Method == par)
+        if (Method == par)
         {
             return detail::par::do_calculate(samples);
         }
-        else if constexpr(Method == par_2)
+        if (Method == par_2)
         {
             return detail::par_2::do_calculate(samples);
         }
-        else
-        {
-            throw std::exception("not supported");
-        }
+
+        throw std::exception("not supported");
     }
 }
 
