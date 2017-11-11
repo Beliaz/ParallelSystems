@@ -148,7 +148,7 @@ namespace pi
             template<class RandomEngineType, class RandomDistributionType>
             point_t generate_point(RandomEngineType& rnd, RandomDistributionType& rng)
             {
-                return { rng(rnd), rng(rnd) };
+                return point_t(rng(rnd), rng(rnd));
             }
 
             inline value_t do_calculate(const uint64_t samples)
