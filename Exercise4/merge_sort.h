@@ -57,7 +57,7 @@ std::vector<double> insertion_sort (const std::vector<double> _arr){
 
 #if defined(PAR_OPT)
 
-std::vector<double> par_sort(const std::vector<double> _arr) {
+std::vector<double> par_sort(std::vector<double> _arr) {
     if(_arr.size()>15) {
         std::vector<double> result1, result2;
 
