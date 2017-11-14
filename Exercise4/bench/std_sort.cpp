@@ -1,4 +1,4 @@
-#define SEQ_OPT
+#define STD_QUICK
 
 #include "merge_sort_benchmark.h"
 

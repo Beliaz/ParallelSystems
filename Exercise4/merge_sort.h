@@ -21,85 +21,90 @@ std::vector<double> init(unsigned n) {
     return retval;
 }
 
-std::vector<double> merge(std::vector<double> left, std::vector<double> right)
-{
-    std::vector<double> result = std::vector<double>(left.size()+right.size());
-    for(unsigned int i=0;i<result.size();i++)
+
+void merge(double * begin_left,
+           double * middle,
+           double * end_right) {
+
+    int size=(middle-begin_left)+(end_right-middle);
+    std::vector<double> left(begin_left,middle);
+    std::vector<double> right(middle,end_right);
+    for(unsigned int i=0;i<size;i++)
         if( !right.empty() && left[0]>right[0]) {
-            result[i]=right[0];
+            *(begin_left+i)=right[0];
             right.erase(right.begin());
         } else if(!left.empty()){
-            result[i]=left[0];
+            *(begin_left+i)=left[0];
             left.erase(left.begin());
         } else {
-            result[i]=right[0];
+            *(begin_left+i)=right[0];
             right.erase(right.begin());
         }
-    return result;
 }
 
-std::vector<double> insertion_sort (const std::vector<double> _arr){
-    int j, temp;
-    std::vector<double> retval = _arr;
-
-    for (unsigned int i = 0; i < retval.size(); i++){
+void insertion_sort (double * begin, double * end){
+    int j;
+    double temp;
+    int size=(end-begin);
+    for (unsigned int i = 1; i < size; i++){
         j = i;
 
-        while (j > 0 && retval[j] < retval[j-1]){
-            temp = static_cast<int>(retval[j]);
-            retval[j] = retval[j-1];
-            retval[j-1] = temp;
+        while (j > 0 && *(begin+j) < *(begin+j-1)){
+            temp = *(begin+j);
+            *(begin+j) = *(begin+j-1);
+            *(begin+j-1) = temp;
             j--;
         }
     }
-    return retval;
 }
 
 #if defined(PAR_OPT)
 
-std::vector<double> par_sort(std::vector<double> _arr) {
-    if(_arr.size()>15) {
-        std::vector<double> result1, result2;
 
-#pragma omp task firstprivate(result1,_arr)
-        result1 = par_sort(std::vector<double>(_arr.begin(), _arr.begin() + (_arr.size() / 2)));
-#pragma omp task firstprivate(result2,_arr)
-        result2 = par_sort(std::vector<double>(_arr.begin() + (_arr.size() / 2), _arr.end()));
+void par_sort(double * begin, double * end) {
+    int size=(end-begin);
+    double * middle=begin + (size/2);
+    if(size>32) {
+
+#pragma omp task untied mergeable
+        par_sort(begin,middle);
+#pragma omp task untied mergeable
+        par_sort(middle,end);
 #pragma omp taskwait
-
-        return merge(result1, result2);
-    } else if (_arr.size()>1)
-        return insertion_sort(_arr);
-    else return _arr;
+        merge(begin,middle,end);
+    } else if (size>1)
+        insertion_sort(begin,end);
+    else return;
 }
-std::vector<double> sort(const std::vector<double> _arr) {
-    std::vector<double> retval;
+void sort(std::vector<double> * _arr) {
+    double * array = _arr->data();
 #pragma omp parallel
     {
 #pragma omp single
-        retval=par_sort(_arr);
+        par_sort(array,array+_arr->size());
     }
-    return retval;
-}
-
-#elif defined(SEQ_OPT)
-
-std::vector<double> sort(const std::vector<double> _arr)
-{
-    if(_arr.size()>7) return merge(sort(std::vector<double>(_arr.begin(), _arr.begin() + (_arr.size()/2))),
-                                   sort(std::vector<double>(_arr.begin() + (_arr.size()/2), _arr.end())));
-    else if (_arr.size()>1) return insertion_sort(_arr);
-    else return _arr;
 }
 
 #else
 
-std::vector<double> sort(const std::vector<double> _arr)
-{
-    if(_arr.size()>1) return merge(sort(std::vector<double>(_arr.begin(), _arr.begin() + (_arr.size()/2))),
-                                   sort(std::vector<double>(_arr.begin() + (_arr.size()/2), _arr.end())));
-    else return _arr;
+void seq_sort(double * begin, double * end) {
+    int size=(end-begin);
+    double * middle=begin + (size/2);
+    if(size>17) {
+        seq_sort(begin, middle);
+        seq_sort(middle, end);
+        merge(begin,middle,end);
+    }
+    else if (size>1) return insertion_sort(begin,end);
+    else return;
 }
+
+void sort(std::vector<double> * _arr)
+{
+    double * array = _arr->data();
+    seq_sort(array,array+_arr->size());
+}
+
 
 #endif
 
@@ -107,8 +112,10 @@ std::vector<double> sort(const std::vector<double> _arr)
 bool is_sorted(const std::vector<double> _arr)
 {
     for(unsigned int i=1;i<_arr.size();i++)
-        if(_arr[i]<_arr[i-1])
+        if(_arr[i]<_arr[i-1]) {
+            std::cout<<_arr[i]<<" < "<<_arr[i-1]<<std::endl;
             return false;
+        }
     return true;
 }
 

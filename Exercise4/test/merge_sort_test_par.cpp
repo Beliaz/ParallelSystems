@@ -21,8 +21,10 @@ int main(int, char**)
 
     {
         ChronoTimer t("Start");
-        arr = sort(arr);
+        sort(&arr);
     }
+
+    std::cout<<"res: "<<arr.size()<<" sort: "<<(is_sorted(arr) ? "true":"false")<<" original: "<<problem_size<<std::endl;
 
 
     return is_sorted(arr)

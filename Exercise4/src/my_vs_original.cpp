@@ -25,7 +25,7 @@ int main(int args, char** argv){
 
         {
             ChronoTimer t("My merge sort");
-            _arr=sort(_arr);
+            sort(&_arr);
             my_sort_time = t.getTime();
         }
         {

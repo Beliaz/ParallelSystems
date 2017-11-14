@@ -8,10 +8,11 @@
 
 int main(int, char**)
 {
-    constexpr auto problem_size = 1000;
+    constexpr auto problem_size = 1'000'000;
 
     auto arr = init(problem_size);
-    arr = sort(arr);
+    sort(&arr);
+    std::cout<<"res: "<<arr.size()<<" sort: "<<(is_sorted(arr) ? "true":"false")<<" original: "<<problem_size<<std::endl;
 
     return is_sorted(arr)
         ? EXIT_SUCCESS
