@@ -67,9 +67,7 @@ namespace pi
                 // computed value as array index
                 thread_local std::array<buffer_t, 3> buffers;
 
-                #ifndef _MSC_VER 
                 #pragma omp simd
-                #endif
                 for (auto i = 0ll; i < static_cast<int64_t>(samples); i++)
                 {
                     const auto x = rng_x(rnd_x);
@@ -159,8 +157,8 @@ namespace pi
                     thread_local std::default_random_engine rnd_y;
                     thread_local std::uniform_real_distribution<value_t> rng_y(-1, 1);
 
-                    rnd_x.seed(omp_get_thread_num());
-                    rnd_y.seed(2 * omp_get_num_threads() - omp_get_thread_num());
+                    rnd_x.seed(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()) * omp_get_thread_num() + 1);
+                    rnd_y.seed(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()) * ((2 * omp_get_num_threads() + 1) - omp_get_thread_num()));
                     
                     constexpr auto num_buffers = 8;
                     using buffer_t = std::array<unsigned long long, num_buffers>;
@@ -169,11 +167,7 @@ namespace pi
                     // computed value as array index
                     thread_local std::array<buffer_t, 3> buffers;
 
-                    #ifndef _MSC_VER 
                     #pragma omp for simd
-                    #else
-                    #pragma omp for
-                    #endif
                     for (auto i = 0ll; i < static_cast<int64_t>(samples); i++)
                     {
                         const auto x = rng_x(rnd_x);
