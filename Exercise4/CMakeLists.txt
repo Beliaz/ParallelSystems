@@ -35,22 +35,5 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/bench/)
 
 aux_source_directory(. SRC_LIST)
 
-add_executable(pi src/pi/main.cpp)
-
-add_executable(merge_sort test/merge_sort_test.cpp)
-target_link_libraries(merge_sort ${SRC_LIST})
-
-add_executable(merge_sort_par test/merge_sort_test_par.cpp)
-target_link_libraries(merge_sort ${SRC_LIST})
-
-add_executable(merge_sort_seq test/merge_sort_test_seq.cpp)
-target_link_libraries(merge_sort ${SRC_LIST})
-
-add_executable(my_vs_std src/my_vs_original.cpp)
-target_link_libraries(my_vs_std ${SRC_LIST})
-
-add_executable(monte_carlo test/monteCarlo2.cpp)
-
-add_executable(monte_carlo_par test/monteCarlo2Parallel.cpp)
-
-add_executable(n_queens src/nQueens.cpp)
+add_executable(pi_par src/pi/pi_par.cpp)
+add_executable(pi_par_2 src/pi/pi_par_2.cpp)

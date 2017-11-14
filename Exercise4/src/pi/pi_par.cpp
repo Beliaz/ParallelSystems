@@ -14,11 +14,13 @@ int main(const int argc, char** argv)
 
     const auto samples = std::stoull(argv[1]);
 
-    const auto pi_approx = [&]()
     {
-        ChronoTimer timer("PI");
-        return pi::calculate<pi::method::par>(samples);
-    }();
+        ChronoTimer timer("PI_1");
+
+        const auto pi = pi::calculate<pi::method::par>(samples);
+
+        std::cout << floor(pi * 100) / 100 << " - ";
+    };
     
     return EXIT_SUCCESS;
 }

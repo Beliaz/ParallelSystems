@@ -8,11 +8,11 @@ int main(int, char**)
 {
     constexpr auto samples = 10'000'000;
 
-    const auto estimated_pi = pi::calculate<pi::method::par>(samples);
+    const auto estimated_pi = pi::calculate<pi::method::seq_3>(samples);
 
     std::cout << estimated_pi << std::endl;
 
-    return round(estimated_pi * 100) == round(M_PI * 100)
+    return round(estimated_pi * 10) == round(M_PI * 10)
         ? EXIT_SUCCESS
         : EXIT_FAILURE;
 }

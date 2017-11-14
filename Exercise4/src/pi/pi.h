@@ -49,6 +49,8 @@ namespace pi
         {
             inline value_t do_calculate(const uint64_t samples)
             {
+                // use two independend random number devices and distributions
+                // to reduce dependencies
                 std::default_random_engine rnd_x;
                 std::uniform_real_distribution<value_t> rng_x(-1, 1);
 
@@ -56,43 +58,43 @@ namespace pi
                 std::uniform_real_distribution<value_t> rng_y(-1, 1);
 
                 rnd_x.seed(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
-                rnd_y.seed(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
-
-                std::vector<value_t> xs;
-                std::vector<value_t> ys;
-
-                xs.reserve(samples);
-                ys.reserve(samples);
-
-                #ifndef _MSC_VER 
-                #pragma omp simd
-                #endif
-                for (auto i = 0ull; i < samples; i++)
-                {
-                    xs[i] = rng_x(rnd_x);
-                    ys[i] = rng_y(rnd_y);
-                }
+                rnd_y.seed(8u * static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
 
                 constexpr auto num_buffers = 8;
-                std::array<std::array<unsigned long long, 3>, num_buffers> nums_inside;
+                using buffer_t = std::array<unsigned long long, num_buffers>;
+
+                // use array of buffers to remove branching by using
+                // computed value as array index
+                thread_local std::array<buffer_t, 3> buffers;
 
                 #ifndef _MSC_VER 
                 #pragma omp simd
                 #endif
-                for (auto i = 0ull; i < samples; i++)
+                for (auto i = 0ll; i < static_cast<int64_t>(samples); i++)
                 {
-                    const auto j = static_cast<int>(xs[i] * xs[i] + ys[i] * ys[i]);
+                    const auto x = rng_x(rnd_x);
+                    const auto y = rng_y(rnd_y);
 
-                    ++nums_inside[i % num_buffers][j];
+                    // j == 0 iff current point inside the circle
+                    // j == 1 iff current point outside the circle
+                    // j == 2 iff current point on the edge of the rectangle
+                    constexpr auto epsilon = std::numeric_limits<value_t>::min();
+                    const auto j = static_cast<int>(x * x + y * y - epsilon);
+
+                    ++buffers[j][i % num_buffers];
                 }
 
-                auto num_inside = 0ull;
-                for (const auto& n : nums_inside)
-                {
-                    num_inside += n[0];
-                }
+                // only count points for which the squared distance
+                // was below 1 ( => j == 0 )
+                const auto& nums_inside = buffers[0];
 
-                return num_inside * 4 / static_cast<value_t>(samples);
+                // accumulate values from all buffers
+                const auto num_inside = std::accumulate(
+                    nums_inside.begin(),
+                    nums_inside.end(),
+                    0ull);
+
+                return 4 * num_inside / static_cast<value_t>(samples);
             }
         }
 
@@ -191,7 +193,7 @@ namespace pi
                     const auto& nums_inside = buffers[0];
 
                     // accumulate values from all buffers
-                    num_inside = accumulate(
+                    num_inside = std::accumulate(
                         nums_inside.begin(), 
                         nums_inside.end(), 
                         num_inside);
@@ -205,6 +207,7 @@ namespace pi
     enum method
     {
         seq,
+        seq_3,
         par,
         par_2
     };
@@ -216,13 +219,20 @@ namespace pi
         {
             return detail::seq_1::do_calculate(samples);
         }
+
         if (Method == par)
         {
             return detail::par::do_calculate(samples);
         }
+
         if (Method == par_2)
         {
             return detail::par_2::do_calculate(samples);
+        }
+
+        if (Method == seq_3)
+        {
+            return detail::seq_3::do_calculate(samples);
         }
 
         throw std::runtime_error("not supported");
