@@ -26,6 +26,9 @@
 
 #$ -l h_vmem=2G
 
+module load gcc/5.1.0
+module load intel/15.0
+
 for num_samples in "100000" "1000000" "100000000" 
 do
     echo $num_samples " Samples =============="
@@ -63,6 +66,23 @@ do
 	echo "pgi"
 	./build/pi_par_2_pgi $num_samples
 	echo
+
+        echo "gcc"
+        ./build/pi_seq_gcc $num_samples
+        ./build/pi_seq_gcc $num_samples
+        ./build/pi_seq_gcc $num_samples
+        echo
+
+        echo "icc"
+        ./build/pi_seq_icc $num_samples
+        echo
+
+        echo "pgi"
+        ./build/pi_seq_pgi $num_samples
+        echo
+
     done
 done
 	
+module unload gcc/5.1.0
+moduel unload intel/15.0
