@@ -1,0 +1,124 @@
+naive    : simple parallel implementation as shown in the last proseminar (namespace detail::par)
+optimized: optimized parallel implementation (namespace detail::par_2)
+
+Implementations can be found in src/pi/pi.h in the corresponding namespace
+
+optimized parallel version with 1 Thread is faster than the fastest sequential version. Thats why there is no sequential version here.
+
+ICC/PGI versions were orders or magnitude slower than the GCC version of the optimized implementation
+
+The optimized implementation is about 10% faster than the naive implementation (using GCC).
+
+
+10000000:1:naive:gcc:      3.14 - Timer - PI_1: 219 ms 
+10000000:1:naive:gcc:      3.14 - Timer - PI_1: 219 ms 
+10000000:1:naive:gcc:      3.14 - Timer - PI_1: 219 ms 
+10000000:1:naive:icc:      3.14 - Timer - PI_1: 293 ms 
+10000000:1:optimized:gcc:  3.14 - Timer - PI_2: 197 ms 
+10000000:1:optimized:gcc:  3.14 - Timer - PI_2: 197 ms 
+10000000:1:optimized:gcc:  3.14 - Timer - PI_2: 197 ms 
+10000000:1:optimized:icc:  3.14 - Timer - PI_2: 2385 ms 
+ --- 
+10000000:2:naive:gcc:      3.14 - Timer - PI_1: 110 ms 
+10000000:2:naive:gcc:      3.14 - Timer - PI_1: 110 ms 
+10000000:2:naive:gcc:      3.14 - Timer - PI_1: 110 ms 
+10000000:2:naive:icc:      3.14 - Timer - PI_1: 147 ms 
+10000000:2:optimized:gcc:  3.14 - Timer - PI_2: 99 ms 
+10000000:2:optimized:gcc:  3.14 - Timer - PI_2: 99 ms 
+10000000:2:optimized:gcc:  3.14 - Timer - PI_2: 99 ms 
+10000000:2:optimized:icc:  3.14 - Timer - PI_2: 1315 ms 
+ --- 
+10000000:4:naive:gcc:      3.14 - Timer - PI_1: 55 ms 
+10000000:4:naive:gcc:      3.14 - Timer - PI_1: 55 ms 
+10000000:4:naive:gcc:      3.14 - Timer - PI_1: 55 ms 
+10000000:4:naive:icc:      3.14 - Timer - PI_1: 74 ms 
+10000000:4:optimized:gcc:  3.14 - Timer - PI_2: 49 ms 
+10000000:4:optimized:gcc:  3.14 - Timer - PI_2: 49 ms 
+10000000:4:optimized:gcc:  3.14 - Timer - PI_2: 49 ms 
+10000000:4:optimized:icc:  3.14 - Timer - PI_2: 659 ms 
+ --- 
+10000000:8:naive:gcc:      3.14 - Timer - PI_1: 28 ms 
+10000000:8:naive:gcc:      3.14 - Timer - PI_1: 28 ms 
+10000000:8:naive:gcc:      3.14 - Timer - PI_1: 28 ms 
+10000000:8:naive:icc:      3.14 - Timer - PI_1: 53 ms 
+10000000:8:optimized:gcc:  3.14 - Timer - PI_2: 25 ms 
+10000000:8:optimized:gcc:  3.14 - Timer - PI_2: 25 ms 
+10000000:8:optimized:gcc:  3.14 - Timer - PI_2: 25 ms 
+10000000:8:optimized:icc:  3.14 - Timer - PI_2: 342 ms 
+ --- 
+
+
+100000000:1:naive:gcc:      3.14 - Timer - PI_1: 2195 ms 
+100000000:1:naive:gcc:      3.14 - Timer - PI_1: 2194 ms 
+100000000:1:naive:gcc:      3.14 - Timer - PI_1: 2195 ms 
+100000000:1:naive:icc:      3.14 - Timer - PI_1: 2931 ms 
+100000000:1:optimized:gcc:  3.14 - Timer - PI_2: 1969 ms 
+100000000:1:optimized:gcc:  3.14 - Timer - PI_2: 1968 ms 
+100000000:1:optimized:gcc:  3.14 - Timer - PI_2: 1969 ms 
+100000000:1:optimized:icc:  3.14 - Timer - PI_2: 23828 ms 
+ --- 
+100000000:2:naive:gcc:      3.14 - Timer - PI_1: 1100 ms 
+100000000:2:naive:gcc:      3.14 - Timer - PI_1: 1098 ms 
+100000000:2:naive:gcc:      3.14 - Timer - PI_1: 1098 ms 
+100000000:2:naive:icc:      3.14 - Timer - PI_1: 1464 ms 
+100000000:2:optimized:gcc:  3.14 - Timer - PI_2: 985 ms 
+100000000:2:optimized:gcc:  3.14 - Timer - PI_2: 985 ms 
+100000000:2:optimized:gcc:  3.14 - Timer - PI_2: 985 ms 
+100000000:2:optimized:icc:  3.14 - Timer - PI_2: 13130 ms 
+ --- 
+100000000:4:naive:gcc:      3.14 - Timer - PI_1: 550 ms 
+100000000:4:naive:gcc:      3.14 - Timer - PI_1: 550 ms 
+100000000:4:naive:gcc:      3.14 - Timer - PI_1: 550 ms 
+100000000:4:naive:icc:      3.14 - Timer - PI_1: 733 ms 
+100000000:4:optimized:gcc:  3.14 - Timer - PI_2: 493 ms 
+100000000:4:optimized:gcc:  3.14 - Timer - PI_2: 493 ms 
+100000000:4:optimized:gcc:  3.14 - Timer - PI_2: 493 ms 
+100000000:4:optimized:icc:  3.14 - Timer - PI_2: 6568 ms 
+ --- 
+100000000:8:naive:gcc:      3.14 - Timer - PI_1: 275 ms 
+100000000:8:naive:gcc:      3.14 - Timer - PI_1: 276 ms 
+100000000:8:naive:gcc:      3.14 - Timer - PI_1: 275 ms 
+100000000:8:naive:icc:      3.14 - Timer - PI_1: 382 ms 
+100000000:8:optimized:gcc:  3.14 - Timer - PI_2: 247 ms 
+100000000:8:optimized:gcc:  3.14 - Timer - PI_2: 247 ms 
+100000000:8:optimized:gcc:  3.14 - Timer - PI_2: 247 ms 
+100000000:8:optimized:icc:  3.14 - Timer - PI_2: 3293 ms 
+ --- 
+
+
+1000000000:1:naive:gcc:      3.14 - Timer - PI_1: 21947 ms 
+1000000000:1:naive:gcc:      3.14 - Timer - PI_1: 21945 ms 
+1000000000:1:naive:gcc:      3.14 - Timer - PI_1: 21946 ms 
+1000000000:1:naive:icc:      3.14 - Timer - PI_1: 29310 ms 
+1000000000:1:optimized:gcc:  3.14 - Timer - PI_2: 19686 ms 
+1000000000:1:optimized:gcc:  3.14 - Timer - PI_2: 19687 ms 
+1000000000:1:optimized:gcc:  3.14 - Timer - PI_2: 19685 ms 
+1000000000:1:optimized:icc:  3.14 - Timer - PI_2: 238294 ms 
+ --- 
+1000000000:2:naive:gcc:      3.14 - Timer - PI_1: 10985 ms 
+1000000000:2:naive:gcc:      3.14 - Timer - PI_1: 10985 ms 
+1000000000:2:naive:gcc:      3.14 - Timer - PI_1: 10984 ms 
+1000000000:2:naive:icc:      3.14 - Timer - PI_1: 14628 ms 
+1000000000:2:optimized:gcc:  3.14 - Timer - PI_2: 9858 ms 
+1000000000:2:optimized:gcc:  3.14 - Timer - PI_2: 9852 ms 
+1000000000:2:optimized:gcc:  3.14 - Timer - PI_2: 9853 ms 
+1000000000:2:optimized:icc:  3.14 - Timer - PI_2: 131358 ms 
+ --- 
+1000000000:4:naive:gcc:      3.14 - Timer - PI_1: 5495 ms 
+1000000000:4:naive:gcc:      3.14 - Timer - PI_1: 5495 ms 
+1000000000:4:naive:gcc:      3.14 - Timer - PI_1: 5495 ms 
+1000000000:4:naive:icc:      3.14 - Timer - PI_1: 7319 ms 
+1000000000:4:optimized:gcc:  3.14 - Timer - PI_2: 4932 ms 
+1000000000:4:optimized:gcc:  3.14 - Timer - PI_2: 4928 ms 
+1000000000:4:optimized:gcc:  3.14 - Timer - PI_2: 4928 ms 
+1000000000:4:optimized:icc:  3.14 - Timer - PI_2: 65704 ms 
+ --- 
+1000000000:8:naive:gcc:      3.14 - Timer - PI_1: 2752 ms 
+1000000000:8:naive:gcc:      3.14 - Timer - PI_1: 2750 ms 
+1000000000:8:naive:gcc:      3.14 - Timer - PI_1: 2751 ms 
+1000000000:8:naive:icc:      3.14 - Timer - PI_1: 3665 ms 
+1000000000:8:optimized:gcc:  3.14 - Timer - PI_2: 2468 ms 
+1000000000:8:optimized:gcc:  3.14 - Timer - PI_2: 2467 ms 
+1000000000:8:optimized:gcc:  3.14 - Timer - PI_2: 2468 ms 
+1000000000:8:optimized:icc:  3.14 - Timer - PI_2: 32890 ms 
+ --- 

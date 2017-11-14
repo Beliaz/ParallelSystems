@@ -1,4 +1,4 @@
-# Name your job. Unless you use the -o and -e options, output will
+BB# Name your job. Unless you use the -o and -e options, output will
 # go to a unique file name.ojob_id for each job.
 #$ -N run
 
@@ -29,60 +29,45 @@
 module load gcc/5.1.0
 module load intel/15.0
 
-for num_samples in "100000" "1000000" "100000000" 
+for num_samples in "10000000" "100000000" "1000000000" 
 do
-    echo $num_samples " Samples =============="
+    echo
     
     for threads in 1 2 4 8
     do
         export OMP_NUM_THREADS=$threads
 
-        echo $threads " - Threads ------------------------"
+        printf $num_samples":"$threads":naive:gcc:      "
+        ./build/pi_par_1_gcc $num_samples
 
-	echo "gcc"
-	./build/pi_par_1_gcc $num_samples
-	./build/pi_par_1_gcc $num_samples
-	./build/pi_par_1_gcc $num_samples
-	echo 
-
-	echo "icc"
-	./build/pi_par_1_icc $num_samples
-	echo 
-
-	echo "pgi"
-	./build/pi_par_1_pgi $num_samples
-	echo 
-
-	echo "gcc"
+        printf $num_samples":"$threads":naive:gcc:      "
+        ./build/pi_par_1_gcc $num_samples
+        
+        printf $num_samples":"$threads":naive:gcc:      "
+        ./build/pi_par_1_gcc $num_samples
+        
+        printf $num_samples":"$threads":naive:icc:      "
+        ./build/pi_par_1_icc $num_samples
+             
+	printf $num_samples":"$threads":optimized:gcc:  "
 	./build/pi_par_2_gcc $num_samples
-	./build/pi_par_2_gcc $num_samples
-	./build/pi_par_2_gcc $num_samples
-	echo
 
-	echo "icc"
+        printf $num_samples":"$threads":optimized:gcc:  "
+	./build/pi_par_2_gcc $num_samples
+
+        printf $num_samples":"$threads":optimized:gcc:  "
+	./build/pi_par_2_gcc $num_samples
+	
+	printf $num_samples":"$threads":optimized:icc:  "
 	./build/pi_par_2_icc $num_samples
-	echo
-
-	echo "pgi"
-	./build/pi_par_2_pgi $num_samples
-	echo
-
-        echo "gcc"
-        ./build/pi_seq_gcc $num_samples
-        ./build/pi_seq_gcc $num_samples
-        ./build/pi_seq_gcc $num_samples
-        echo
-
-        echo "icc"
-        ./build/pi_seq_icc $num_samples
-        echo
-
-        echo "pgi"
-        ./build/pi_seq_pgi $num_samples
-        echo
-
+	
+	echo " --- "
     done
+
+    echo
 done
 	
+echo
+
 module unload gcc/5.1.0
 moduel unload intel/15.0
