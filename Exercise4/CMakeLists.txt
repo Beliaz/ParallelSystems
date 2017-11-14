@@ -37,3 +37,4 @@ aux_source_directory(. SRC_LIST)
 
 add_executable(pi_par src/pi/pi_par.cpp)
 add_executable(pi_par_2 src/pi/pi_par_2.cpp)
+add_executable(pi_seq src/pi/pi_seq.cpp)
