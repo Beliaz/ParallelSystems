@@ -2,6 +2,8 @@
 #include <iostream>
 #include <stdlib.h>
 #include <algorithm>
+#include "time_ms.h"
+
 
 int factorial(int num) 
 {
