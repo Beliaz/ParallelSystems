@@ -30,6 +30,7 @@ include(ConfigGBench)
 #add_subdirectory(${PROJECT_SOURCE_DIR}/bench/)
 
 aux_source_directory(. SRC_LIST)
-aux_source_directory(test SRC_LIST)
 
-add_executable(avl ${SRC_LIST})
+add_executable(avl_seq test/avl_test.cpp ${SRC_LIST})
+
+add_executable(avl_par test/avl_test_par.cpp ${SRC_LIST})

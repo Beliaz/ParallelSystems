@@ -58,27 +58,56 @@ private:
         return simple_left_rotation(p1);
     }
 
-
+#if defined(PARALLEL)
     void insert(unsigned int value, nodeptr & p){
         if( p==NULL ){
-            #pragma omp ordered
-            {
-                p = new node;
-                p->value = value;
-                p->left = NULL;
-                p->right = NULL;
-                p->height = 0;
-            }
+            p = new node;
+            p->value = value;
+            p->left = NULL;
+            p->right = NULL;
+            p->height = 0;
             return;
         }
         if( value == p->value )
             return;
-        else if (value<p->value)
+        else if (value<p->value) {
             insert(value, p->left);
-        else
+        }
+        else {
             insert(value, p->right);
+
+        }
     }
 
+#else
+    void insert(unsigned int value, nodeptr & p){
+        if( p==NULL ){
+            p = new node;
+            p->value = value;
+            p->left = NULL;
+            p->right = NULL;
+            p->height = 0;
+            return;
+        }
+        if( value == p->value )
+            return;
+        else if (value<p->value) {
+            insert(value, p->left);
+            if(get_height(p->left)-get_height(p->right) == 2) {
+                if(value < p->left->value)  p=simple_right_rotation(p);
+                else                        p=double_right_rotation(p);
+            }
+        }
+        else {
+            insert(value, p->right);
+            if ((get_height(p->right) - get_height(p->left))==2) {
+                if(value > p->right->value) p=simple_left_rotation(p);
+                else                        p=double_left_rotation(p);
+            }
+        }
+    }
+
+#endif
     void balance(nodeptr & p)
     {
 
@@ -126,6 +155,8 @@ public:
 
     ~avlTree() { delete root; }
 
+#if defined(PARALLEL)
+
     void insert(std::vector<unsigned int> values) {
         if(root == NULL) {
             root = new node;
@@ -135,17 +166,35 @@ public:
             root->height = 0;
             values.erase( values.begin() );
         }
+        std::cout<<"Insert Par"<<std::endl;
 
-        int block = 10;
+        int block = omp_get_num_threads() * 100;
         for(int j=0;j<values.size();j+=block) {
-            #pragma omp parallel for schedule(dynamic)
-            for (unsigned int i = 0; i < block; i++) {
+            #pragma omp parallel for private(block) shared(root) schedule(static)
+            for (unsigned int i = 0; i < block; i++)
                 insert(values[i+j], root);
 
-            }
             balance(root);
         }
     }
+
+#else
+
+    void insert(std::vector<unsigned int> values) {
+        if(root == NULL) {
+            root = new node;
+            root->value = values[0];
+            root->right = NULL;
+            root->left = NULL;
+            root->height = 0;
+            values.erase( values.begin() );
+        }
+        std::cout<<"Insert Seq"<<std::endl;
+        for(int j=0;j<values.size();j++)
+                insert(values[j], root);
+    }
+
+#endif
 
     bool check_order(){
         return ((check_order(root,0)==std::numeric_limits<int>::max())?false:true);
