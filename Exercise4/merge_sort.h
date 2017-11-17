@@ -24,22 +24,14 @@ std::vector<double> init(unsigned n) {
 
 void merge(double * begin_left,
            double * middle,
-           double * end_right) {
+           double * end_right,
+           double * output) {
 
-    int size=(middle-begin_left)+(end_right-middle);
-    std::vector<double> left(begin_left,middle);
-    std::vector<double> right(middle,end_right);
-    for(unsigned int i=0;i<size;i++)
-        if( !right.empty() && left[0]>right[0]) {
-            *(begin_left+i)=right[0];
-            right.erase(right.begin());
-        } else if(!left.empty()){
-            *(begin_left+i)=left[0];
-            left.erase(left.begin());
-        } else {
-            *(begin_left+i)=right[0];
-            right.erase(right.begin());
+    for(unsigned int i=0,j=0;i<output->size();i++)
+        if(*(begin_left+i)<*(middle+j)){
+
         }
+
 }
 
 void insertion_sort (double * begin, double * end){
@@ -61,27 +53,27 @@ void insertion_sort (double * begin, double * end){
 #if defined(PAR_OPT)
 
 
-void par_sort(double * begin, double * end) {
+void par_sort(double * begin, double * end, double * output) {
     int size=(end-begin);
     double * middle=begin + (size/2);
     if(size>32) {
 
 #pragma omp task untied mergeable
-        par_sort(begin,middle);
+        par_sort(begin,middle,output);
 #pragma omp task untied mergeable
-        par_sort(middle,end);
+        par_sort(middle,end,output+(size/2));
 #pragma omp taskwait
-        merge(begin,middle,end);
+        merge(begin,middle,end,output);
     } else if (size>1)
         insertion_sort(begin,end);
     else return;
 }
 void sort(std::vector<double> * _arr) {
-    double * array = _arr->data();
+    double * output = _arr->data();
 #pragma omp parallel
     {
 #pragma omp single
-        par_sort(array,array+_arr->size());
+        par_sort(array,array+_arr->size(),_arr);
     }
 }
 

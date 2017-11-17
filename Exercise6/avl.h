@@ -8,6 +8,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <omp.h>
 #include <math.h>
 
 struct node{
@@ -23,14 +24,14 @@ class avlTree
 private:
 
     nodeptr root;
-    int num_elems;
 
     int get_height(nodeptr & p){
         if(p!=NULL) return p->height;
         else return 0;
     }
 
-    nodeptr srl(nodeptr &p1)
+
+    nodeptr simple_right_rotation(nodeptr &p1)
     {
         nodeptr p2 = p1->left;
         p1->left=p2->right;
@@ -39,7 +40,7 @@ private:
         p2->height=std::max(get_height(p2->left),p1->height)+1;
         return p2;
     }
-    nodeptr srr(nodeptr &p1)
+    nodeptr simple_left_rotation(nodeptr &p1)
     {
         nodeptr p2 = p1->right;
         p1->right=p2->left;
@@ -48,61 +49,80 @@ private:
         p2->height=std::max(get_height(p2->right),p1->height)+1;
         return p2;
     }
-    nodeptr drl(nodeptr &p1){
-        p1->left = srr(p1->left);
-        return srl(p1);
+    nodeptr double_right_rotation(nodeptr &p1){
+        p1->left = simple_left_rotation(p1->left);
+        return simple_right_rotation(p1);
     }
-    nodeptr drr(nodeptr &p1){
-        p1->right = srl(p1->right);
-        return srr(p1);
+    nodeptr double_left_rotation(nodeptr &p1){
+        p1->right = simple_right_rotation(p1->right);
+        return simple_left_rotation(p1);
     }
 
 
     void insert(unsigned int value, nodeptr & p){
         if( p==NULL ){
-            p = new node;
-            p->value = value;
-            p->left = NULL;
-            p->right = NULL;
-            p->height = 0;
-            num_elems++;
+            #pragma omp ordered
+            {
+                p = new node;
+                p->value = value;
+                p->left = NULL;
+                p->right = NULL;
+                p->height = 0;
+            }
             return;
         }
-        if( value == p->value ) return;
-        else if (value<p->value){
+        if( value == p->value )
+            return;
+        else if (value<p->value)
             insert(value, p->left);
-            if( ( get_height(p->left) - get_height(p->right) ) == 2 ){
-                if( value < p->left->value )    p = srl(p);
-                else                            p = drl(p);
-            }
-        } else {
+        else
             insert(value, p->right);
-            if( ( get_height(p->right) - get_height(p->left) )  == 2 ) {
-                if( value > p->right->value )   p = srr(p);
-                else                            p = drr(p);
-            }
+    }
+
+    void balance(nodeptr & p)
+    {
+
+        if(p->left!=NULL)
+            balance(p->left);
+        if(p->right!=NULL)
+            balance(p->right);
+        if(p->left==NULL && p->right==NULL) {
+            p->height=0;
+            return;
         }
-        p->height = std::max( get_height(p->left), get_height(p->right)) + 1;
+
+        if( ( get_height(p->left) - get_height(p->right) ) == 2 ){
+            if( p->left->right == NULL || get_height(p->left->left) > get_height(p->left->right) )
+                p = simple_right_rotation(p);
+            else
+                p = double_right_rotation(p);
+        }
+
+
+        if( ( get_height(p->right) - get_height(p->left) )  == 2 ) {
+            if( p->right->left == NULL || get_height(p->right->right) > get_height(p->right->left) )
+                p = simple_left_rotation(p);
+            else
+                p = double_left_rotation(p);
+        }
+
+        p->height=std::max(get_height(p->left),get_height(p->right))+1;
     }
 
-    int get_num_elems(){
-        return num_elems;
-    }
-
-    std::string print(nodeptr node, bool offset){
-        std::string result="";
-        if(offset)
-            for(unsigned int i=0;i<std::pow(2,node->height);i++)
-                result+=" ";
-        for(unsigned int i=0;i<std::pow(2,node->height-1);i++)
-            result+=" ";
-        result+=node->value;
-        return result;
+    int check_order(nodeptr node, unsigned int prev){
+        if(node!=NULL)
+        {
+            prev=check_order(node->left,prev);
+            if(prev>node->value){
+                return std::numeric_limits<int>::max();
+            }
+            return check_order(node->right,node->value);
+        } else return prev;
     }
 
 public:
 
-    avlTree() : root(NULL),num_elems(0){}
+    avlTree() : root(NULL){}
 
     ~avlTree() { delete root; }
 
@@ -114,21 +134,23 @@ public:
             root->left = NULL;
             root->height = 0;
             values.erase( values.begin() );
-            num_elems++;
         }
-        for(auto value : values) {
-            insert(value,root);
+
+        int block = 10;
+        for(int j=0;j<values.size();j+=block) {
+            #pragma omp parallel for schedule(dynamic)
+            for (unsigned int i = 0; i < block; i++) {
+                insert(values[i+j], root);
+
+            }
+            balance(root);
         }
     }
 
-    friend std::ostream& operator<<(std::ostream& stream, const avlTree& o){
-     /*   stream<<"Height: " <<o.root->height<<std::endl;
-        stream<<"Elements: "<<o.get_num_elems()<<std::endl;
-        stream<<o.print(o.root,false)<<endl;
-        stream<<o.print(o.root->left,false);
-        stream<<o.print(o.root->right,true);
-       */ return stream;
+    bool check_order(){
+        return ((check_order(root,0)==std::numeric_limits<int>::max())?false:true);
     }
+
 };
 
 

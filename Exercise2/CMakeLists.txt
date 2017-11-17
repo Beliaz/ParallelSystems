@@ -4,7 +4,7 @@ project(Exercise2 LANGUAGES CXX)
 # cmake module directory
 set(CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH}
-    ${PROJECT_SOURCE_DIR}/cmake)
+        cmake)
 
 # This include is required if you want 
 # to use CTest framework for you benchmarks with add_test()

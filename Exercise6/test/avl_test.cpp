@@ -4,8 +4,8 @@
 
 #include "../avl.h"
 #include <string>
-#include <omp.h>
 #include <chrono>
+#include "../chrono_timer.h"
 #include <random>
 #include <iostream>
 #include <stdlib.h>
@@ -20,6 +20,12 @@ int main(int argc, char** argv) {
 
     unsigned int N = std::atoi(argv[1]);
 
+    if (N<20) {
+        printf("Please greater than 20");
+        return EXIT_FAILURE;
+
+    }
+
     std::default_random_engine random_engine;
     std::uniform_int_distribution<unsigned int> range(0, N/8);
 
@@ -31,7 +37,11 @@ int main(int argc, char** argv) {
         list.push_back(range(random_engine));
 
     avlTree avl;
-    avl.insert(list);
+    {
+        ChronoTimer h("insert");
+        avl.insert(list);
+    }
 
-    std::cout<<"ha"<<std::endl;
+    std::cout<<std::endl<<((avl.check_order()==true)?"true":"false")<<std::endl;
+
 }
