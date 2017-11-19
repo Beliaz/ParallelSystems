@@ -34,3 +34,5 @@ aux_source_directory(. SRC_LIST)
 add_executable(avl_seq test/avl_test.cpp ${SRC_LIST})
 
 add_executable(avl_par test/avl_test_par.cpp ${SRC_LIST})
+
+add_executable(avl_par_stable test/avl_test_par_stable.cpp ${SRC_LIST})

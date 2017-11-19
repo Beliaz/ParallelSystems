@@ -10,6 +10,9 @@
 #include <string>
 #include <omp.h>
 #include <math.h>
+#include <bitset>
+#include <functional>
+
 
 struct node{
     unsigned int value;
@@ -58,6 +61,13 @@ private:
         return simple_left_rotation(p1);
     }
 
+
+    nodeptr find(nodeptr &p, unsigned int value){
+        if(p->value==value) return p;
+        else if(value<p->value) return find(p->left,value);
+        else return find(p->right,value);
+    }
+
 #if defined(PARALLEL)
     void insert(unsigned int value, nodeptr & p){
         if( p==NULL ){
@@ -78,6 +88,45 @@ private:
 
         }
     }
+#elif defined(PARALLEL_STABLE)
+
+    int insert(std::vector<unsigned int> values, nodeptr & p, std::function<bool(unsigned int)> fun){
+        for(auto value : values)
+            if(fun(value))
+                insert(value,p);
+    }
+
+
+    int insert(unsigned int value, nodeptr & p){
+        if( p==NULL ){
+            p = new node;
+            p->value = value;
+            p->left = NULL;
+            p->right = NULL;
+            p->height = 1;
+            return true;
+        }
+        if( value == p->value )
+            return false;
+        else if (value<p->value) {
+            int deep=insert(value, p->left);
+            if(get_height(p->left)-get_height(p->right) == 2) {
+                if(value < p->left->value)  p=simple_right_rotation(p);
+                else                        p=double_right_rotation(p);
+            }
+            p->height=std::max(get_height(p->left),get_height(p->right))+1;
+        }
+        else {
+            int deep=insert(value, p->right);
+            if ((get_height(p->right) - get_height(p->left))==2) {
+                if(value > p->right->value) p=simple_left_rotation(p);
+                else                        p=double_left_rotation(p);
+            }
+            p->height=std::max(get_height(p->left),get_height(p->right))+1;
+        }
+        return true;
+    }
+
 
 #else
     void insert(unsigned int value, nodeptr & p){
@@ -170,12 +219,102 @@ public:
 
         int block = omp_get_num_threads() * 100;
         for(int j=0;j<values.size();j+=block) {
+        // Only works because statistically we have every value 8 times in our
+        // vector because vector of size(n) with values from 0 to n/8
+
             #pragma omp parallel for private(block) shared(root) schedule(static)
             for (unsigned int i = 0; i < block; i++)
                 insert(values[i+j], root);
 
             balance(root);
         }
+    }
+
+#elif defined(PARALLEL_STABLE)
+
+
+/*
+ * first determine how many cores to use, max(x , 2^x < omp_get_max_threads)
+ * create tree with deepness x
+ *
+ * parrall insert the whole set into the 2^x subnodes, skip values that are to large or to small
+ *
+ * example:
+ * 5 cores => use 4 of them, x=2
+ * tree:
+ *              9
+ *      4               15
+ *  2       6       11      19
+ *
+ *
+ *  thread 1 works on node 2 and use only vars lower 4
+ *  thread 2 works on node 6 and use only vars greater 4 smaller 9
+ *  thread 3 works on node 11 and use only vars greater 9 smaller 15
+ *  thread 4 works on node 19 and use only vars greater 15
+ */
+
+    void insert(std::vector<unsigned int> values) {
+        if(root == NULL) {
+            root = new node;
+            root->value = values[0];
+            root->right = NULL;
+            root->left = NULL;
+            root->height = 0;
+            values.erase( values.begin() );
+        }
+        std::cout<<"Insert Par_stable"<<std::endl;
+
+        //determine cores to use
+        const unsigned int num_threads = omp_get_max_threads();
+        const unsigned int parallel_deepness = std::log2(num_threads);
+        const unsigned int num_parallel_trees = std::pow(2,parallel_deepness);
+
+
+        //root nodes of the sub trees
+        nodeptr parall_tree_roots[num_parallel_trees];
+        nodeptr parall_sup_roots[num_parallel_trees/2];
+
+        for(unsigned int i=0;i<num_parallel_trees*4;i++) {
+            if(insert(values[0], root)==false) i--;
+            values.erase( values.begin() );
+        }
+        for(unsigned int i=0,j=0;i<num_parallel_trees;i+=2,j++) {
+            nodeptr temp=root;
+            std::bitset<128> bin(i);
+            for(unsigned int j=1;j<parallel_deepness; j++)
+                if(bin[parallel_deepness-j]==0)
+                    temp = temp->left;
+                else
+                    temp = temp->right;
+            parall_sup_roots[j]=temp;
+            parall_tree_roots[i]=temp->left;
+            parall_tree_roots[i+1]=temp->right;
+        }
+#pragma omp parallel for schedule(static,1)
+                for(unsigned int i=0;i<num_parallel_trees;i++)
+                    insert(values,
+                           // root node of sub tree
+                           parall_tree_roots[i],
+                           //lamba check if var in range
+                           [&](unsigned int value){
+                                if(i==0){
+                                    if(value<parall_tree_roots[0]->value) return true;
+                                    else return false;
+                                }else if(i==num_parallel_trees-1){
+                                    if(value>parall_tree_roots[i]->value) return true;
+                                    else return false;
+                                } else {
+                                    if(i%2==0)
+                                        if(value < parall_tree_roots[i/2]->value && value > parall_sup_roots[(i-1)/2]->value) return true;
+                                        else return false;
+                                    else
+                                        if(value > parall_tree_roots[i]->value && value < parall_sup_roots[(i+1)/2]->value) return true;
+                                        else return false;
+                                }
+                            });
+
+        //final balanceing
+                balance(root);
     }
 
 #else
