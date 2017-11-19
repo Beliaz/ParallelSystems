@@ -1,0 +1,9 @@
+par optimization:
+
+O(N/8)
+
+
+par stable optimation
+
+
+O(core*N + log(N/core))
