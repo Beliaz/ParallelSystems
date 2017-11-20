@@ -1,9 +1,0 @@
-par optimization:
-
-O(N/8 * log(N))
-
-
-par stable optimation
-
-
-O(num_cores*N + N/num_cores * log(N))
