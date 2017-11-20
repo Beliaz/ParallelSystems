@@ -39,6 +39,8 @@ int main(int argc, char** argv) {
     for(unsigned int i=0;i<N;i++)
         list.push_back(range(random_engine));
 
+    std::cout << "Insert Par_stable" << std::endl;
+
     avlTree avl;
     {
         ChronoTimer h("insert");

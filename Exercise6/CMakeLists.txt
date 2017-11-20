@@ -6,7 +6,7 @@ set(CMAKE_MODULE_PATH
         ${CMAKE_MODULE_PATH}
         ${PROJECT_SOURCE_DIR}/cmake)
 
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 
 include(CTest)
 
@@ -31,7 +31,7 @@ ENDIF()
 
 include(ConfigGBench)
 
-#add_subdirectory(${PROJECT_SOURCE_DIR}/bench/)
+add_subdirectory(${PROJECT_SOURCE_DIR}/bench/)
 add_subdirectory(${PROJECT_SOURCE_DIR}/test/)
 
 aux_source_directory(. SRC_LIST)

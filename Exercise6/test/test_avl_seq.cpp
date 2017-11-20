@@ -22,6 +22,8 @@ int main(int, char**)
 
         std::cout << "n: " << n << "\n";
 
+        std::cout << "Insert Seq" << std::endl;
+
         avlTree avl;
         {
             ChronoTimer h("insert");
