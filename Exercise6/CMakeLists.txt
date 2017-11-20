@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5.2)
+cmake_minimum_required(VERSION 3.5)
 project(Exercise4 LANGUAGES CXX)
 
 # cmake module directory
@@ -7,6 +7,10 @@ set(CMAKE_MODULE_PATH
         ${PROJECT_SOURCE_DIR}/cmake)
 
 set(CMAKE_BUILD_TYPE Debug)
+
+include(CTest)
+
+enable_testing()
 
 set(BENCHMARK_ENABLE_TESTING OFF)
 
@@ -28,11 +32,12 @@ ENDIF()
 include(ConfigGBench)
 
 #add_subdirectory(${PROJECT_SOURCE_DIR}/bench/)
+add_subdirectory(${PROJECT_SOURCE_DIR}/test/)
 
 aux_source_directory(. SRC_LIST)
 
-add_executable(avl_seq test/avl_test.cpp ${SRC_LIST})
+add_executable(avl_seq avl_seq.cpp)
 
-add_executable(avl_par test/avl_test_par.cpp ${SRC_LIST})
+add_executable(avl_par avl_par.cpp)
 
-add_executable(avl_par_stable test/avl_test_par_stable.cpp ${SRC_LIST})
+add_executable(avl_par_stable avl_par_stable.cpp)

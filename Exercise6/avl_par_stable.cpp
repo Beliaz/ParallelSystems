@@ -4,10 +4,10 @@
 
 #define PARALLEL_STABLE
 
-#include "../avl.h"
+#include "avl.h"
 #include <string>
 #include <chrono>
-#include "../chrono_timer.h"
+#include "chrono_timer.h"
 #include <random>
 #include <iostream>
 #include <stdlib.h>
