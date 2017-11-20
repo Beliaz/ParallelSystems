@@ -25,6 +25,8 @@ int main(int, char**)
 
         std::cout << "n: " << n << "\n";
 
+        std::cout << "Insert Par_stable" << std::endl;
+
         avlTree avl;
         {
             ChronoTimer h("insert");

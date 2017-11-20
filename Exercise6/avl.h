@@ -216,7 +216,6 @@ public:
             root->height = 0;
             values.erase( values.begin() );
         }
-        std::cout<<"Insert Par"<<std::endl;
 
         const auto block = omp_get_num_threads() * 100;
         for(auto j = 0u;j<values.size();j+=block) {
@@ -263,7 +262,6 @@ public:
             root->height = 0;
             values.erase( values.begin() );
         }
-        std::cout<<"Insert Par_stable"<<std::endl;
 
         //determine cores to use
         const auto num_threads = omp_get_max_threads();
@@ -281,7 +279,7 @@ public:
         for(unsigned int i=0,j=0;i<num_parallel_trees;i+=2,j++) {
             nodeptr temp=root;
             std::bitset<128> bin(i);
-            for(auto j=1;j<parallel_deepness; j++)
+            for(auto j=1u;j<parallel_deepness; j++)
                 if(bin[parallel_deepness-j]==0)
                     temp = temp->left;
                 else
@@ -297,7 +295,7 @@ public:
                            //lamba check if var in range
                            [&](unsigned int value){
                                nodeptr temp=root;
-                               for(auto j=0;j<parallel_deepness; j++)
+                               for(auto j=0u;j<parallel_deepness; j++)
                                    if(value<temp->value)
                                        temp = temp->left;
                                    else
@@ -323,7 +321,6 @@ public:
             root->height = 0;
             values.erase( values.begin() );
         }
-        std::cout<<"Insert Seq"<<std::endl;
         for(auto j=0u;j<values.size();j++)
                 insert(values[j], root);
     }
