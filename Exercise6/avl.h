@@ -12,7 +12,7 @@
 #include <math.h>
 #include <bitset>
 #include <functional>
-
+#include <algorithm>
 
 struct node{
     unsigned int value;
@@ -24,8 +24,6 @@ struct node{
 typedef struct node * nodeptr;
 class avlTree
 {
-private:
-
     nodeptr root;
 
     int get_height(nodeptr & p){
@@ -90,13 +88,13 @@ private:
     }
 #elif defined(PARALLEL_STABLE)
 
-    int insert(std::vector<unsigned int> values, nodeptr & p, std::function<bool(unsigned int)> fun){
-        for(auto value : values)
-            if(fun(value))
-                insert(value,p);
+    int insert(std::vector<unsigned int> values, nodeptr & p, std::function<bool(unsigned int)> fun)
+    {
+        for (const auto value : values)
+            if (fun(value))
+                insert(value, p);
     }
-
-
+    
     int insert(unsigned int value, nodeptr & p){
         if( p==NULL ){
             p = new node;
@@ -108,20 +106,26 @@ private:
         }
         if( value == p->value )
             return false;
-        else if (value<p->value) {
-            int deep=insert(value, p->left);
+        else if (value<p->value) 
+        {
+            insert(value, p->left);
+
             if(get_height(p->left)-get_height(p->right) == 2) {
                 if(value < p->left->value)  p=simple_right_rotation(p);
                 else                        p=double_right_rotation(p);
             }
+
             p->height=std::max(get_height(p->left),get_height(p->right))+1;
         }
-        else {
-            int deep=insert(value, p->right);
+        else 
+        {
+            insert(value, p->right);
+
             if ((get_height(p->right) - get_height(p->left))==2) {
                 if(value > p->right->value) p=simple_left_rotation(p);
                 else                        p=double_left_rotation(p);
             }
+
             p->height=std::max(get_height(p->left),get_height(p->right))+1;
         }
         return true;
@@ -217,13 +221,13 @@ public:
         }
         std::cout<<"Insert Par"<<std::endl;
 
-        int block = omp_get_num_threads() * 100;
-        for(int j=0;j<values.size();j+=block) {
+        const auto block = omp_get_num_threads() * 100;
+        for(auto j = 0u;j<values.size();j+=block) {
         // Only works because statistically we have every value 8 times in our
         // vector because vector of size(n) with values from 0 to n/8
 
-            #pragma omp parallel for private(block) shared(root) schedule(static)
-            for (unsigned int i = 0; i < block; i++)
+            #pragma omp parallel for shared(root) schedule(static)
+            for (auto i = 0; i < block; i++)
                 insert(values[i+j], root);
 
             balance(root);
@@ -265,9 +269,9 @@ public:
         std::cout<<"Insert Par_stable"<<std::endl;
 
         //determine cores to use
-        const unsigned int num_threads = omp_get_max_threads();
-        const unsigned int parallel_deepness = std::log2(num_threads);
-        const unsigned int num_parallel_trees = std::pow(2,parallel_deepness);
+        const auto num_threads = omp_get_max_threads();
+        const auto parallel_deepness = static_cast<unsigned>(std::log2(num_threads));
+        const auto num_parallel_trees = static_cast<unsigned>(std::pow(2,parallel_deepness));
 
 
         //root nodes of the sub trees
@@ -329,7 +333,7 @@ public:
             values.erase( values.begin() );
         }
         std::cout<<"Insert Seq"<<std::endl;
-        for(int j=0;j<values.size();j++)
+        for(auto j=0u;j<values.size();j++)
                 insert(values[j], root);
     }
 
