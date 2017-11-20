@@ -88,14 +88,14 @@ class avlTree
     }
 #elif defined(PARALLEL_STABLE)
 
-    int insert(std::vector<unsigned int> values, nodeptr & p, std::function<bool(unsigned int)> fun)
+    void insert(std::vector<unsigned int> values, nodeptr & p, std::function<bool(unsigned int)> fun)
     {
         for (const auto value : values)
             if (fun(value))
                 insert(value, p);
     }
     
-    int insert(unsigned int value, nodeptr & p){
+    bool insert(unsigned int value, nodeptr & p){
         if( p==NULL ){
             p = new node;
             p->value = value;
@@ -226,7 +226,7 @@ public:
         // Only works because statistically we have every value 8 times in our
         // vector because vector of size(n) with values from 0 to n/8
 
-            #pragma omp parallel for shared(root) schedule(static)
+            #pragma omp parallel for private(root) schedule(static)
             for (auto i = 0; i < block; i++)
                 insert(values[i+j], root);
 
@@ -276,7 +276,6 @@ public:
 
         //root nodes of the sub trees
         nodeptr parall_tree_roots[num_parallel_trees];
-        nodeptr parall_sup_roots[num_parallel_trees/2];
 
         for(unsigned int i=0;i<num_parallel_trees*4;i++) {
             if(insert(values[0], root)==false) i--;
@@ -285,12 +284,11 @@ public:
         for(unsigned int i=0,j=0;i<num_parallel_trees;i+=2,j++) {
             nodeptr temp=root;
             std::bitset<128> bin(i);
-            for(unsigned int j=1;j<parallel_deepness; j++)
+            for(auto j=1;j<parallel_deepness; j++)
                 if(bin[parallel_deepness-j]==0)
                     temp = temp->left;
                 else
                     temp = temp->right;
-            parall_sup_roots[j]=temp;
             parall_tree_roots[i]=temp->left;
             parall_tree_roots[i+1]=temp->right;
         }
@@ -301,21 +299,17 @@ public:
                            parall_tree_roots[i],
                            //lamba check if var in range
                            [&](unsigned int value){
-                                if(i==0){
-                                    if(value<parall_tree_roots[0]->value) return true;
-                                    else return false;
-                                }else if(i==num_parallel_trees-1){
-                                    if(value>parall_tree_roots[i]->value) return true;
-                                    else return false;
-                                } else {
-                                    if(i%2==0)
-                                        if(value < parall_tree_roots[i/2]->value && value > parall_sup_roots[(i-1)/2]->value) return true;
-                                        else return false;
-                                    else
-                                        if(value > parall_tree_roots[i]->value && value < parall_sup_roots[(i+1)/2]->value) return true;
-                                        else return false;
-                                }
-                            });
+                               nodeptr temp=root;
+                               for(auto j=0;j<parallel_deepness; j++)
+                                   if(value<temp->value)
+                                       temp = temp->left;
+                                   else
+                                       temp = temp->right;
+                               if(temp->value==parall_tree_roots[i]->value)
+                                   return true;
+                               else
+                                   return false;
+                           });
 
         //final balanceing
                 balance(root);
