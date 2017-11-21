@@ -78,13 +78,10 @@ class avlTree
         }
         if( value == p->value )
             return;
-        else if (value<p->value) {
+        else if (value<p->value)
             insert(value, p->left);
-        }
-        else {
+        else
             insert(value, p->right);
-
-        }
     }
 #elif defined(PARALLEL_STABLE)
 
