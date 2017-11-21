@@ -14,7 +14,7 @@
 #include <cmath>
 #include <memory>
 
-using nodeptr = std::unique_ptr<struct node>;
+using nodeptr = std::shared_ptr<struct node>;
 
 struct node
 {
@@ -154,6 +154,7 @@ public:
     }
 };
 
+#define PARALLEL_STABLE
 #if defined(PARALLEL_STABLE)
 
 inline void avl_tree::insert(std::vector<unsigned int> values, nodeptr & p, const std::function<bool(unsigned int)> fun) const
@@ -230,7 +231,7 @@ inline void avl_tree::insert(std::vector<unsigned int> values)
 {
     if (root_ == nullptr)
     {
-        root_ = std::make_unique<node>();
+        root_ = std::make_shared<node>();
 
         root_->value = values[0];
         root_->right = nullptr;
@@ -258,18 +259,18 @@ inline void avl_tree::insert(std::vector<unsigned int> values)
 
     for (unsigned int i = 0; i < num_parallel_trees; i ++)
     {
-        auto temp = root_.get();
+        auto temp = root_;
 
         std::bitset<128> bin(i);
 
         for (auto k = 0u; k < parallel_depth; k++)
         {
             temp = bin[parallel_depth - k] == 0
-                ? temp->left.get()
-                : temp->right.get();
+                ? temp->left
+                : temp->right;
         }
 
-        swap(parallel_tree_roots[i], temp);
+        parallel_tree_roots[i] = temp;
     }
 
     #pragma omp parallel for schedule(static, 1)
@@ -282,13 +283,13 @@ inline void avl_tree::insert(std::vector<unsigned int> values)
             //lamba check if var in range
             [&](unsigned int value)
         {
-            auto temp = root_.get();
+            auto temp = root_;
 
             for (auto j = 0u; j < parallel_depth; j++)
             {
                 temp = value < temp->value
-                    ? temp->left.get()
-                    : temp->right.get();
+                    ? temp->left
+                    : temp->right;
             }
 
             return temp->value == parallel_tree_roots[i]->value;
@@ -305,7 +306,7 @@ inline bool avl_tree::insert(const unsigned value, nodeptr& p) const
 {
     if (p == nullptr)
     {
-        p = std::make_unique<node>();
+        p = std::make_Shared<node>();
         p->value = value;
         p->left = nullptr;
         p->right = nullptr;
