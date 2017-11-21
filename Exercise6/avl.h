@@ -242,58 +242,57 @@ inline void avl_tree::insert(std::vector<unsigned int> values)
 
     //determine cores to use
     const auto num_threads = omp_get_max_threads();
-    const auto parallel_deepness = static_cast<unsigned>(std::log2(num_threads));
-    const auto num_parallel_trees = static_cast<unsigned>(std::pow(2, parallel_deepness));
+    const auto parallel_depth= static_cast<unsigned>(std::log2(num_threads));
+    const auto num_parallel_trees = static_cast<unsigned>(std::pow(2, parallel_depth));
     
     //root nodes of the sub trees
-    nodeptr parall_tree_roots[num_parallel_trees];
+    std::vector<nodeptr> parallel_tree_roots(num_parallel_trees);
 
     for (unsigned int i = 0; i < num_parallel_trees * 4; i++) 
     {
         if (!insert(values[0], root_))
-            i--;
+            --i;
 
         values.erase(values.begin());
     }
 
-    for (unsigned int i = 0, j = 0; i<num_parallel_trees; i += 2, j++) 
+    for (unsigned int i = 0, j = 0; i < num_parallel_trees - 1; i += 2, j++) 
     {
         auto temp = root_.get();
 
         std::bitset<128> bin(i);
 
-        for (auto k = 1u; k < parallel_deepness; k++)
+        for (auto k = 1u; k < parallel_depth; k++)
         {
-            temp = bin[parallel_deepness - k] == 0 
+            temp = bin[parallel_depth - k] == 0
                 ? temp->left.get()
                 : temp->right.get();
         }
 
-        swap(parall_tree_roots[i], temp->left);
-        swap(parall_tree_roots[i + 1], temp->right);
+        swap(parallel_tree_roots[i], temp->left);
+        swap(parallel_tree_roots[i + 1], temp->right);
     }
 
     #pragma omp parallel for schedule(static, 1)
-    for (unsigned int i = 0; i < num_parallel_trees; i++)
+    for (auto i = 0; i < static_cast<int>(num_parallel_trees); i++)
     {
         insert(
             values,  
             // root node of sub tree
-            parall_tree_roots[i],
+            parallel_tree_roots[i],
             //lamba check if var in range
             [&](unsigned int value)
         {
             auto temp = root_.get();
 
-            for (auto j = 0u; j < parallel_deepness; j++)
+            for (auto j = 0u; j < parallel_depth; j++)
             {
-                if (value < temp->value)
-                    temp = temp->left.get();
-                else
-                    temp = temp->right.get();
+                temp = value < temp->value
+                    ? temp->left.get()
+                    : temp->right.get();
             }
 
-            return temp->value == parall_tree_roots[i]->value;
+            return temp->value == parallel_tree_roots[i]->value;
         });
     }
 
