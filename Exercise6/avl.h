@@ -256,21 +256,20 @@ inline void avl_tree::insert(std::vector<unsigned int> values)
         values.erase(values.begin());
     }
 
-    for (unsigned int i = 0, j = 0; i < num_parallel_trees - 1; i += 2, j++) 
+    for (unsigned int i = 0; i < num_parallel_trees; i ++)
     {
         auto temp = root_.get();
 
         std::bitset<128> bin(i);
 
-        for (auto k = 1u; k < parallel_depth; k++)
+        for (auto k = 0u; k < parallel_depth; k++)
         {
             temp = bin[parallel_depth - k] == 0
                 ? temp->left.get()
                 : temp->right.get();
         }
 
-        swap(parallel_tree_roots[i], temp->left);
-        swap(parallel_tree_roots[i + 1], temp->right);
+        swap(parallel_tree_roots[i], temp);
     }
 
     #pragma omp parallel for schedule(static, 1)
