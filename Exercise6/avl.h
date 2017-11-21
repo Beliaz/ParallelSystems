@@ -47,8 +47,8 @@ private:
         p1->left = move(p2->right);
         p2->right = move(p1);
 
-        p1->height = std::max(get_height(p1->left), get_height(p1->right)) + 1;
-        p2->height = std::max(get_height(p2->left), p1->height) + 1;
+        p2->right->height = std::max(get_height(p2->right->left), get_height(p2->right->right)) + 1;
+        p2->height = std::max(get_height(p2->left), p2->right->height) + 1;
 
         return p2;
     }
@@ -60,8 +60,8 @@ private:
         p1->right = move(p2->left);
         p2->left = move(p1);
 
-        p1->height = std::max(get_height(p1->left), get_height(p1->right)) + 1;
-        p2->height = std::max(get_height(p2->right), p1->height) + 1;
+        p2->left->height = std::max(get_height(p2->left->left), get_height(p2->left->right)) + 1;
+        p2->height = std::max(get_height(p2->right), p2->left->height) + 1;
 
         return p2;
     }
