@@ -44,6 +44,6 @@ int main(int argc, char** argv) {
         avl.insert(list);
     }
 
-    std::cout<<std::endl<<((avl.check_order()==true)?"true":"false")<<std::endl;
+    std::cout<<std::endl<<((avl.is_valid()==true)?"true":"false")<<std::endl;
 
 }

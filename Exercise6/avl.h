@@ -37,10 +37,7 @@ public:
 private:
     static int get_height(nodeptr& p)
     {
-        if (p != nullptr)
-            return p->height;
-
-        return 0;
+        return p ? p->height : 0;
     }
 
     nodeptr simple_right_rotation(nodeptr& p1) const
@@ -111,8 +108,7 @@ private:
             else
                 p = double_right_rotation(p);
         }
-
-        if (get_height(p->right) - get_height(p->left) == 2)
+        else if (get_height(p->right) - get_height(p->left) == 2)
         {
             if (p->right->left == nullptr || get_height(p->right->right) > get_height(p->right->left))
                 p = simple_left_rotation(p);
@@ -123,21 +119,22 @@ private:
         p->height = std::max(get_height(p->left), get_height(p->right)) + 1;
     }
 
-    int check_order(const nodeptr& node, unsigned int prev) const
+    int is_valid(const nodeptr& node, unsigned int prev) const
     {
-        if (node != nullptr)
-        {
-            prev = check_order(node->left, prev);
+        if (node == nullptr) return prev;
 
-            if (prev > node->value)
-            {
-                return std::numeric_limits<int>::max();
-            }
+        prev = is_valid(node->left, prev);
 
-            return check_order(node->right, node->value);
-        }
+        if (prev > node->value)
+            return std::numeric_limits<int>::max();
 
-        return prev;
+        const auto left_height = node->left ? node->left->height : node->height;
+        const auto right_height = node->right ? node->right->height : node->height;
+
+        if (abs(right_height - left_height) > 1)
+            return std::numeric_limits<int>::max();
+
+        return is_valid(node->right, node->value);
     }
 
 public:
@@ -151,9 +148,9 @@ public:
     void insert(std::vector<unsigned int> values);
     void insert(std::vector<unsigned int> values, nodeptr & p, const std::function<bool(unsigned int)> fun) const;
 
-    bool check_order() const
+    bool is_valid() const
     {
-        return check_order(root_, 0) == std::numeric_limits<int>::max() ? false : true;
+        return is_valid(root_, 0) != std::numeric_limits<int>::max();
     }
 };
 

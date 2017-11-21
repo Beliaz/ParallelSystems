@@ -36,7 +36,7 @@ static void avl_insert(benchmark::State& state)
         
         state.PauseTiming();
 
-        if (!avl.check_order()) 
+        if (!avl.is_valid()) 
             state.SkipWithError("ordering invariant not preserved");
 
         avl.reset();

@@ -30,7 +30,7 @@ int main(int, char**)
             avl.insert(list);
         }
 
-        const auto valid = avl.check_order();
+        const auto valid = avl.is_valid();
 
         std::cout << "ordered: " << (valid ? "true" : "false") << std::endl;
         std::cout << std::endl;
