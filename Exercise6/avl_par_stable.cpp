@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
 
     std::cout << "Insert Par_stable" << std::endl;
 
-    avlTree avl;
+    avl_tree avl;
     {
         ChronoTimer h("insert");
         avl.insert(list);

@@ -30,7 +30,7 @@ static void avl_insert(benchmark::State& state)
 
     for(const auto _ : state)
     {
-        avlTree avl;
+        avl_tree avl;
 
         avl.insert(list);
 
