@@ -37,7 +37,4 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/test/)
 aux_source_directory(. SRC_LIST)
 
 add_executable(avl_seq avl_seq.cpp)
-
-add_executable(avl_par avl_par.cpp)
-
 add_executable(avl_par_stable avl_par_stable.cpp)
