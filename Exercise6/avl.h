@@ -142,13 +142,10 @@ private:
 
 public:
 
+    void reset() { root_ = nullptr; }
+
     avl_tree() : root_(nullptr)
     {
-    }
-
-    ~avl_tree()
-    {
-
     }
 
     void insert(std::vector<unsigned int> values);
