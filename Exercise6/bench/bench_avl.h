@@ -30,13 +30,18 @@ static void avl_insert(benchmark::State& state)
 
     for(const auto _ : state)
     {
-        avlTree avl;
+        avl_tree avl;
 
         avl.insert(list);
+        
+        state.PauseTiming();
 
-        if (avl.check_order()) continue;
-            
-        state.SkipWithError("ordering invariant not preserved");
+        if (!avl.check_order()) 
+            state.SkipWithError("ordering invariant not preserved");
+
+        avl.reset();
+
+        state.ResumeTiming();
     }
 }
 

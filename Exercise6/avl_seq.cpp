@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
 
     std::cout << "Insert Seq" << std::endl;
 
-    avlTree avl;
+    avl_tree avl;
     {  
         ChronoTimer h("insert");
         avl.insert(list);
