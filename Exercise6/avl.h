@@ -12,14 +12,15 @@
 #include <algorithm>
 #include <omp.h>
 #include <cmath>
+#include <memory>
 
-using nodeptr = struct node*;
+using nodeptr = std::unique_ptr<struct node>;
 
 struct node
 {
     unsigned int value;
-    node* left;
-    node* right;
+    nodeptr left;
+    nodeptr right;
     int height;
 };
 
@@ -28,8 +29,8 @@ class avl_tree
     nodeptr root_;
 
 public:
-    explicit avl_tree(const nodeptr root)
-        : root_(root)
+    explicit avl_tree(nodeptr&& root)
+        : root_(move(root))
     {
     }
 
@@ -44,10 +45,10 @@ private:
 
     nodeptr simple_right_rotation(nodeptr& p1) const
     {
-        auto p2 = p1->left;
+        auto p2 = move(p1->left);
 
-        p1->left = p2->right;
-        p2->right = p1;
+        p1->left = move(p2->right);
+        p2->right = move(p1);
 
         p1->height = std::max(get_height(p1->left), get_height(p1->right)) + 1;
         p2->height = std::max(get_height(p2->left), p1->height) + 1;
@@ -57,10 +58,10 @@ private:
 
     nodeptr simple_left_rotation(nodeptr& p1) const
     {
-        auto p2 = p1->right;
+        auto p2 = move(p1->right);
 
-        p1->right = p2->left;
-        p2->left = p1;
+        p1->right = move(p2->left);
+        p2->left = move(p1);
 
         p1->height = std::max(get_height(p1->left), get_height(p1->right)) + 1;
         p2->height = std::max(get_height(p2->right), p1->height) + 1;
@@ -70,17 +71,17 @@ private:
 
     nodeptr double_right_rotation(nodeptr& p1) const
     {
-        p1->left = simple_left_rotation(p1->left);
+        p1->left = move(simple_left_rotation(p1->left));
         return simple_right_rotation(p1);
     }
 
     nodeptr double_left_rotation(nodeptr& p1) const
     {
-        p1->right = simple_right_rotation(p1->right);
+        p1->right = move(simple_right_rotation(p1->right));
         return simple_left_rotation(p1);
     }
 
-    static nodeptr find(nodeptr& p, const unsigned int value)
+    static nodeptr& find(nodeptr& p, const unsigned int value)
     {
         if (p->value == value)
             return p;
@@ -94,15 +95,14 @@ private:
 
     void balance(nodeptr& p) const
     {
-        if (p->left != nullptr)
-            balance(p->left);
-        if (p->right != nullptr)
-            balance(p->right);
-        if (p->left == nullptr && p->right == nullptr)
+        if (!p->left && !p->right)
         {
             p->height = 0;
             return;
         }
+
+        if (p->left)  balance(p->left);
+        if (p->right) balance(p->right);
 
         if (get_height(p->left) - get_height(p->right) == 2)
         {
@@ -123,7 +123,7 @@ private:
         p->height = std::max(get_height(p->left), get_height(p->right)) + 1;
     }
 
-    int check_order(const nodeptr node, unsigned int prev) const
+    int check_order(const nodeptr& node, unsigned int prev) const
     {
         if (node != nullptr)
         {
@@ -136,6 +136,7 @@ private:
 
             return check_order(node->right, node->value);
         }
+
         return prev;
     }
 
@@ -147,7 +148,7 @@ public:
 
     ~avl_tree()
     {
-        delete root_;
+
     }
 
     void insert(std::vector<unsigned int> values);
@@ -159,53 +160,7 @@ public:
     }
 };
 
-#if defined(PARALLEL)
-
-inline void avl_tree::insert(const unsigned int value, nodeptr & p) const 
-{
-    if (p == nullptr)
-    {
-        p = new node;
-        p->value = value;
-        p->left = nullptr;
-        p->right = nullptr;
-        p->height = 0;
-        return;
-    }
-
-    if (value<p->value)
-        insert(value, p->left);
-    else
-        insert(value, p->right);
-}
-
-inline void avl_tree::insert(std::vector<unsigned int> values)
-{
-    if (root_ == nullptr) 
-    {
-        root_ = new node;
-        root_->value = values[0];
-        root_->right = nullptr;
-        root_->left = nullptr;
-        root_->height = 0;
-        values.erase(values.begin());
-    }
-
-    const auto block = omp_get_num_threads() * 100;
-    for (auto j = 0u; j < values.size(); j += block) 
-    {
-        // Only works because statistically we have every value 8 times in our
-        // vector because vector of size(n) with values from 0 to n/8
-
-        #pragma omp parallel for private(root) schedule(static)
-        for (auto i = 0; i < block; i++)
-            insert(values[i + j], root_);
-
-        balance(root_);
-    }
-}
-
-#elif defined(PARALLEL_STABLE)
+#if defined(PARALLEL_STABLE)
 
 inline void avl_tree::insert(std::vector<unsigned int> values, nodeptr & p, const std::function<bool(unsigned int)> fun) const
 {
@@ -214,11 +169,11 @@ inline void avl_tree::insert(std::vector<unsigned int> values, nodeptr & p, cons
             insert(value, p);
 }
 
-inline bool avl_tree::insert(const unsigned int value, nodeptr & p) const
+inline bool avl_tree::insert(const unsigned int value, nodeptr& p) const
 {
     if (p == nullptr)
     {
-        p = new node;
+        p = std::make_unique<node>();
 
         p->value = value;
         p->left = nullptr;
@@ -281,11 +236,13 @@ inline void avl_tree::insert(std::vector<unsigned int> values)
 {
     if (root_ == nullptr)
     {
-        root_ = new node;
+        root_ = std::make_unique<node>();
+
         root_->value = values[0];
         root_->right = nullptr;
         root_->left = nullptr;
         root_->height = 0;
+
         values.erase(values.begin());
     }
 
@@ -297,7 +254,7 @@ inline void avl_tree::insert(std::vector<unsigned int> values)
     //root nodes of the sub trees
     nodeptr parall_tree_roots[num_parallel_trees];
 
-    for (unsigned int i = 0; i<num_parallel_trees * 4; i++) 
+    for (unsigned int i = 0; i < num_parallel_trees * 4; i++) 
     {
         if (!insert(values[0], root_))
             i--;
@@ -307,22 +264,22 @@ inline void avl_tree::insert(std::vector<unsigned int> values)
 
     for (unsigned int i = 0, j = 0; i<num_parallel_trees; i += 2, j++) 
     {
-        auto temp = root_;
+        auto temp = root_.get();
 
         std::bitset<128> bin(i);
 
         for (auto k = 1u; k < parallel_deepness; k++)
         {
             temp = bin[parallel_deepness - k] == 0 
-                ? temp->left
-                : temp->right;
+                ? temp->left.get()
+                : temp->right.get();
         }
 
-        parall_tree_roots[i] = temp->left;
-        parall_tree_roots[i + 1] = temp->right;
+        swap(parall_tree_roots[i], temp->left);
+        swap(parall_tree_roots[i + 1], temp->right);
     }
 
-    #pragma omp parallel for schedule(static,1)
+    #pragma omp parallel for schedule(static, 1)
     for (unsigned int i = 0; i < num_parallel_trees; i++)
     {
         insert(
@@ -332,16 +289,17 @@ inline void avl_tree::insert(std::vector<unsigned int> values)
             //lamba check if var in range
             [&](unsigned int value)
         {
-            auto temp = root_;
+            auto temp = root_.get();
+
             for (auto j = 0u; j < parallel_deepness; j++)
+            {
                 if (value < temp->value)
-                    temp = temp->left;
+                    temp = temp->left.get();
                 else
-                    temp = temp->right;
-            if (temp->value == parall_tree_roots[i]->value)
-                return true;
-            else
-                return false;
+                    temp = temp->right.get();
+            }
+
+            return temp->value == parall_tree_roots[i]->value;
         });
     }
 
@@ -355,7 +313,7 @@ inline bool avl_tree::insert(const unsigned value, nodeptr& p) const
 {
     if (p == nullptr)
     {
-        p = new node;
+        p = std::make_unique<node>();
         p->value = value;
         p->left = nullptr;
         p->right = nullptr;
@@ -393,7 +351,7 @@ inline void avl_tree::insert(std::vector<unsigned int> values)
 {
     if (root_ == nullptr)
     {
-        root_ = new node;
+        root_ = std::make_unique<node>();
         root_->value = values[0];
         root_->right = nullptr;
         root_->left = nullptr;
