@@ -90,8 +90,6 @@ private:
             : find(p->right, value);
     }
 
-    bool insert(const unsigned int value, nodeptr& p) const;
-
     void balance(nodeptr& p) const
     {
         if (p->left != nullptr)
@@ -139,6 +137,8 @@ private:
         return prev;
     }
 
+    bool insert(const unsigned int value, nodeptr& p) const;
+
 public:
 
     avl_tree() : root_(nullptr)
@@ -159,53 +159,8 @@ public:
     }
 };
 
-#if defined(PARALLEL)
 
-inline void avl_tree::insert(const unsigned int value, nodeptr & p) const 
-{
-    if (p == nullptr)
-    {
-        p = new node;
-        p->value = value;
-        p->left = nullptr;
-        p->right = nullptr;
-        p->height = 0;
-        return;
-    }
-
-    if (value<p->value)
-        insert(value, p->left);
-    else
-        insert(value, p->right);
-}
-
-inline void avl_tree::insert(std::vector<unsigned int> values)
-{
-    if (root_ == nullptr) 
-    {
-        root_ = new node;
-        root_->value = values[0];
-        root_->right = nullptr;
-        root_->left = nullptr;
-        root_->height = 0;
-        values.erase(values.begin());
-    }
-
-    const auto block = omp_get_num_threads() * 100;
-    for (auto j = 0u; j < values.size(); j += block) 
-    {
-        // Only works because statistically we have every value 8 times in our
-        // vector because vector of size(n) with values from 0 to n/8
-
-        #pragma omp parallel for private(root) schedule(static)
-        for (auto i = 0; i < block; i++)
-            insert(values[i + j], root_);
-
-        balance(root_);
-    }
-}
-
-#elif defined(PARALLEL_STABLE)
+#if defined(PARALLEL_STABLE)
 
 inline void avl_tree::insert(std::vector<unsigned int> values, nodeptr & p, const std::function<bool(unsigned int)> fun) const
 {
@@ -405,6 +360,6 @@ inline void avl_tree::insert(std::vector<unsigned int> values)
 }
 
 
-#endif
+#endif //PARALLEL STABLE
 
 #endif //PARALLELSYSTEMS_AVL_H
