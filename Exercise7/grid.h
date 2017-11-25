@@ -4,6 +4,9 @@
 #include <vector>
 #include <array>
 
+namespace stencil
+{
+
 // =================================================================
 // cell
 
@@ -13,11 +16,17 @@ struct cell_value;
 template<class CellType>
 using cell_value_t = typename cell_value<CellType>::value_type;
 
-template<class CellType>
-void set_cell_value(CellType& cell, const cell_value_t<CellType>& value)
+template<class CellType, class CellValueType>
+void set_cell_value(CellType& cell, const CellValueType value)
 {
-    cell = value;
+    static_assert(std::is_void_v<CellType>, "set_cell_value not implemented for this type");
 }
+
+// =================================================================
+// bounds
+
+template<class CellType, size_t Dim>
+using bounds_t = std::array<CellType, 2 * Dim>;
 
 // =================================================================
 // grid
@@ -38,6 +47,7 @@ auto size(const grid_extents_t<Dim>& extents)
 
     return size;
 }
+
 template<size_t Dim>
 struct index_helper;
 
@@ -108,12 +118,19 @@ public:
     
     void set(const index_type& index, const cell_type& value)
     {
-        return set_cell_value(cells_[size(index)], value);
+        return set_cell_value(
+            cells_[index_helper<dim>::linearize(index, extents_)], 
+            value);
     }
+
+    const extents_type& extents() const { return extents_; }
 
 private:
     const extents_type extents_;
     storage_type cells_;
 };
+
+}
+
 
 #endif // JACOBI_ITERATION_H

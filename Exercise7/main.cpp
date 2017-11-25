@@ -1,16 +1,23 @@
 #include "grid.h"
 #include <iostream>
+#include "print.h"
+
+// ==============================================================================
+// define types
 
 using cell_t = float;
 
 template<>
-struct cell_value<float>
+void stencil::set_cell_value(cell_t& cell, const float value)
 {
-    using value_type = float;
-};
+    cell = value;
+}
 
 template<size_t Dim>
-using bounds_t = std::array<cell_t, 2 * Dim>;
+using grid_t = stencil::grid_t<cell_t, Dim>;
+
+template<size_t Dim>
+using bounds_t = stencil::bounds_t<cell_t, Dim>;
 
 template<size_t Dim>
 bounds_t<Dim> parse_bounds(char* argv[], const size_t offset)
@@ -23,84 +30,70 @@ bounds_t<Dim> parse_bounds(char* argv[], const size_t offset)
     return bounds;
 }
 
+// ==============================================================================
+// iteration
+
 template<size_t Dim>
 struct jacobian_iteration;
 
 template<>
 struct jacobian_iteration<1>
 {
-    static void execute(double epsilon, grid_extents_t<1> extents, bounds_t<1> bounds)
+    static void execute(double epsilon, const stencil::grid_extents_t<1> extents, bounds_t<1> bounds)
     {
-        using grid_t = grid_t<cell_t, 1>;
+        using grid_t = grid_t<1>;
 
         grid_t grid(extents);
 
-        for (auto i = 0u; i < extents[0]; ++i)
-        {
-            std::cout << grid.at(i);
-        }
+        grid.set({ extents[0] / 2 }, 2);
 
-        std::cout << std::endl;
+        // do iteration
+
+        grid_printer<1>::print(grid);
     }
 };
 
 template<>
 struct jacobian_iteration<2>
 {
-    static void execute(double epsilon, grid_extents_t<2> extents, bounds_t<2> bounds)
+    static void execute(double epsilon, const stencil::grid_extents_t<2> extents, bounds_t<2> bounds)
     {
-        using grid_t = grid_t<cell_t, 2>;
+        using grid_t = grid_t<2>;
 
         grid_t grid(extents);
 
-        for (auto x = 0u; x < extents[0]; ++x)
-        {
-            for(auto y = 0u; y < extents[1]; ++y)
-            {
-                std::cout << grid.at({x, y});
-            }
+        grid.set({ extents[0] / 2, extents[1] / 2 }, 2);
 
-            std::cout << "\n";
-        }
+        // do iteration
 
-        std::cout << std::endl;
+        grid_printer<2>::print(grid);
     }
 };
 
 template<>
 struct jacobian_iteration<3>
 {
-    static void execute(double epsilon, grid_extents_t<3> extents, bounds_t<3> bounds)
+    static void execute(double epsilon, const stencil::grid_extents_t<3> extents, bounds_t<3> bounds)
     {
-        using grid_t = grid_t<cell_t, 3>;
+        using grid_t = grid_t<3>;
 
         grid_t grid(extents);
 
-        for (auto z = 0u; z < extents[2]; ++z)
-        {
-            std::cout << "z = " << z << "\n\n";
+        grid.set({ extents[0] / 2, extents[1] / 2, extents[2] / 2 }, 2);
 
-            for (auto x = 0u; x < extents[0]; ++x)
-            {
-                for (auto y = 0u; y < extents[1]; ++y)
-                {
-                    std::cout << grid.at({ x, y, z });
-                }
+        // do iteration
 
-                std::cout << "\n";
-            }
-
-            std::cout << "\n\n";
-        }
-
-        std::cout << std::endl;
+        grid_printer<3>::print(grid);
     }
 };
 
+// ==============================================================================
 
 int main(const int argc, char* argv[])
 {
+#ifdef _MSC_VER
     struct do_finally { ~do_finally() { std::cin.get(); } } _;
+#endif
 
     if (argc < 6 )
     {
