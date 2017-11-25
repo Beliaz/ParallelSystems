@@ -25,6 +25,7 @@ void print3D(TYPE *array, SIZETYPE size) {
     }
 }
 
+//Create and write the random values to start with
 void autoFill3D(TYPE *array, SIZETYPE size) {
 #pragma omp parallel for
     for (SIZETYPE i = 1; i < size + 1; i++)
@@ -33,6 +34,9 @@ void autoFill3D(TYPE *array, SIZETYPE size) {
                 array[i * (size + 2) * (size + 2) + j * (size + 2) + k] = (TYPE) (std::rand() % 600) + 173;
 }
 
+//Write Borders so we do not need any border cases.
+//Needs some crazy position calculations as there is only a one dimensional array used.
+//However, the first layer of size (size + 2)² is the top one, so the value in the left top corner got index 0
 void create3DBorders(TYPE *array, SIZETYPE size, TYPE *borders) {
     for (SIZETYPE i = 0; i < (size + 2) * (size + 2); i++) {
         array[i] = borders[0];
@@ -55,6 +59,7 @@ void create3DBorders(TYPE *array, SIZETYPE size, TYPE *borders) {
     }
 }
 
+//Does the job and returns the delta Epsilon accumulated over all comparisons.
 TYPE iteration3D(TYPE *source, TYPE *target, SIZETYPE size) {
     TYPE dEpsilon = 0;
 #pragma omp parallel for reduction (+ : dEpsilon)
@@ -62,6 +67,7 @@ TYPE iteration3D(TYPE *source, TYPE *target, SIZETYPE size) {
         for (SIZETYPE j = 1; j < size + 1; j++) {
             for (SIZETYPE k = 1; k < size + 1; k++) {
                 TYPE current = source[i * (size + 2) * (size + 2) + j * (size + 2) + k];
+                //Using seven points as it is necessary to take the local value into account as well
                 TYPE newValue = (TYPE) ((
                         source[i * (size + 2) * (size + 2) + j * (size + 2) + k - 1] +
                         source[i * (size + 2) * (size + 2) + j * (size + 2) + k + 1] +
@@ -79,6 +85,7 @@ TYPE iteration3D(TYPE *source, TYPE *target, SIZETYPE size) {
     return dEpsilon;
 }
 
+//Function to control and start the computation. Does measure the time as well and returns it
 unsigned long calculate3D(SIZETYPE size, TYPE *borders) {
     auto *array1 = initArray(size, 3);
     auto *array2 = initArray(size, 3);
@@ -86,15 +93,20 @@ unsigned long calculate3D(SIZETYPE size, TYPE *borders) {
     create3DBorders(array1, size, borders);
     create3DBorders(array2, size, borders);
 
+    //Start to measure time
     unsigned long startTime = time_ms();
     unsigned long finishTime;
+
+    //Always do two iterations, as the arrays have to switch every time. This way, it is not needed to keep track which was the last
     while(true){
         iteration3D(array1, array2, size);
 
         TYPE dEpsilon = iteration3D(array2, array1, size);
         if (dEpsilon < epsilonStop) {
             finishTime = time_ms();
-            print3D(array1, size);
+            //Finish measuring time
+            if (DOPRINT)
+                print3D(array1, size);
             break;
         }
     }

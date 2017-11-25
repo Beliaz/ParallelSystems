@@ -41,13 +41,13 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
-    std::cout << std::endl;
     std::srand(std::time(0));
     int dimension = atoi(argv[1]);
     SIZETYPE size = atoi(argv[2]);
     if (dimension > 3 || dimension < 1 || size <= 0)
         return EXIT_FAILURE;
 
+    //Array used to write the border cases
     TYPE *borders = new TYPE[size];
     for (int i = 0; i < dimension * 2; i++)
         borders[i] = atoi(argv[i+3]);

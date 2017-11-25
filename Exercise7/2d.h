@@ -21,6 +21,7 @@ void print2D(TYPE *array, SIZETYPE size) {
     }
 }
 
+//Create and write the random values to start with
 void autoFill2D(TYPE *array, SIZETYPE size) {
 #pragma omp parallel for
     for (SIZETYPE i = 1; i < size + 1; i++) {
@@ -29,6 +30,7 @@ void autoFill2D(TYPE *array, SIZETYPE size) {
     }
 }
 
+//Write Borders so we do not need any border cases.
 void create2DBorders(TYPE *array, SIZETYPE size, TYPE *borders) {
     for (SIZETYPE i = 0; i < size + 2; i++) {
         array[i] = borders[0];
@@ -42,12 +44,14 @@ void create2DBorders(TYPE *array, SIZETYPE size, TYPE *borders) {
     }
 }
 
+//Does the job and returns the delta Epsilon accumulated over all comparisons.
 TYPE iteration2D(TYPE *source, TYPE *target, SIZETYPE size) {
     TYPE dEpsilon = 0;
 #pragma omp parallel for reduction (+ : dEpsilon)
     for (SIZETYPE i = 1; i < size + 1; i++) {
         for (SIZETYPE j = 1; j < size + 1; j++) {
             TYPE current = source[i*(size+2)+j];
+            //Using five points as it is necessary to take the local value into account as well
             TYPE newValue = (TYPE) ((source[i*(size+2)+j-1] + source[i*(size+2)+j] + source[i*(size+2)+j+1] + source[(i-1)*(size+2)+j] + source[(i+1)*(size+2)+j]) / 5);
             target[i*(size+2)+j] = newValue;
             dEpsilon += current - newValue > 0 ? current - newValue : newValue - current;
@@ -57,6 +61,7 @@ TYPE iteration2D(TYPE *source, TYPE *target, SIZETYPE size) {
     return dEpsilon;
 }
 
+//Function to control and start the computation. Does measure the time as well and returns it
 unsigned long calculate2D(SIZETYPE size, TYPE *borders) {
     auto *array1 = initArray(size, 2);
     auto *array2 = initArray(size, 2);
@@ -64,15 +69,20 @@ unsigned long calculate2D(SIZETYPE size, TYPE *borders) {
     create2DBorders(array2, size, borders);
     autoFill2D(array1, size);
 
+    //Start to measure time
     unsigned long startTime = time_ms();
     unsigned long finishTime;
+
+    //Always do two iterations, as the arrays have to switch every time. This way, it is not needed to keep track which was the last
     while(true){
         iteration2D(array1, array2, size);
 
         TYPE dEpsilon = iteration2D(array2, array1, size);
         if (dEpsilon < epsilonStop) {
+            //Finish measuring time
             finishTime = time_ms();
-            print2D(array1, size);
+            if (DOPRINT)
+                print2D(array1, size);
             break;
         }
     }

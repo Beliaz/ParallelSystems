@@ -6,7 +6,9 @@
 #define TYPE float
 #define SIZETYPE long
 #define epsilonStop 1
+#define DOPRINT true
 
+//Creates an array based on the dimension an size
 TYPE* initArray(SIZETYPE size, short dimension) {
     TYPE *array = nullptr;
     switch (dimension) {
