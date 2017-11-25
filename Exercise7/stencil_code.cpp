@@ -5,6 +5,7 @@
 #include "1d.h"
 #include "2d.h"
 #include "3d.h"
+#include "time_ms.h"
 
 int main() {
     std::cout << std::endl;
@@ -18,6 +19,8 @@ int main() {
 
 
     TYPE *borders;
+
+    unsigned long startTime = time_ms();
     switch (dimension) {
         default:
         case 1:
@@ -42,4 +45,6 @@ int main() {
             borders[5] = 2000;
             calculate3D(size, borders);
     }
+    unsigned long finishTime = time_ms();
+    std::cout << "Took " << finishTime - startTime << "ms to finish the job" << std::endl;
 }
