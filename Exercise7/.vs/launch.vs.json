@@ -1,0 +1,29 @@
+{
+  "version": "0.2.1",
+  "defaults": {},
+  "configurations": [
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "${buildRoot}\\stencil.exe",
+      "name": "stencil 1d",
+      "args": [ "0.1 1 10 1 1" ]
+    },
+
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "${buildRoot}\\stencil.exe",
+      "name": "stencil 2d",
+      "args": [ "0.1 2 10 1 1 1 1" ]
+    },
+
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "${buildRoot}\\stencil.exe",
+      "name": "stencil 3d",
+      "args": [ "0.1 3 3 1 1 1 1 1 1" ]
+    }
+  ]
+}
