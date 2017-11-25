@@ -9,7 +9,6 @@
 #endif //PARALLELSYSTEMSTEAM_3D_H
 
 void print3D(TYPE *array, SIZETYPE size) {
-
     for (int i = 0; i < size + 2; i++) {
         for (SIZETYPE j = 0; j <= size + 1; j++) {
             for (SIZETYPE k = 0; k <= size + 1; k++) {
@@ -21,6 +20,14 @@ void print3D(TYPE *array, SIZETYPE size) {
         }
         std::cout << std::endl;
     }
+}
+
+void autoFill3D(TYPE *array, SIZETYPE size) {
+#pragma omp parallel for
+    for (SIZETYPE i = 1; i < size + 1; i++)
+        for (SIZETYPE j = 1; j < size + 1; j++)
+            for (SIZETYPE k = 1; k < size + 1; k++)
+                array[i * (size + 2) * (size + 2) + j * (size + 2) + k] = (TYPE) (std::rand() % 600) + 173;
 }
 
 void create3DBorders(TYPE *array, SIZETYPE size, TYPE *borders) {
@@ -72,6 +79,7 @@ TYPE iteration3D(TYPE *source, TYPE *target, SIZETYPE size) {
 void calculate3D(SIZETYPE size, TYPE *borders) {
     auto *array1 = initArray(size, 3);
     auto *array2 = initArray(size, 3);
+    autoFill3D(array1, size);
     create3DBorders(array1, size, borders);
     create3DBorders(array2, size, borders);
 
