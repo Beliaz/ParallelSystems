@@ -2,10 +2,10 @@
 #include <iostream>
 #include <cmath>
 #include <ctime>
+#include "baseDef.h"
 #include "1d.h"
 #include "2d.h"
 #include "3d.h"
-#include "time_ms.h"
 
 bool inputTester(int argc, char **argv) {
     //Dimension + Size always needed + 2*dimension for borders
@@ -14,6 +14,23 @@ bool inputTester(int argc, char **argv) {
         if (std::isnan(atoi(argv[i])))
             return false;
     return (argc == 5 && atoi(argv[1]) == 1 || argc == 7 && atoi(argv[1]) == 2 || argc == 9 && atoi(argv[1]) == 3);
+}
+
+unsigned long calculate(SIZETYPE size, TYPE *borders, int dimension) {
+    unsigned long duration = 0;
+    switch (dimension) {
+        default:
+        case 1:
+            duration = calculate1D(size, borders);
+            break;
+        case 2:
+            duration = calculate2D(size, borders);
+            break;
+        case 3:
+            duration = calculate3D(size, borders);
+            break;
+    }
+    return duration;
 }
 
 int main(int argc, char **argv) {
@@ -28,31 +45,13 @@ int main(int argc, char **argv) {
     std::srand(std::time(0));
     int dimension = atoi(argv[1]);
     SIZETYPE size = atoi(argv[2]);
-    if (dimension > 3 || dimension < 1)
+    if (dimension > 3 || dimension < 1 || size <= 0)
         return EXIT_FAILURE;
-    if (size <= 0)
-        return EXIT_FAILURE;
-
 
     TYPE *borders = new TYPE[size];
-
     for (int i = 0; i < dimension * 2; i++)
         borders[i] = atoi(argv[i+3]);
 
-    unsigned long startTime = time_ms();
-    switch (dimension) {
-        default:
-        case 1:
-            calculate1D(size, borders);
-            break;
-        case 2:
-            calculate2D(size, borders);
-            break;
-        case 3:
-            calculate3D(size, borders);
-            break;
-    }
-    unsigned long finishTime = time_ms();
-    std::cout << "Took " << finishTime - startTime << "ms to finish the job" << std::endl;
+    std::cout << "Took " << calculate(size, borders, dimension) << "ms to finish the job" << std::endl;
     return EXIT_SUCCESS;
 }

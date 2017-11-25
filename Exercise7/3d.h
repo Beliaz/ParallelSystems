@@ -2,6 +2,9 @@
 #ifndef TYPE
 #include "baseDef.h"
 #endif
+#ifndef time_ms
+#include "time_ms.h"
+#endif
 
 #ifndef PARALLELSYSTEMSTEAM_3D_H
 #define PARALLELSYSTEMSTEAM_3D_H
@@ -76,21 +79,24 @@ TYPE iteration3D(TYPE *source, TYPE *target, SIZETYPE size) {
     return dEpsilon;
 }
 
-void calculate3D(SIZETYPE size, TYPE *borders) {
+unsigned long calculate3D(SIZETYPE size, TYPE *borders) {
     auto *array1 = initArray(size, 3);
     auto *array2 = initArray(size, 3);
     autoFill3D(array1, size);
     create3DBorders(array1, size, borders);
     create3DBorders(array2, size, borders);
 
+    unsigned long startTime = time_ms();
+    unsigned long finishTime;
     while(true){
-
         iteration3D(array1, array2, size);
 
         TYPE dEpsilon = iteration3D(array2, array1, size);
-        if (dEpsilon < 1) {
+        if (dEpsilon < epsilonStop) {
+            finishTime = time_ms();
             print3D(array1, size);
             break;
         }
     }
+    return finishTime - startTime;
 }

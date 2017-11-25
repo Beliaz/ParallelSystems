@@ -2,6 +2,9 @@
 #ifndef TYPE
 #include "baseDef.h"
 #endif
+#ifndef time_ms
+#include "time_ms.h"
+#endif
 
 #ifndef PARALLELSYSTEMSTEAM_2D_H
 #define PARALLELSYSTEMSTEAM_2D_H
@@ -54,20 +57,24 @@ TYPE iteration2D(TYPE *source, TYPE *target, SIZETYPE size) {
     return dEpsilon;
 }
 
-void calculate2D(SIZETYPE size, TYPE *borders) {
+unsigned long calculate2D(SIZETYPE size, TYPE *borders) {
     auto *array1 = initArray(size, 2);
     auto *array2 = initArray(size, 2);
     create2DBorders(array1, size, borders);
     create2DBorders(array2, size, borders);
     autoFill2D(array1, size);
 
+    unsigned long startTime = time_ms();
+    unsigned long finishTime;
     while(true){
         iteration2D(array1, array2, size);
 
         TYPE dEpsilon = iteration2D(array2, array1, size);
-        if (dEpsilon < 1) {
+        if (dEpsilon < epsilonStop) {
+            finishTime = time_ms();
             print2D(array1, size);
             break;
         }
     }
+    return finishTime - startTime;
 }

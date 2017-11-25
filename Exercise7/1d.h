@@ -2,6 +2,10 @@
 #ifndef TYPE
 #include "baseDef.h"
 #endif
+#ifndef time_ms
+#include "time_ms.h"
+
+#endif
 
 #ifndef PARALLELSYSTEMSTEAM_1D_H
 #define PARALLELSYSTEMSTEAM_1D_H
@@ -35,7 +39,7 @@ TYPE iteration(TYPE *source, TYPE *target, SIZETYPE size) {
     return dEpsilon;
 }
 
-void calculate1D(SIZETYPE size, TYPE *borders) {
+unsigned long calculate1D(SIZETYPE size, TYPE *borders) {
     auto *array1 = initArray(size, 1);
     auto *array2 = initArray(size, 1);
     autoFill(array1, size);
@@ -43,13 +47,17 @@ void calculate1D(SIZETYPE size, TYPE *borders) {
     array1[0] = array2[0] = borders[0];
     array1[size+1] = array2[size+1] = borders[1];
 
+    unsigned long startTime = time_ms();
+    unsigned long finishTime;
     while(true){
         iteration(array1, array2, size);
 
         TYPE dEpsilon = iteration(array2, array1, size);
-        if (dEpsilon < 1) {
+        if (dEpsilon < epsilonStop) {
+            finishTime = time_ms();
             print1D(array1, size);
             break;
         }
     }
+    return finishTime - startTime;
 }
