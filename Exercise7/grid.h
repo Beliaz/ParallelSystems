@@ -29,13 +29,10 @@ template<class CellType, size_t Dim>
 using bounds_t = std::array<CellType, 2 * Dim>;
 
 // =================================================================
-// grid
+// extents
 
 template<size_t Dim>
 using grid_extents_t = std::array<size_t, Dim>;
-
-template<size_t Dim>
-using grid_index_t = std::array<size_t, Dim>;
 
 template<size_t Dim>
 auto size(const grid_extents_t<Dim>& extents)
@@ -47,6 +44,12 @@ auto size(const grid_extents_t<Dim>& extents)
 
     return size;
 }
+
+// =================================================================
+// index
+
+template<size_t Dim>
+using grid_index_t = std::array<size_t, Dim>;
 
 template<size_t Dim>
 struct index_helper;
@@ -86,6 +89,8 @@ struct index_helper<3>
     }
 };
 
+// =================================================================
+// grid
 
 template<class CellType, size_t Dim>
 class grid_t

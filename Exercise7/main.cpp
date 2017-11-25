@@ -1,6 +1,7 @@
 #include "grid.h"
 #include <iostream>
 #include "print.h"
+#include "grid_helper.h"
 
 // ==============================================================================
 // define types
@@ -19,6 +20,54 @@ using grid_t = stencil::grid_t<cell_t, Dim>;
 template<size_t Dim>
 using bounds_t = stencil::bounds_t<cell_t, Dim>;
 
+// ==============================================================================
+// iteration
+
+template<size_t Dim>
+struct jacobi_iteration;
+
+template<>
+struct jacobi_iteration<1>
+{
+    static void execute(double epsilon, const stencil::grid_extents_t<1> extents, const bounds_t<1> bounds)
+    {
+        auto grid = create_grid<cell_t, 1>(extents, bounds, 0);
+
+        // do iteration
+
+        grid_printer<1>::print(grid);
+    }
+};
+
+template<>
+struct jacobi_iteration<2>
+{
+    static void execute(double epsilon, const stencil::grid_extents_t<2> extents, const bounds_t<2> bounds)
+    {
+        auto grid = create_grid<cell_t, 2>(extents, bounds, 0);
+
+        // do iteration
+
+        grid_printer<2>::print(grid);
+    }
+};
+
+template<>
+struct jacobi_iteration<3>
+{
+    static void execute(double epsilon, const stencil::grid_extents_t<3> extents, const bounds_t<3> bounds)
+    {
+        auto grid = create_grid<cell_t, 3>(extents, bounds, 0);
+
+        // do iteration
+
+        grid_printer<3>::print(grid);
+    }
+};
+
+// ==============================================================================
+// entry point
+
 template<size_t Dim>
 bounds_t<Dim> parse_bounds(char* argv[], const size_t offset)
 {
@@ -29,65 +78,6 @@ bounds_t<Dim> parse_bounds(char* argv[], const size_t offset)
 
     return bounds;
 }
-
-// ==============================================================================
-// iteration
-
-template<size_t Dim>
-struct jacobian_iteration;
-
-template<>
-struct jacobian_iteration<1>
-{
-    static void execute(double epsilon, const stencil::grid_extents_t<1> extents, bounds_t<1> bounds)
-    {
-        using grid_t = grid_t<1>;
-
-        grid_t grid(extents);
-
-        grid.set({ extents[0] / 2 }, 2);
-
-        // do iteration
-
-        grid_printer<1>::print(grid);
-    }
-};
-
-template<>
-struct jacobian_iteration<2>
-{
-    static void execute(double epsilon, const stencil::grid_extents_t<2> extents, bounds_t<2> bounds)
-    {
-        using grid_t = grid_t<2>;
-
-        grid_t grid(extents);
-
-        grid.set({ extents[0] / 2, extents[1] / 2 }, 2);
-
-        // do iteration
-
-        grid_printer<2>::print(grid);
-    }
-};
-
-template<>
-struct jacobian_iteration<3>
-{
-    static void execute(double epsilon, const stencil::grid_extents_t<3> extents, bounds_t<3> bounds)
-    {
-        using grid_t = grid_t<3>;
-
-        grid_t grid(extents);
-
-        grid.set({ extents[0] / 2, extents[1] / 2, extents[2] / 2 }, 2);
-
-        // do iteration
-
-        grid_printer<3>::print(grid);
-    }
-};
-
-// ==============================================================================
 
 int main(const int argc, char* argv[])
 {
@@ -132,13 +122,13 @@ int main(const int argc, char* argv[])
     {
         switch (dim)
         {
-        case 1: jacobian_iteration<1>::execute(epsilon, { n },       
+        case 1: jacobi_iteration<1>::execute(epsilon, { n },       
             parse_bounds<1>(argv, bounds_arg_offset)); break;
 
-        case 2: jacobian_iteration<2>::execute(epsilon, { n, n },
+        case 2: jacobi_iteration<2>::execute(epsilon, { n, n },
             parse_bounds<2>(argv, bounds_arg_offset)); break;
 
-        case 3: jacobian_iteration<3>::execute(epsilon, { n, n, n },
+        case 3: jacobi_iteration<3>::execute(epsilon, { n, n, n },
             parse_bounds<3>(argv, bounds_arg_offset)); break;
 
         default: return EXIT_FAILURE;
