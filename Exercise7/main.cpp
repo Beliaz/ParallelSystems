@@ -1,6 +1,7 @@
 #include "grid.h"
 #include <iostream>
 #include "print.h"
+#include "grid_helper.h"
 
 // ==============================================================================
 // define types
@@ -21,82 +22,6 @@ using bounds_t = stencil::bounds_t<cell_t, Dim>;
 
 // ==============================================================================
 // iteration
-template<size_t Dim>
-struct grid_helper;
-
-template<>
-struct grid_helper<1>
-{
-    static void initialize(grid_t<1>& grid, const bounds_t<1>& bounds, const cell_t& initial_value)
-    {
-        grid.set({ 0 }, bounds[0]);
-        grid.set({ grid.extents()[0] - 1 }, bounds[1]);
-        
-        for (auto i = 1u; i < grid.extents()[0] - 1; ++i)
-            grid.set({ i }, initial_value);
-    }
-};
-
-template<>
-struct grid_helper<2>
-{
-    static void initialize(grid_t<2>& grid, const bounds_t<2>& bounds, const cell_t& initial_value)
-    {
-        const auto& extents = grid.extents();
-
-        for (auto y = 0u; y < grid.extents()[1]; ++y)
-        {
-            for (auto x = 0u; x < grid.extents()[0]; ++x)
-            {
-                auto value = initial_value;
-
-                value += x == 0 || x == extents[0] - 1 ? bounds[0] : 0;
-                value += y == 0 || y == extents[1] - 1 ? bounds[1] : 0;
-
-                grid.set({ x, y }, value);
-            }
-        }
-    }
-};
-
-template<>
-struct grid_helper<3>
-{
-    static void initialize(grid_t<3>& grid, const bounds_t<3>& bounds, const cell_t& initial_value)
-    {
-        const auto& extents = grid.extents();
-
-        for (auto z = 0u; z < grid.extents()[2]; ++z)
-        {
-            for (auto y = 0u; y < grid.extents()[1]; ++y)
-            {
-                for (auto x = 0u; x < grid.extents()[0]; ++x)
-                {
-                    auto value = initial_value;
-
-                    value += x == 0 || x == extents[0] - 1 ? bounds[0] : 0;
-                    value += y == 0 || y == extents[1] - 1 ? bounds[1] : 0;
-                    value += z == 0 || z == extents[2] - 1 ? bounds[2] : 0;
-
-                    grid.set({ x, y, z }, value);
-                }
-            }
-        }
-    }
-};
-
-template<size_t Dim>
-grid_t<Dim> create_grid(stencil::grid_extents_t<Dim> extents, const bounds_t<Dim>& bounds, const cell_t& initial_value)
-{
-    for (auto& extent : extents)
-        extent += 2; // make place for bounds
-
-    grid_t<Dim> grid(extents);
-
-    grid_helper<Dim>::initialize(grid, bounds, initial_value);
-
-    return grid;
-}
 
 template<size_t Dim>
 struct jacobi_iteration;
@@ -106,7 +31,7 @@ struct jacobi_iteration<1>
 {
     static void execute(double epsilon, const stencil::grid_extents_t<1> extents, const bounds_t<1> bounds)
     {
-        auto grid = create_grid<1>(extents, bounds, 0);
+        auto grid = create_grid<cell_t, 1>(extents, bounds, 0);
 
         // do iteration
 
@@ -119,7 +44,7 @@ struct jacobi_iteration<2>
 {
     static void execute(double epsilon, const stencil::grid_extents_t<2> extents, const bounds_t<2> bounds)
     {
-        auto grid = create_grid<2>(extents, bounds, 0);
+        auto grid = create_grid<cell_t, 2>(extents, bounds, 0);
 
         // do iteration
 
@@ -132,7 +57,7 @@ struct jacobi_iteration<3>
 {
     static void execute(double epsilon, const stencil::grid_extents_t<3> extents, const bounds_t<3> bounds)
     {
-        auto grid = create_grid<3>(extents, bounds, 0);
+        auto grid = create_grid<cell_t, 3>(extents, bounds, 0);
 
         // do iteration
 
