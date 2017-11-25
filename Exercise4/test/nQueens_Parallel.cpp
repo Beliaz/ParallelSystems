@@ -1,5 +1,6 @@
 #include <malloc.h>
 #include <iostream>
+#include "time_ms.h"
 
 int* initArray (int problemSize, int i, int j) {
     auto* array = new int[problemSize];
@@ -61,8 +62,13 @@ int findIterations(int problemSize) {
     return sum;
 }
 
-int main(void) {
-    int size = 10;
+int main(int argc, char *argv[]) {
+    if (argc != 2)
+        return EXIT_FAILURE;
+    int size = atoi(argv[1]);
+    unsigned long start_time = time_ms();
     printf("Found %d iterations\n",findIterations(size));
-    return 0;
+    unsigned long end_time = time_ms() - start_time;
+    printf("Took %lu ms for problem size of %d", end_time, size);
+    return EXIT_SUCCESS;
 }

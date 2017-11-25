@@ -67,11 +67,11 @@ int main(int argc, char** argv) {
     int problemSize = atoi(argv[1]);
     int foundPermutations = 0;
     int permutationCount = factorial(problemSize);
-    int *permutations = new int[problemSize * permutationCount];
+    int *permutations = new int[problemSize * permutationCount * sizeof(double)];
 
     createPermutations(problemSize, permutations);
-    foundPermutations = checkPermutations(problemSize, permutationCount, permutations);
+    //foundPermutations = checkPermutations(problemSize, permutationCount, permutations);
 
-    printf("found %d possibilities\n", foundPermutations);
+    //printf("found %d possibilities\n", foundPermutations);
 
 }
