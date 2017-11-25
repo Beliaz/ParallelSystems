@@ -9,7 +9,7 @@ int main() {
     std::cout << std::endl;
     std::srand(std::time(0));
     short dimension = 2;
-    SIZETYPE size = 200;
+    SIZETYPE size = 20;
     if (dimension > 3 || dimension < 1)
         return EXIT_FAILURE;
     if (size <= 0)
