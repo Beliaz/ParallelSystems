@@ -29,39 +29,112 @@ struct jacobi_iteration;
 template<>
 struct jacobi_iteration<1>
 {
-    static void execute(double epsilon, const stencil::grid_extents_t<1> extents, const bounds_t<1> bounds)
+    static void execute(const float epsilon, const stencil::grid_extents_t<1> extents, const bounds_t<1> bounds)
     {
         auto grid = create_grid<cell_t, 1>(extents, bounds, 0);
 
-        // do iteration
+        print(grid);
+        std::cout << "\n";
 
-        grid_printer<1>::print(grid);
+        auto max_diff = std::numeric_limits<decltype(epsilon)>::max();
+
+        while(max_diff > epsilon)
+        {
+            max_diff = 0;
+
+            for (auto i = 1u; i < extents[0] + 1; ++i)
+            {
+                const auto new_value = (grid.at(i - 1) + grid.at(i + 1)) / 2;
+
+                max_diff = std::max(max_diff, new_value - grid.at(i));
+
+                grid.set({ i }, new_value);
+            }
+        }
+
+        print(grid);
+        std::cout << std::endl;
     }
 };
 
 template<>
 struct jacobi_iteration<2>
 {
-    static void execute(double epsilon, const stencil::grid_extents_t<2> extents, const bounds_t<2> bounds)
+    static void execute(const float epsilon, const stencil::grid_extents_t<2> extents, const bounds_t<2> bounds)
     {
         auto grid = create_grid<cell_t, 2>(extents, bounds, 0);
 
-        // do iteration
+        print(grid);
+        std::cout << "\n";
 
-        grid_printer<2>::print(grid);
+        auto max_diff = std::numeric_limits<decltype(epsilon)>::max();
+
+        while (max_diff > epsilon)
+        {
+            max_diff = 0;
+
+            for (auto y = 1u; y < extents[1] + 1; ++y)
+            {
+                for (auto x = 1u; x < extents[0] + 1; ++x)
+                {
+                    const auto new_value = (
+                            grid.at({ x - 1, y + 0 }) + 
+                            grid.at({ x + 1, y + 0 }) +
+                            grid.at({ x + 0, y - 1 }) +
+                            grid.at({ x - 1, y + 1 })) / 4;
+
+                    max_diff = std::max(max_diff, new_value - grid.at({x, y}));
+
+                    grid.set({ x, y }, new_value);
+                }
+            }
+        }
+
+        print(grid);
+        std::cout << std::endl;
     }
 };
 
 template<>
 struct jacobi_iteration<3>
 {
-    static void execute(double epsilon, const stencil::grid_extents_t<3> extents, const bounds_t<3> bounds)
+    static void execute(const float epsilon, const stencil::grid_extents_t<3> extents, const bounds_t<3> bounds)
     {
         auto grid = create_grid<cell_t, 3>(extents, bounds, 0);
 
-        // do iteration
+        print(grid);
+        std::cout << "\n";
 
-        grid_printer<3>::print(grid);
+        auto max_diff = std::numeric_limits<decltype(epsilon)>::max();
+
+        while (max_diff > epsilon)
+        {
+            max_diff = 0;
+
+            for (auto z = 1u; z < extents[2] + 1; ++z)
+            {
+                for (auto y = 1u; y < extents[1] + 1; ++y)
+                {
+                    for (auto x = 1u; x < extents[0] + 1; ++x)
+                    {
+                        const auto new_value = (
+                            grid.at({ x - 1, y + 0, z + 0 }) +
+                            grid.at({ x + 1, y + 0, z + 0 }) +
+                            grid.at({ x + 0, y - 1, z + 0 }) +
+                            grid.at({ x + 0, y + 1, z + 0 }) +
+                            grid.at({ x + 0, y + 0, z - 1 }) +
+                            grid.at({ x + 0, y + 0, z + 1 })) / 6;
+
+                        max_diff = std::max(max_diff, new_value - grid.at({ x, y, z }));
+
+                        grid.set({ x, y, z }, new_value);
+                    }
+                }
+            }
+        }
+
+        print(grid);
+        std::cout << std::endl;
     }
 };
 
@@ -74,7 +147,7 @@ bounds_t<Dim> parse_bounds(char* argv[], const size_t offset)
     bounds_t<Dim> bounds;
 
     for (auto i = 0u; i < bounds.size(); ++i)
-        bounds[i] = static_cast<cell_t>(atof(argv[offset + i]));
+        stencil::set_cell_value(bounds[i], static_cast<float>(atof(argv[offset + i])));
 
     return bounds;
 }
@@ -94,7 +167,7 @@ int main(const int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    const auto epsilon = atof(argv[1]);
+    const auto epsilon = static_cast<cell_t>(atof(argv[1]));
     const auto dim = atoi(argv[2]);
     const auto n = static_cast<size_t>(atoi(argv[3]));
 
