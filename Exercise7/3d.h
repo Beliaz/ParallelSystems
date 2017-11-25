@@ -30,48 +30,59 @@ void create3DBorders(TYPE *array, SIZETYPE size, TYPE *borders) {
     for (SIZETYPE i = 0; i < (size + 2) * (size + 2); i++) {
         array[(size+2)*(size + 2)*(size+1)+i] = borders[1];
     }
-    int counter = 0;
-    for (SIZETYPE i = 1; i <= (size + 2) * (size + 2); i++) {
-        //short version for position i*(size + 2) …
-        long position = (size + 2) * (size + 2) * (i % (size + 2)) + (size+2) * counter;
+    for (SIZETYPE i = 0; i < (size + 2) * (size + 2); i++) {
+        long position = i*(size + 2);
         array[position] = borders[2];
         array[position + size + 1] = borders[3];
-        if (i != 0 && i%(size + 2) == 0)
-            counter++;
     }
-    counter = 0;
+    int counter = 0;
     for (SIZETYPE i = 1; i <= (size + 2) * (size + 2); i++) {
-        long position = (size + 2) *(size + 2) * counter + i%(size + 2);
-        array[position] = borders[4];
-        array[(size+2) * (size + 2) * (counter + 1) - (i % 4 + 1)] = borders[5];
+        array[(size+2) * (size+2) * counter + i%(size + 2)] = borders[4];
+        array[(size+2) * (size+2) * (counter + 1) - (i%(size+2)+1)] = borders[5];
 
         if (i != 0 && i%(size + 2) == 0)
             counter++;
     }
 }
 
-/*void calculate2D(SIZETYPE size, TYPE *borders) {
-    auto *array1 = initArray(size, 2);
-    auto *array2 = initArray(size, 2);
-    create2DBorders(array1, size, borders);
-    create2DBorders(array2, size, borders);
-    autoFill2D(array1, size);
+TYPE iteration3D(TYPE *source, TYPE *target, SIZETYPE size) {
+    TYPE dEpsilon = 0;
+#pragma omp parallel for reduction (+ : dEpsilon)
+    for (SIZETYPE i = 1; i < size + 1; i++) {
+        for (SIZETYPE j = 1; j < size + 1; j++) {
+            for (SIZETYPE k = 1; k < size + 1; k++) {
+                TYPE current = source[i * (size + 2) * (size + 2) + j * (size + 2) + k];
+                TYPE newValue = (TYPE) ((
+                        source[i * (size + 2) * (size + 2) + j * (size + 2) + k - 1] +
+                        source[i * (size + 2) * (size + 2) + j * (size + 2) + k + 1] +
+                        source[i * (size + 2) * (size + 2) + j * (size + 2) + k] +
+                        source[i * (size + 2) * (size + 2) + (j-1) * (size + 2) + k] +
+                        source[i * (size + 2) * (size + 2) + (j+1) * (size + 2) + k] +
+                        source[(i - 1) * (size + 2) * (size + 2) + (j-1) * (size + 2) + k] +
+                        source[(i + 1) * (size + 2) * (size + 2) + (j-1) * (size + 2) + k]) / 7);
 
-    while(true){
-        iteration2D(array1, array2, size);
-
-        TYPE dEpsilon = iteration2D(array2, array1, size);
-        if (dEpsilon < 1) {
-            print2D(array1, size);
-            break;
+                target[i * (size + 2) * (size + 2) + j * (size + 2) + k] = newValue;
+                dEpsilon += current - newValue > 0 ? current - newValue : newValue - current;
+            }
         }
     }
-}*/
+    return dEpsilon;
+}
 
 void calculate3D(SIZETYPE size, TYPE *borders) {
     auto *array1 = initArray(size, 3);
     auto *array2 = initArray(size, 3);
-    //print3D(array1, size);
     create3DBorders(array1, size, borders);
-    print3D(array1, size);
+    create3DBorders(array2, size, borders);
+
+    while(true){
+
+        iteration3D(array1, array2, size);
+
+        TYPE dEpsilon = iteration3D(array2, array1, size);
+        if (dEpsilon < 1) {
+            print3D(array1, size);
+            break;
+        }
+    }
 }
