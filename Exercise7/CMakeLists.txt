@@ -36,3 +36,4 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/test/)
 
 aux_source_directory(. SRC_LIST)
 
+add_executable(stencil main.cpp)
