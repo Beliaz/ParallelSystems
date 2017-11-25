@@ -17,9 +17,9 @@ template<class CellType>
 using cell_value_t = typename cell_value<CellType>::value_type;
 
 template<class CellType, class CellValueType>
-void set_cell_value(CellType& cell, const CellValueType value)
+void set_cell_value(CellType&, const CellValueType)
 {
-    static_assert(std::is_void_v<CellType>, "set_cell_value not implemented for this type");
+    static_assert(std::is_void<CellType>::value, "set_cell_value not implemented for this type");
 }
 
 // =================================================================
@@ -108,7 +108,7 @@ public:
     explicit grid_t(const extents_type& extents)
         : extents_(extents)
     {
-        cells_.resize(size(extents_));
+        cells_.reserve(size(extents_));
     }
 
     const cell_type& at(const index_type& index) const

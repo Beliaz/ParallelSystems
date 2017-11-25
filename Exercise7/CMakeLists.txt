@@ -6,8 +6,6 @@ set(CMAKE_MODULE_PATH
         ${CMAKE_MODULE_PATH}
         ${PROJECT_SOURCE_DIR}/cmake)
 
-set(CMAKE_BUILD_TYPE Debug)
-
 include(CTest)
 
 enable_testing()
@@ -15,9 +13,10 @@ enable_testing()
 set(BENCHMARK_ENABLE_TESTING OFF)
 
 if(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest /wd4141 /WX /arch:AVX2")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest /wd4141 /arch:AVX2")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ox /arch:AVX2 /DNDEBUG")
 else()
+	set(CMAKE_BUILD_TYPE Release)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -march=native")
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG ")
 endif()
