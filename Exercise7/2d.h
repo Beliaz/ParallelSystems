@@ -26,7 +26,7 @@ void autoFill2D(TYPE *array, SIZETYPE size) {
 #pragma omp parallel for
     for (SIZETYPE i = 1; i < size + 1; i++) {
         for (SIZETYPE j = 1; j < size + 1; j++)
-            array[i*(size+2)+j] = (TYPE) (std::rand() % 600) + 173;
+            array[i*(size+2)+j] = 0;
     }
 }
 
@@ -72,19 +72,26 @@ unsigned long calculate2D(SIZETYPE size, TYPE *borders) {
     //Start to measure time
     unsigned long startTime = time_ms();
     unsigned long finishTime;
+    unsigned iterations = 0;
 
     //Always do two iterations, as the arrays have to switch every time. This way, it is not needed to keep track which was the last
-    while(true){
-        iteration2D(array1, array2, size);
+    while (true) {
 
+        iteration2D(array1, array2, size);
         TYPE dEpsilon = iteration2D(array2, array1, size);
+
+        iterations += 2;
+
         if (dEpsilon < epsilonStop) {
             //Finish measuring time
             finishTime = time_ms();
             if (DOPRINT)
-                print2D(array1, size);
+                print1D(array1, size);
             break;
         }
     }
+
+    printf("iterations: %i\n", iterations);
+
     return finishTime - startTime;
 }

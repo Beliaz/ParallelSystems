@@ -56,12 +56,16 @@ unsigned long calculate1D(SIZETYPE size, TYPE *borders) {
     //Start to measure time
     unsigned long startTime = time_ms();
     unsigned long finishTime;
+    unsigned iterations = 0;
 
     //Always do two iterations, as the arrays have to switch every time. This way, it is not needed to keep track which was the last
-    while(true){
-        iteration(array1, array2, size);
+    while (true) {
 
+        iteration(array1, array2, size);
         TYPE dEpsilon = iteration(array2, array1, size);
+
+        iterations += 2;
+
         if (dEpsilon < epsilonStop) {
             //Finish measuring time
             finishTime = time_ms();
@@ -70,5 +74,8 @@ unsigned long calculate1D(SIZETYPE size, TYPE *borders) {
             break;
         }
     }
+
+    printf("iterations: %i\n", iterations);
+
     return finishTime - startTime;
 }
