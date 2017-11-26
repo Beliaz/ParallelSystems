@@ -15,7 +15,7 @@
       "projectTarget": "${buildRoot}\\stencil.exe",
       "name": "stencil 2d",
       "args": [
-        "0.1 2 100 1 1 1 1"
+        "1 2 500 1 1 1 1"
       ]
     },
     {

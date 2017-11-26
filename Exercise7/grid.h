@@ -13,15 +13,6 @@ namespace stencil
 template<class CellType>
 struct cell_value;
 
-template<class CellType>
-using cell_value_t = typename cell_value<CellType>::value_type;
-
-template<class CellType, class CellValueType>
-void set_cell_value(CellType&, const CellValueType)
-{
-    static_assert(std::is_void<CellType>::value, "set_cell_value not implemented for this type");
-}
-
 // =================================================================
 // bounds
 
@@ -116,18 +107,21 @@ public:
         return at(index_helper<dim>::linearize(index, extents_));
     }
 
+    cell_type& at(const index_type& index)
+    {
+        return at(index_helper<dim>::linearize(index, extents_));
+    }
+
     const cell_type& at(const index_value_type linear_index) const
     {
         return cells_[linear_index];
     }
-    
-    void set(const index_type& index, const cell_type& value)
-    {
-        return set_cell_value(
-            cells_[index_helper<dim>::linearize(index, extents_)], 
-            value);
-    }
 
+    cell_type& at(const index_value_type linear_index)
+    {
+        return cells_[linear_index];
+    }
+    
     const extents_type& extents() const { return extents_; }
 
 private:

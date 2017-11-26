@@ -4,17 +4,13 @@
 #include "grid_helper.h"
 #include <string>
 #include "chrono_timer.h"
+#include <tuple>
 
 // ==============================================================================
 // define types
-
-using cell_t = float;
-
-template<>
-void stencil::set_cell_value(cell_t& cell, const float value)
-{
-    cell = value;
-}
+//using cell_t = float;
+using cell_t = std::array<float, 2>;
+using cell_value_t = cell_t::value_type;
 
 template<size_t Dim>
 using grid_t = stencil::grid_t<cell_t, Dim>;
@@ -31,17 +27,20 @@ struct jacobi_iteration;
 template<>
 struct jacobi_iteration<1>
 {
+    template<size_t ReadIndex>
     static auto execute(grid_t<1>& grid)
     {
         auto error = 0.0f;
 
         for (auto i = 1u; i < grid.extents()[0] - 1; ++i)
         {
-            const auto new_value = (grid.at(i - 1) + grid.at(i + 1)) / 2;
+            const auto new_value = (
+                grid.at(i - 1)[ReadIndex] + 
+                grid.at(i + 1)[ReadIndex]) / 2;
 
-            error += abs(new_value - grid.at(i));
+            error += abs(new_value - grid.at(i)[ReadIndex]);
 
-            grid.set({ i }, new_value);
+            grid.at(i)[1 - ReadIndex] = new_value;
         }
 
         return error;
@@ -51,6 +50,7 @@ struct jacobi_iteration<1>
 template<>
 struct jacobi_iteration<2>
 {
+    template<size_t ReadIndex>
     static auto execute(grid_t<2>& grid)
     {
         auto error = 0.0f;
@@ -60,14 +60,14 @@ struct jacobi_iteration<2>
             for (auto x = 1u; x < grid.extents()[0] - 1; ++x)
             {
                 const auto new_value = (
-                        grid.at({ x - 1, y + 0 }) + 
-                        grid.at({ x + 1, y + 0 }) +
-                        grid.at({ x + 0, y - 1 }) +
-                        grid.at({ x - 1, y + 1 })) / 4;
+                        grid.at({ x - 1, y + 0 })[ReadIndex] +
+                        grid.at({ x + 1, y + 0 })[ReadIndex] +
+                        grid.at({ x + 0, y - 1 })[ReadIndex] +
+                        grid.at({ x - 1, y + 1 })[ReadIndex]) / 4;
 
-                error += abs(new_value - grid.at({x, y}));
+                error += abs(new_value - grid.at({x, y})[ReadIndex]);
 
-                grid.set({ x, y }, new_value);
+                grid.at({ x, y })[1 - ReadIndex] = new_value;
             }
         }
             
@@ -78,6 +78,7 @@ struct jacobi_iteration<2>
 template<>
 struct jacobi_iteration<3>
 {
+    template<size_t ReadIndex>
     static auto execute(grid_t<3>& grid)
     {
         auto error = 0.0f;
@@ -89,16 +90,16 @@ struct jacobi_iteration<3>
                 for (auto x = 1u; x < grid.extents()[0] - 1; ++x)
                 {
                     const auto new_value = (
-                        grid.at({ x - 1, y + 0, z + 0 }) +
-                        grid.at({ x + 1, y + 0, z + 0 }) +
-                        grid.at({ x + 0, y - 1, z + 0 }) +
-                        grid.at({ x + 0, y + 1, z + 0 }) +
-                        grid.at({ x + 0, y + 0, z - 1 }) +
-                        grid.at({ x + 0, y + 0, z + 1 })) / 6;
+                        grid.at({ x - 1, y + 0, z + 0 })[ReadIndex] +
+                        grid.at({ x + 1, y + 0, z + 0 })[ReadIndex] +
+                        grid.at({ x + 0, y - 1, z + 0 })[ReadIndex] +
+                        grid.at({ x + 0, y + 1, z + 0 })[ReadIndex] +
+                        grid.at({ x + 0, y + 0, z - 1 })[ReadIndex] +
+                        grid.at({ x + 0, y + 0, z + 1 })[ReadIndex]) / 6;
 
-                    error += abs(new_value - grid.at({x, y, z}));
+                    error += abs(new_value - grid.at({x, y, z})[ReadIndex]);
 
-                    grid.set({ x, y, z }, new_value);
+                    grid.at({ x, y, z })[1 - ReadIndex] = new_value;
                 }
             }
         }
@@ -107,10 +108,10 @@ struct jacobi_iteration<3>
     }
 };
 
-template<class GridType>
+template<size_t ReadIndex, class GridType>
 auto do_jacobi_iteration(GridType& grid)
 {
-    return jacobi_iteration<GridType::dim>::execute(grid);
+    return jacobi_iteration<GridType::dim>::template execute<ReadIndex>(grid);
 }
 
 // ==============================================================================
@@ -122,7 +123,10 @@ bounds_t<Dim> parse_bounds(char* argv[], const size_t offset)
     bounds_t<Dim> bounds;
 
     for (auto i = 0u; i < bounds.size(); ++i)
-        stencil::set_cell_value(bounds[i], static_cast<float>(atof(argv[offset + i])));
+        bounds[i] = { 
+            static_cast<cell_value_t>(atof(argv[offset + i])), 
+            static_cast<cell_value_t>(atof(argv[offset + i])) 
+        };
 
     return bounds;
 }
@@ -132,10 +136,10 @@ void execute_stencil_code(const float epsilon,
     const stencil::grid_extents_t<Dim> extents, 
     const bounds_t<Dim> bounds)
 {
-    chrono_timer timer("create grid (" + std::to_string(Dim) + "D, " +
+    chrono_timer timer("create (" + std::to_string(Dim) + "D, " +
         std::to_string(stencil::size(extents)) + ")");
 
-    auto grid = create_grid<cell_t, Dim>(extents, bounds, 0);
+    auto grid = create_grid<cell_t, Dim>(extents, bounds, {0, 0});
 
     timer.print();  
     timer.stop();
@@ -149,10 +153,20 @@ void execute_stencil_code(const float epsilon,
     }
 
     {
-        chrono_timer t("jacobi      (" + std::to_string(Dim) + "D, " + 
+        chrono_timer t("jacobi (" + std::to_string(Dim) + "D, " + 
             std::to_string(stencil::size(extents)) + ")");
 
-        while (do_jacobi_iteration(grid) > epsilon) {}
+        for(;;)
+        {
+            if (do_jacobi_iteration<0>(grid) < epsilon)
+            {
+                do_jacobi_iteration<1>(grid);
+                break;
+            }
+
+            if (do_jacobi_iteration<1>(grid) < epsilon)
+                break;
+        }
     }
 
     if (extents[0] > 50) return;
@@ -177,7 +191,7 @@ int main(const int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    const auto epsilon = static_cast<cell_t>(atof(argv[1]));
+    const auto epsilon = static_cast<cell_value_t>(atof(argv[1]));
     const auto dim = atoi(argv[2]);
     const auto n = static_cast<size_t>(atoi(argv[3]));
 
