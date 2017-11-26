@@ -4,7 +4,6 @@
 #include "grid_helper.h"
 #include <string>
 #include "chrono_timer.h"
-#include <tuple>
 
 // ==============================================================================
 // define types
@@ -38,7 +37,7 @@ struct jacobi_iteration<1>
                 grid.at(i - 1)[ReadIndex] + 
                 grid.at(i + 1)[ReadIndex]) / 2;
 
-            error += abs(new_value - grid.at(i)[ReadIndex]);
+            error += std::abs(new_value - grid.at(i)[ReadIndex]);
 
             grid.at(i)[1 - ReadIndex] = new_value;
         }
@@ -65,7 +64,7 @@ struct jacobi_iteration<2>
                         grid.at({ x + 0, y - 1 })[ReadIndex] +
                         grid.at({ x - 0, y + 1 })[ReadIndex]) / 4;
 
-                error += abs(new_value - grid.at({x, y})[ReadIndex]);
+                error += std::abs(new_value - grid.at({x, y})[ReadIndex]);
 
                 grid.at({ x, y })[1 - ReadIndex] = new_value;
             }
@@ -97,7 +96,7 @@ struct jacobi_iteration<3>
                         grid.at({ x + 0, y + 0, z - 1 })[ReadIndex] +
                         grid.at({ x + 0, y + 0, z + 1 })[ReadIndex]) / 6;
 
-                    error += abs(new_value - grid.at({x, y, z})[ReadIndex]);
+                    error += std::abs(new_value - grid.at({x, y, z})[ReadIndex]);
 
                     grid.at({ x, y, z })[1 - ReadIndex] = new_value;
                 }
