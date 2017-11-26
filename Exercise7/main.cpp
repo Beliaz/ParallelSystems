@@ -31,6 +31,7 @@ struct jacobi_iteration<1>
     {
         auto error = 0.0f;
 
+        #pragma omp parallel for reduction (+ : error)
         for (auto i = 1u; i < grid.extents()[0] - 1; ++i)
         {
             const auto new_value = (
@@ -54,6 +55,7 @@ struct jacobi_iteration<2>
     {
         auto error = 0.0f;
 
+        #pragma omp parallel for reduction (+ : error)
         for (auto y = 1u; y < grid.extents()[1] - 1; ++y)
         {
             for (auto x = 1u; x < grid.extents()[0] - 1; ++x)
@@ -82,6 +84,7 @@ struct jacobi_iteration<3>
     {
         auto error = 0.0f;
 
+        #pragma omp parallel for reduction (+ : error)
         for (auto z = 1u; z < grid.extents()[2] - 1; ++z)
         {
             for (auto y = 1u; y < grid.extents()[1] - 1; ++y)
@@ -187,7 +190,7 @@ void execute_stencil_code(const float epsilon,
     std::cout << "iterations: " << iterations << std::endl;
 
     // hacky - copies the final values into the first
-    // element (for convenience only)
+    // element (convenience only)
     if (final_value_index == 1) do_jacobi_iteration<1>(grid);
 
     if (extents[0] > 50) return;
@@ -233,10 +236,6 @@ int main(const int argc, char* argv[])
         std::cerr << "dim must be either 1, 2 or 3";
         return EXIT_FAILURE;
     }
-
-    std::cout << "epsilon: " << epsilon << "\n";
-    std::cout << "dim: " << dim << "\n";
-    std::cout << "n: " << n << std::endl;
 
     constexpr auto bounds_arg_offset = 4;
 

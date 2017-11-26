@@ -62,8 +62,10 @@ struct grid_helper<3>
     {
         const auto& extents = grid.extents();
 
+        #pragma omp parallel
         for (auto z = 0u; z < grid.extents()[2]; ++z)
         {
+            #pragma omp for
             for (auto y = 0u; y < grid.extents()[1]; ++y)
             {
                 for (auto x = 0u; x < grid.extents()[0]; ++x)
