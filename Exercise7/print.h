@@ -34,12 +34,42 @@ struct grid_printer<2>
 
         for (auto y = 0u; y < grid.extents()[0]; ++y)
         {
+            if (y == grid.extents()[1] - 1)
+            {
+                std::cout << "===";
+
+                for (auto x = 0u; x < grid.extents()[1]; ++x)
+                    std::cout << "======";
+
+                std::cout << "==";
+
+                std::cout << "\n";
+            }
+            
             for (auto x = 0u; x < grid.extents()[1]; ++x)
             {
+                if (x == grid.extents()[0] - 1)
+                    std::cout << "|| ";
+
                 std::cout << grid.at({ x, y })[0] << " ";
+
+                if (x == 0) std::cout << "|| ";
+            }
+
+            if (y == 0)
+            {
+                std::cout << "\n";
+
+                std::cout << "===";
+
+                for (auto x = 0u; x < grid.extents()[1]; ++x)
+                    std::cout << "======";
+
+                std::cout << "==";
             }
 
             std::cout << "\n";
+
         }
     }
 };
