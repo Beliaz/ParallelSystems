@@ -1,9 +1,12 @@
 #include "grid.h"
-#include <iostream>
 #include "print.h"
 #include "grid_helper.h"
-#include <string>
 #include "chrono_timer.h"
+#include "jacobi.h"
+#include "iteration.h"
+
+#include <string>
+#include <iostream>
 
 // ==============================================================================
 // define types
@@ -17,101 +20,8 @@ using grid_t = stencil::grid_t<cell_t, Dim>;
 template<size_t Dim>
 using bounds_t = stencil::bounds_t<cell_t, Dim>;
 
-// ==============================================================================
-// iteration
-
-template<size_t Dim>
-struct jacobi_iteration;
-
-template<>
-struct jacobi_iteration<1>
-{
-    template<size_t ReadIndex>
-    static auto execute(grid_t<1>& grid)
-    {
-        auto error = 0.0f;
-
-        for (auto i = 1u; i < grid.extents()[0] - 1; ++i)
-        {
-            const auto new_value = (
-                grid.at(i - 1)[ReadIndex] + 
-                grid.at(i + 1)[ReadIndex]) / 2;
-
-            error += std::abs(new_value - grid.at(i)[ReadIndex]);
-
-            grid.at(i)[1 - ReadIndex] = new_value;
-        }
-
-        return error;
-    }
-};
-
-template<>
-struct jacobi_iteration<2>
-{
-    template<size_t ReadIndex>
-    static auto execute(grid_t<2>& grid)
-    {
-        auto error = 0.0f;
-
-        for (auto y = 1u; y < grid.extents()[1] - 1; ++y)
-        {
-            for (auto x = 1u; x < grid.extents()[0] - 1; ++x)
-            {
-                const auto new_value = (
-                        grid.at({ x - 1, y + 0 })[ReadIndex] +
-                        grid.at({ x + 1, y + 0 })[ReadIndex] +
-                        grid.at({ x + 0, y - 1 })[ReadIndex] +
-                        grid.at({ x - 0, y + 1 })[ReadIndex]) / 4;
-
-                error += std::abs(new_value - grid.at({x, y})[ReadIndex]);
-
-                grid.at({ x, y })[1 - ReadIndex] = new_value;
-            }
-        }
-            
-        return error;
-    }
-};
-
-template<>
-struct jacobi_iteration<3>
-{
-    template<size_t ReadIndex>
-    static auto execute(grid_t<3>& grid)
-    {
-        auto error = 0.0f;
-
-        for (auto z = 1u; z < grid.extents()[2] - 1; ++z)
-        {
-            for (auto y = 1u; y < grid.extents()[1] - 1; ++y)
-            {
-                for (auto x = 1u; x < grid.extents()[0] - 1; ++x)
-                {
-                    const auto new_value = (
-                        grid.at({ x - 1, y + 0, z + 0 })[ReadIndex] +
-                        grid.at({ x + 1, y + 0, z + 0 })[ReadIndex] +
-                        grid.at({ x + 0, y - 1, z + 0 })[ReadIndex] +
-                        grid.at({ x + 0, y + 1, z + 0 })[ReadIndex] +
-                        grid.at({ x + 0, y + 0, z - 1 })[ReadIndex] +
-                        grid.at({ x + 0, y + 0, z + 1 })[ReadIndex]) / 6;
-
-                    error += std::abs(new_value - grid.at({x, y, z})[ReadIndex]);
-
-                    grid.at({ x, y, z })[1 - ReadIndex] = new_value;
-                }
-            }
-        }
-
-        return error;
-    }
-};
-
-template<size_t ReadIndex, class GridType>
-auto do_jacobi_iteration(GridType& grid)
-{
-    return jacobi_iteration<GridType::dim>::template execute<ReadIndex>(grid);
-}
+// stencil code using jacobi iteration
+using stencil_code = stencil::stencil_iteration<stencil::jacobi_iteration>;
 
 // ==============================================================================
 // entry point
@@ -169,17 +79,15 @@ void execute_stencil_code(const float epsilon,
 
         for(;;)
         {
-            ++iterations;
-
-            if (do_jacobi_iteration<0>(grid) < epsilon)
+            ++iterations; 
+            if (stencil_code::do_iteration<0>(grid) < epsilon)
             {
                 final_value_index = 1;
                 break;
             }
 
             ++iterations;
-
-            if (do_jacobi_iteration<1>(grid) < epsilon)
+            if (stencil_code::do_iteration<1>(grid) < epsilon)
                 break;
         }
     }
@@ -187,8 +95,8 @@ void execute_stencil_code(const float epsilon,
     std::cout << "iterations: " << iterations << std::endl;
 
     // hacky - copies the final values into the first
-    // element (for convenience only)
-    if (final_value_index == 1) do_jacobi_iteration<1>(grid);
+    // element (convenience only)
+    if (final_value_index == 1) stencil_code::do_iteration<1>(grid);
 
     if (extents[0] > 50) return;
 
@@ -199,6 +107,7 @@ void execute_stencil_code(const float epsilon,
 
 int main(const int argc, char* argv[])
 {
+
 #ifdef _MSC_VER
     struct do_finally { ~do_finally() { std::cin.get(); } } _;
 #endif
@@ -233,10 +142,6 @@ int main(const int argc, char* argv[])
         std::cerr << "dim must be either 1, 2 or 3";
         return EXIT_FAILURE;
     }
-
-    std::cout << "epsilon: " << epsilon << "\n";
-    std::cout << "dim: " << dim << "\n";
-    std::cout << "n: " << n << std::endl;
 
     constexpr auto bounds_arg_offset = 4;
 

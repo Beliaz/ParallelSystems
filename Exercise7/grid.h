@@ -99,7 +99,7 @@ public:
     explicit grid_t(const extents_type& extents)
         : extents_(extents)
     {
-        cells_.resize(size(extents_));
+        cells_.reserve(size(extents_));
     }
 
     const cell_type& at(const index_type& index) const
