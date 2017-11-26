@@ -2,52 +2,10 @@
 #include "print.h"
 #include "grid_helper.h"
 #include "chrono_timer.h"
-#include "jacobi.h"
-#include "iteration.h"
+#include "stencil.h"
 
 #include <string>
 #include <iostream>
-
-// ==============================================================================
-// define types
-//using cell_t = float;
-using cell_t = std::array<float, 2>;
-using cell_value_t = cell_t::value_type;
-
-template<size_t Dim>
-using grid_t = stencil::grid_t<cell_t, Dim>;
-
-template<size_t Dim>
-using bounds_t = stencil::bounds_t<cell_t, Dim>;
-
-// stencil code using jacobi iteration
-using stencil_code = stencil::stencil_iteration<stencil::jacobi_iteration>;
-
-// ==============================================================================
-// entry point
-
-template<size_t Dim>
-bounds_t<Dim> parse_bounds(const int argc, char* argv[], const size_t offset)
-{
-    bounds_t<Dim> bounds;
-
-    if (argc < static_cast<int>(offset + bounds.size()))
-    {
-        throw std::runtime_error("bounds missing ( " + 
-            std::to_string(argc - offset) + 
-            " instead of " + 
-            std::to_string(bounds.size()) + 
-            " )");
-    }
-
-    for (auto i = 0u; i < bounds.size(); ++i)
-        bounds[i] = { 
-            static_cast<cell_value_t>(atof(argv[offset + i])), 
-            static_cast<cell_value_t>(atof(argv[offset + i])) 
-        };
-
-    return bounds;
-}
 
 template<size_t Dim>
 void execute_stencil_code(const float epsilon, 
@@ -97,6 +55,29 @@ void execute_stencil_code(const float epsilon,
     std::cout << "\n" << "Result: " << "\n\n";
     print(grid);
     std::cout << std::endl;
+}
+
+template<size_t Dim>
+bounds_t<Dim> parse_bounds(const int argc, char* argv[], const size_t offset)
+{
+    bounds_t<Dim> bounds;
+
+    if (argc < static_cast<int>(offset + bounds.size()))
+    {
+        throw std::runtime_error("bounds missing ( " +
+            std::to_string(argc - offset) +
+            " instead of " +
+            std::to_string(bounds.size()) +
+            " )");
+    }
+
+    for (auto i = 0u; i < bounds.size(); ++i)
+        bounds[i] = {
+        static_cast<cell_value_t>(atof(argv[offset + i])),
+        static_cast<cell_value_t>(atof(argv[offset + i]))
+    };
+
+    return bounds;
 }
 
 int main(const int argc, char* argv[])

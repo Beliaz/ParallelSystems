@@ -1,5 +1,5 @@
-#ifndef JACOBI_ITERATION_H
-#define JACOBI_ITERATION_H
+#ifndef GRID_H
+#define GRID_H
 
 #include <vector>
 #include <array>
@@ -132,4 +132,4 @@ private:
 }
 
 
-#endif // JACOBI_ITERATION_H
+#endif // GRID_H
