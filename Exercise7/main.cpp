@@ -63,7 +63,7 @@ struct jacobi_iteration<2>
                         grid.at({ x - 1, y + 0 })[ReadIndex] +
                         grid.at({ x + 1, y + 0 })[ReadIndex] +
                         grid.at({ x + 0, y - 1 })[ReadIndex] +
-                        grid.at({ x - 1, y + 1 })[ReadIndex]) / 4;
+                        grid.at({ x - 0, y + 1 })[ReadIndex]) / 4;
 
                 error += abs(new_value - grid.at({x, y})[ReadIndex]);
 
@@ -118,9 +118,18 @@ auto do_jacobi_iteration(GridType& grid)
 // entry point
 
 template<size_t Dim>
-bounds_t<Dim> parse_bounds(char* argv[], const size_t offset)
+bounds_t<Dim> parse_bounds(const int argc, char* argv[], const size_t offset)
 {
     bounds_t<Dim> bounds;
+
+    if (argc < static_cast<int>(offset + bounds.size()))
+    {
+        throw std::runtime_error("bounds missing ( " + 
+            std::to_string(argc - offset) + 
+            " instead of " + 
+            std::to_string(bounds.size()) + 
+            " )");
+    }
 
     for (auto i = 0u; i < bounds.size(); ++i)
         bounds[i] = { 
@@ -152,22 +161,35 @@ void execute_stencil_code(const float epsilon,
         std::cout << std::endl;
     }
 
+    auto final_value_index = 0;
+    auto iterations = 0;
+
     {
         chrono_timer t("jacobi (" + std::to_string(Dim) + "D, " + 
             std::to_string(stencil::size(extents)) + ")");
 
         for(;;)
         {
+            ++iterations;
+
             if (do_jacobi_iteration<0>(grid) < epsilon)
             {
-                do_jacobi_iteration<1>(grid);
+                final_value_index = 1;
                 break;
             }
+
+            ++iterations;
 
             if (do_jacobi_iteration<1>(grid) < epsilon)
                 break;
         }
     }
+
+    std::cout << "iterations: " << iterations << std::endl;
+
+    // hacky - copies the final values into the first
+    // element (for convenience only)
+    if (final_value_index == 1) do_jacobi_iteration<1>(grid);
 
     if (extents[0] > 50) return;
 
@@ -213,6 +235,10 @@ int main(const int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
+    std::cout << "epsilon: " << epsilon << "\n";
+    std::cout << "dim: " << dim << "\n";
+    std::cout << "n: " << n << std::endl;
+
     constexpr auto bounds_arg_offset = 4;
 
     try
@@ -220,13 +246,13 @@ int main(const int argc, char* argv[])
         switch (dim)
         {
         case 1: execute_stencil_code<1>(epsilon, { n }, 
-            parse_bounds<1>(argv, bounds_arg_offset)); break;
+            parse_bounds<1>(argc, argv, bounds_arg_offset)); break;
 
         case 2: execute_stencil_code<2>(epsilon, { n, n }, 
-            parse_bounds<2>(argv, bounds_arg_offset)); break;
+            parse_bounds<2>(argc, argv, bounds_arg_offset)); break;
 
         case 3: execute_stencil_code<3>(epsilon, { n, n, n },
-            parse_bounds<3>(argv, bounds_arg_offset)); break;
+            parse_bounds<3>(argc, argv, bounds_arg_offset)); break;
 
         default: return EXIT_FAILURE;
         }

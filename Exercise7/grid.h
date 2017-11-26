@@ -87,7 +87,7 @@ template<class CellType, size_t Dim>
 class grid_t
 {
 public:
-    static_assert(Dim <= 3, "invalid dimensionality");
+    static_assert(Dim > 0 && Dim <= 3, "invalid dimensionality");
     static constexpr auto dim = Dim;
 
     using cell_type = CellType;
@@ -99,7 +99,7 @@ public:
     explicit grid_t(const extents_type& extents)
         : extents_(extents)
     {
-        cells_.reserve(size(extents_));
+        cells_.resize(size(extents_));
     }
 
     const cell_type& at(const index_type& index) const

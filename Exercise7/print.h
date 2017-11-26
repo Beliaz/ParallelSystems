@@ -32,9 +32,9 @@ struct grid_printer<2>
     {
         std::cout << std::fixed << std::setprecision(3);
 
-        for (auto x = 0u; x < grid.extents()[0]; ++x)
+        for (auto y = 0u; y < grid.extents()[0]; ++y)
         {
-            for (auto y = 0u; y < grid.extents()[1]; ++y)
+            for (auto x = 0u; x < grid.extents()[1]; ++x)
             {
                 std::cout << grid.at({ x, y })[0] << " ";
             }
@@ -56,9 +56,9 @@ struct grid_printer<3>
         {
             std::cout << "z = " << z << "\n\n";
 
-            for (auto x = 0u; x < grid.extents()[0]; ++x)
+            for (auto y = 0u; y < grid.extents()[0]; ++y)
             {
-                for (auto y = 0u; y < grid.extents()[1]; ++y)
+                for (auto x = 0u; x < grid.extents()[1]; ++x)
                 {
                     std::cout << grid.at({ x, y, z })[0] << " ";
                 }
