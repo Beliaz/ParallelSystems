@@ -110,7 +110,7 @@ unsigned long calculate3D(SIZETYPE size, TYPE *borders) {
             //Finish measuring time
             finishTime = time_ms();
             if (DOPRINT)
-                print1D(array1, size);
+                print3D(array1, size);
             break;
         }
     }
