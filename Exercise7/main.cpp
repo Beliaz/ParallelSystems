@@ -70,7 +70,6 @@ void execute_stencil_code(const float epsilon,
         std::cout << std::endl;
     }
 
-    auto final_value_index = 0;
     auto iterations = 0;
 
     {
@@ -79,26 +78,21 @@ void execute_stencil_code(const float epsilon,
 
         for(;;)
         {
-            ++iterations; 
-            if (stencil_code::do_iteration<0>(grid) < epsilon)
-            {
-                final_value_index = 1;
-                break;
-            }
+            const auto result = stencil_code::do_iteration(grid, epsilon);
 
-            ++iterations;
-            if (stencil_code::do_iteration<1>(grid) < epsilon)
-                break;
+            iterations += std::get<0>(result);
+
+            if (std::get<1>(result)) break;
         }
     }
 
     std::cout << "iterations: " << iterations << std::endl;
 
-    // hacky - copies the final values into the first
-    // element (convenience only)
-    if (final_value_index == 1) stencil_code::do_iteration<1>(grid);
-
     if (extents[0] > 50) return;
+
+    // hacky - copies the final values into the first
+    // element as print expects values to be there...
+    if (iterations % 2 == 1) stencil_code::do_iteration(grid, epsilon);
 
     std::cout << "\n" << "Result: " << "\n\n";
     print(grid);

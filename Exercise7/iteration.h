@@ -74,11 +74,22 @@ struct iteration<3>
 template<template <size_t Dim> class StencilCodeImpl>
 struct stencil_iteration
 {
-    template<size_t ReadIndex, class GridType>
-    static auto do_iteration(GridType& grid)
+    template<class GridType, class DiffType>
+    static std::tuple<const int, const bool, const DiffType>
+    do_iteration(GridType& grid, const DiffType epsilon)
     {
-        return iteration<GridType::dim>::template execute<StencilCodeImpl, ReadIndex>(grid);
-    }
+        using iteration_type = iteration<GridType::dim>;
+
+        const auto first_error = iteration_type::template execute<StencilCodeImpl, 0>(grid);
+        if (first_error < epsilon)
+            return { 1, true, first_error };
+        
+        const auto second_error = iteration_type::template execute<StencilCodeImpl, 1>(grid);
+        if (second_error < epsilon)
+            return { 2, true, second_error };
+
+        return { 2, false, second_error };
+    } 
 };
 
 
