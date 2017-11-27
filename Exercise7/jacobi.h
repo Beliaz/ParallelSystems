@@ -16,8 +16,9 @@ namespace stencil
             const size_t i)
         {
             const auto new_value = (
+                grid.at(i + 0)[ReadIndex] +
                 grid.at(i - 1)[ReadIndex] +
-                grid.at(i + 1)[ReadIndex]) / 2;
+                grid.at(i + 1)[ReadIndex]) / 3;
 
             const auto error = std::abs(new_value - grid.at(i)[ReadIndex]);
 
@@ -36,10 +37,11 @@ namespace stencil
             const size_t y)
         {
             const auto new_value = (
+                grid.at({ x + 0, y + 0 })[ReadIndex] +
                 grid.at({ x - 1, y + 0 })[ReadIndex] +
                 grid.at({ x + 1, y + 0 })[ReadIndex] +
                 grid.at({ x + 0, y - 1 })[ReadIndex] +
-                grid.at({ x - 0, y + 1 })[ReadIndex]) / 4;
+                grid.at({ x - 0, y + 1 })[ReadIndex]) / 5;
 
             const auto error = std::abs(new_value - grid.at({ x, y })[ReadIndex]);
 
@@ -59,12 +61,13 @@ namespace stencil
             const size_t z)
         {
             const auto new_value = (
+                grid.at({ x + 0, y + 0, z + 0 })[ReadIndex] +
                 grid.at({ x - 1, y + 0, z + 0 })[ReadIndex] +
                 grid.at({ x + 1, y + 0, z + 0 })[ReadIndex] +
                 grid.at({ x + 0, y - 1, z + 0 })[ReadIndex] +
                 grid.at({ x + 0, y + 1, z + 0 })[ReadIndex] +
                 grid.at({ x + 0, y + 0, z - 1 })[ReadIndex] +
-                grid.at({ x + 0, y + 0, z + 1 })[ReadIndex]) / 6;
+                grid.at({ x + 0, y + 0, z + 1 })[ReadIndex]) / 7;
 
             const auto error = std::abs(new_value - grid.at({ x, y, z })[ReadIndex]);
 
