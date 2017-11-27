@@ -20,11 +20,14 @@ void execute_stencil_code(const float epsilon,
     timer.print();  
     timer.stop();
 
-    if (extents[0] < 50)
+    constexpr auto printing_threshold = 50;
+
+    if (extents[0] < printing_threshold)
     {
         std::cout << "\n" << "Start Configuration: " << "\n\n";
 
         print(grid);
+
         std::cout << std::endl;
     }
 
@@ -46,14 +49,16 @@ void execute_stencil_code(const float epsilon,
 
     std::cout << "iterations: " << iterations << std::endl;
 
-    if (extents[0] > 50) return;
+    if (extents[0] > printing_threshold) return;
 
     // hacky - copies the final values into the first
     // element as print expects values to be there...
     if (iterations % 2 == 1) stencil_code::do_iteration(grid, epsilon);
 
     std::cout << "\n" << "Result: " << "\n\n";
+
     print(grid);
+
     std::cout << std::endl;
 }
 
