@@ -24,7 +24,7 @@ void print1D(TYPE *array, SIZETYPE size) {
 void autoFill(TYPE *array, SIZETYPE size) {
 #pragma omp parallel for
     for (SIZETYPE i = 1; i < size + 1; i++) {
-        array[i] = (TYPE) (std::rand() % 600) + 173;
+        array[i] = 0;
     }
 }
 
