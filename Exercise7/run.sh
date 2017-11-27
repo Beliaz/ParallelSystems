@@ -1,6 +1,6 @@
-BB# Name your job. Unless you use the -o and -e options, output will
+# Name your job. Unless you use the -o and -e options, output will
 # go to a unique file name.ojob_id for each job.
-#$ -N run_stencil
+#$ -N stencil
 
 # Execute job in the queue "std.q" unless you have special requirements.
 #$ -q std.q
