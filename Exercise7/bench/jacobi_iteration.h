@@ -5,6 +5,8 @@
 #include "../stencil.h"
 #include "../grid_helper.h"
 
+constexpr auto num_iterations = 100;
+
 static void jacobi_iteration_1d_impl(benchmark::State& state)
 {
     constexpr auto dim = 1;
@@ -13,13 +15,25 @@ static void jacobi_iteration_1d_impl(benchmark::State& state)
 
     state.SetComplexityN(static_cast<int>(n));
 
-    auto grid = create_grid<cell_t, dim>({ n }, { 1, 1 }, { 0, 0 });
-
     while (state.KeepRunning())
     {
-        benchmark::DoNotOptimize(stencil::iteration<dim>
-            ::template execute<stencil::jacobi_iteration, 0>(grid));
+        state.PauseTiming();
+
+        auto grid = create_grid<cell_t, dim>({ n }, { 1, 1 }, { 0, 0 });
+
+        state.ResumeTiming();
+
+        for (auto i = 0u; i < num_iterations; i++)
+        {
+            benchmark::DoNotOptimize(stencil::iteration<dim>
+                ::template execute<stencil::jacobi_iteration, 0>(grid));
+
+            benchmark::DoNotOptimize(stencil::iteration<dim>
+                ::template execute<stencil::jacobi_iteration, 1>(grid));
+        }
     }
+
+    state.SetItemsProcessed(n * state.iterations() * num_iterations * 2);
 }
 
 static void jacobi_iteration_2d_impl(benchmark::State& state)
@@ -30,13 +44,25 @@ static void jacobi_iteration_2d_impl(benchmark::State& state)
 
     state.SetComplexityN(static_cast<int>(n));
 
-    auto grid = create_grid<cell_t, dim>({ n, n }, { 1, 1, 1, 1 }, { 0, 0 });
-
     while (state.KeepRunning())
     {
-        benchmark::DoNotOptimize(stencil::iteration<dim>
-            ::template execute<stencil::jacobi_iteration, 0>(grid));
+        state.PauseTiming();
+
+        auto grid = create_grid<cell_t, dim>({ n, n }, { 1, 1, 1, 1 }, { 0, 0 });
+
+        state.ResumeTiming();
+
+        for (auto i = 0u; i < num_iterations; i++)
+        {
+            benchmark::DoNotOptimize(stencil::iteration<dim>
+                ::template execute<stencil::jacobi_iteration, 0>(grid));
+
+            benchmark::DoNotOptimize(stencil::iteration<dim>
+                ::template execute<stencil::jacobi_iteration, 1>(grid));
+        }
     }
+
+    state.SetItemsProcessed(n * n * state.iterations() * num_iterations * 2);
 }
 
 static void jacobi_iteration_3d_impl(benchmark::State& state)
@@ -47,19 +73,31 @@ static void jacobi_iteration_3d_impl(benchmark::State& state)
 
     state.SetComplexityN(static_cast<int>(n));
 
-    auto grid = create_grid<cell_t, dim>({ n, n, n }, { 1, 1, 1, 1, 1, 1 }, { 0, 0 });
-
     while (state.KeepRunning())
     {
-        benchmark::DoNotOptimize(stencil::iteration<dim>
-            ::template execute<stencil::jacobi_iteration, 0>(grid));
+        state.PauseTiming();
+
+        auto grid = create_grid<cell_t, dim>({ n, n, n }, { 1, 1, 1, 1, 1, 1 }, { 0, 0 });
+
+        state.ResumeTiming();
+
+        for(auto i = 0u; i < num_iterations; i++)
+        {
+            benchmark::DoNotOptimize(stencil::iteration<dim>
+                ::template execute<stencil::jacobi_iteration, 0>(grid));
+
+            benchmark::DoNotOptimize(stencil::iteration<dim>
+                ::template execute<stencil::jacobi_iteration, 1>(grid));
+        }
     }
+
+    state.SetItemsProcessed(n * n * n * state.iterations() * num_iterations * 2);
 }
 
 #define JACOBI_ITERATION_1_D_BENCHMARK(f) \
     BENCHMARK(f) \
     ->RangeMultiplier(2) \
-    ->Range(1024, 2 << 19) \
+    ->Range(4096, 2 << 15) \
     ->ReportAggregatesOnly() \
     ->Repetitions(5) \
     ->Complexity(); \
@@ -67,7 +105,7 @@ static void jacobi_iteration_3d_impl(benchmark::State& state)
 #define JACOBI_ITERATION_2_D_BENCHMARK(f) \
     BENCHMARK(f) \
     ->RangeMultiplier(2) \
-    ->Range(16, 2 << 9) \
+    ->Range(32, 2 << 8) \
     ->ReportAggregatesOnly() \
     ->Repetitions(5) \
     ->Complexity();
@@ -75,7 +113,7 @@ static void jacobi_iteration_3d_impl(benchmark::State& state)
 #define JACOBI_ITERATION_3_D_BENCHMARK(f) \
     BENCHMARK(f) \
     ->RangeMultiplier(2) \
-    ->Range(16, 2 << 7) \
+    ->Range(32, 2 << 6) \
     ->ReportAggregatesOnly() \
     ->Repetitions(5) \
     ->Complexity();
