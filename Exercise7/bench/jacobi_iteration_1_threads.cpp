@@ -1,5 +1,6 @@
-#include "jacobi_iteration.h"
 #include <omp.h>
+
+#include "jacobi_iteration_benchmark.h"
 
 constexpr auto num_threads = 1;
 
