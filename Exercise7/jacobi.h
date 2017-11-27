@@ -2,6 +2,7 @@
 #define JACOBI_H
 
 #include "grid.h"
+#include <cmath>
 
 namespace stencil
 {
