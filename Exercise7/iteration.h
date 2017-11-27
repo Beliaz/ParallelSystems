@@ -1,10 +1,17 @@
 #ifndef ITERATION_H
 #define ITERATION_H
 #include "grid.h"
+#include <numeric>
 
 namespace stencil
 {
     
+static constexpr auto error_buffer_size = 8;
+
+template<class ErrorType>
+using error_buffer = std::array<ErrorType, error_buffer_size>;
+
+
 template<size_t Dim>
 struct iteration;
 
@@ -19,10 +26,22 @@ struct iteration<1>
 
         error_type error = 0;
 
-        #pragma omp parallel for reduction (+ : error)
-        for (auto i = 1u; i < grid.extents()[0] - 1; ++i)
+        #pragma omp parallel reduction(+: error)
         {
-            error += StencilCodeImpl<1>::template execute<ReadIndex>(grid, i);
+            static error_buffer<error_type> local_errors;
+            std::fill(local_errors.begin(), local_errors.end(), 0);
+
+            #pragma omp for 
+            for (auto i = 1u; i < grid.extents()[0] - 1; ++i)
+            {
+                local_errors[i % local_errors.size()] += StencilCodeImpl<1>
+                    ::template execute<ReadIndex>(grid, i);
+            }
+
+            error = std::accumulate(
+                local_errors.begin(),
+                local_errors.end(),
+                error);
         }
 
         return error;
@@ -40,13 +59,25 @@ struct iteration<2>
 
         error_type error = 0;
 
-        #pragma omp parallel for reduction (+ : error)
-        for (auto y = 1u; y < grid.extents()[1] - 1; ++y)
+        #pragma omp parallel reduction(+: error)
         {
-            for (auto x = 1u; x < grid.extents()[0] - 1; ++x)
+            static error_buffer<error_type> local_errors;
+            std::fill(local_errors.begin(), local_errors.end(), 0);
+     
+            #pragma omp for 
+            for (auto y = 1u; y < grid.extents()[1] - 1; ++y)
             {
-                error += StencilCodeImpl<2>::template execute<ReadIndex>(grid, x, y);
+                for (auto x = 1u; x < grid.extents()[0] - 1; ++x)
+                {
+                    local_errors[x % local_errors.size()] += StencilCodeImpl<2>
+                        ::template execute<ReadIndex>(grid, x, y);
+                }
             }
+
+            error = std::accumulate(
+                local_errors.begin(),
+                local_errors.end(),
+                error);
         }
 
         return error;
@@ -64,16 +95,28 @@ struct iteration<3>
 
         error_type error = 0;
 
-        #pragma omp parallel for reduction (+ : error)
-        for (auto z = 1u; z < grid.extents()[2] - 1; ++z)
+        #pragma omp parallel reduction(+: error)
         {
-            for (auto y = 1u; y < grid.extents()[1] - 1; ++y)
+            static thread_local error_buffer<error_type> local_errors;
+            std::fill(local_errors.begin(), local_errors.end(), 0);
+
+            #pragma omp for 
+            for (auto z = 1u; z < grid.extents()[2] - 1; ++z)
             {
-                for (auto x = 1u; x < grid.extents()[0] - 1; ++x)
+                for (auto y = 1u; y < grid.extents()[1] - 1; ++y)
                 {
-                    error += StencilCodeImpl<3>::template execute<ReadIndex>(grid, x, y, z);
+                    for (auto x = 1u; x < grid.extents()[0] - 1; ++x)
+                    {
+                        local_errors[x % local_errors.size()] += StencilCodeImpl<3>
+                            ::template execute<ReadIndex>(grid, x, y, z);
+                    }
                 }
             }
+            
+            error = std::accumulate(
+                local_errors.begin(),
+                local_errors.end(),
+                error);
         }
 
         return error;
