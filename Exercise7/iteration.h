@@ -132,7 +132,7 @@ struct stencil_iteration
         using iteration_type = iteration<GridType::dim>;
         using return_type = std::tuple<const int, const bool, const DiffType>;
 
-        static constexpr auto batch_threshold = 1'000'000;
+        static constexpr auto batch_threshold = 1000000;
         static constexpr auto batch_size = 5;
 
         const auto iterations = 2 + [&]()
