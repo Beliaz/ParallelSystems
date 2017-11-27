@@ -1,6 +1,6 @@
 # Name your job. Unless you use the -o and -e options, output will
 # go to a unique file name.ojob_id for each job.
-#$ -N stencil
+#$ -N comparison
 
 # Execute job in the queue "std.q" unless you have special requirements.
 #$ -q std.q
@@ -26,9 +26,15 @@
 
 #$ -l h_vmem=2G
 
+$n_1d = "38000"
+$n_2d = "220"
+$n_3d = "220"
+
 module load gcc/5.1.0
 
-make test
+export OMP_NUM_THREADS=1
+
+printf "stencil_1(1D, $n_1d):" ./stencil_1 1 38000 273 1000
+printf "stencil_2(1D, $n_1d):" ./stencil_2 38000 273 1000
 
 module unload gcc/5.1.0
-
