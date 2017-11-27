@@ -115,7 +115,7 @@ struct stencil_iteration
         using return_type = std::tuple<const int, const bool, const DiffType>;
 
         static constexpr auto batch_threshold = 1000000;
-        static constexpr auto batch_size = 5;
+        static constexpr auto batch_size = 4;
 
         const auto iterations = 2 + [&]()
         {
