@@ -26,15 +26,19 @@
 
 #$ -l h_vmem=2G
 
-$n_1d = "38000"
-$n_2d = "220"
-$n_3d = "220"
+n_1d = "38000"
+n_2d = "220"
+n_3d = "140"
 
 module load gcc/5.1.0
 
-export OMP_NUM_THREADS=1
+for threads in 1 2 4 8
+do
+    export OMP_NUM_THREADS=$threads
 
-printf "stencil_1(1D, $n_1d):" ./stencil_1 1 38000 273 1000
-printf "stencil_2(1D, $n_1d):" ./stencil_2 38000 273 1000
+    printf "stencil_1:$threads:1D:"$n_1d":"; ./stencil_1 1 38000 273 1000
+    printf "stencil_2:$threads:1D:"$n_1d":"; ./stencil_2 38000 273 1000
+
+done
 
 module unload gcc/5.1.0
