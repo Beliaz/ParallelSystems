@@ -26,10 +26,10 @@ static void jacobi_iteration_1d_impl(benchmark::State& state)
         for (auto i = 0u; i < num_iterations; i++)
         {
             benchmark::DoNotOptimize(stencil::iteration<dim>
-                ::template execute<stencil::jacobi_iteration, 0>(grid));
+                ::template execute<stencil::jacobi, 0>(grid));
 
             benchmark::DoNotOptimize(stencil::iteration<dim>
-                ::template execute<stencil::jacobi_iteration, 1>(grid));
+                ::template execute<stencil::jacobi, 1>(grid));
         }
     }
 
@@ -55,10 +55,10 @@ static void jacobi_iteration_2d_impl(benchmark::State& state)
         for (auto i = 0u; i < num_iterations; i++)
         {
             benchmark::DoNotOptimize(stencil::iteration<dim>
-                ::template execute<stencil::jacobi_iteration, 0>(grid));
+                ::template execute<stencil::jacobi, 0>(grid));
 
             benchmark::DoNotOptimize(stencil::iteration<dim>
-                ::template execute<stencil::jacobi_iteration, 1>(grid));
+                ::template execute<stencil::jacobi, 1>(grid));
         }
     }
 
@@ -84,10 +84,10 @@ static void jacobi_iteration_3d_impl(benchmark::State& state)
         for(auto i = 0u; i < num_iterations; i++)
         {
             benchmark::DoNotOptimize(stencil::iteration<dim>
-                ::template execute<stencil::jacobi_iteration, 0>(grid));
+                ::template execute<stencil::jacobi, 0>(grid));
 
             benchmark::DoNotOptimize(stencil::iteration<dim>
-                ::template execute<stencil::jacobi_iteration, 1>(grid));
+                ::template execute<stencil::jacobi, 1>(grid));
         }
     }
 

@@ -30,8 +30,8 @@ auto size(const grid_extents_t<Dim>& extents)
 {
     typename grid_extents_t<Dim>::value_type size = 1;
 
-    for (auto i = 0u; i < Dim; ++i)
-        size *= extents[i];
+    for (const auto extent : extents)
+        size *= extent;
 
     return size;
 }
@@ -63,7 +63,7 @@ struct index_helper<2>
 
     static auto linearize(const grid_index_t<dim>& index, const grid_extents_t<dim>& extents)
     {
-        // x + y * width
+        // x + width * y
         return index[0] + extents[0] * index[1];
     }
 };
@@ -75,7 +75,7 @@ struct index_helper<3>
 
     static auto linearize(const grid_index_t<dim>& index, const grid_extents_t<dim>& extents)
     {
-        // x + y * width + z * width * height
+        // x + width * y + width * height * z 
         return index[0] + extents[0] * index[1] + extents[0] * extents[1] * index[2];
     }
 };

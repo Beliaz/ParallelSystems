@@ -7,10 +7,10 @@
 namespace stencil
 {
     template<size_t Dim>
-    struct jacobi_iteration;
+    struct jacobi;
 
     template<>
-    struct jacobi_iteration<1>
+    struct jacobi<1>
     {
         template<size_t ReadIndex, class CellType>
         static auto execute(grid_t<CellType, 1>& grid,
@@ -30,7 +30,7 @@ namespace stencil
     };
 
     template<>
-    struct jacobi_iteration<2>
+    struct jacobi<2>
     {
         template<size_t ReadIndex, class CellType>
         static auto execute(grid_t<CellType, 2> &grid, 
@@ -38,8 +38,8 @@ namespace stencil
             const size_t y)
         {
             const auto new_value = (
-                grid.at({ x + 0, y + 0 })[ReadIndex] +
                 grid.at({ x - 1, y + 0 })[ReadIndex] +
+                grid.at({ x + 0, y + 0 })[ReadIndex] +
                 grid.at({ x + 1, y + 0 })[ReadIndex] +
                 grid.at({ x + 0, y - 1 })[ReadIndex] +
                 grid.at({ x - 0, y + 1 })[ReadIndex]) / 5;
@@ -53,7 +53,7 @@ namespace stencil
     };
 
     template<>
-    struct jacobi_iteration<3>
+    struct jacobi<3>
     {
         template<size_t ReadIndex, class CellType>
         static auto execute(grid_t<CellType, 3>& grid,
