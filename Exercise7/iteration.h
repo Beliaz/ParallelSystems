@@ -12,9 +12,12 @@ template<>
 struct iteration<1>
 {
     template<template <size_t Dim> class StencilCodeImpl, size_t ReadIndex, class CellType>
-    static auto execute(stencil::grid_t<CellType, 1>& grid)
+    static auto execute(grid_t<CellType, 1>& grid)
     {
-        auto error = 0.0f;
+        using error_type = decltype(StencilCodeImpl<1>
+            ::template execute<ReadIndex>(grid, 0));
+
+        error_type error = 0;
 
         #pragma omp parallel for reduction (+ : error)
         for (auto i = 1u; i < grid.extents()[0] - 1; ++i)
@@ -30,9 +33,12 @@ template<>
 struct iteration<2>
 {
     template<template <size_t Dim> class StencilCodeImpl, size_t ReadIndex, class CellType>
-    static auto execute(stencil::grid_t<CellType, 2> &grid)
+    static auto execute(grid_t<CellType, 2> &grid)
     {
-        auto error = 0.0f;
+        using error_type = decltype(StencilCodeImpl<2>
+            ::template execute<ReadIndex>(grid, 0, 0));
+
+        error_type error = 0;
 
         #pragma omp parallel for reduction (+ : error)
         for (auto y = 1u; y < grid.extents()[1] - 1; ++y)
@@ -51,9 +57,12 @@ template<>
 struct iteration<3>
 {
     template<template <size_t Dim> class StencilCodeImpl, size_t ReadIndex, class CellType>
-    static auto execute(stencil::grid_t<CellType, 3>& grid)
+    static auto execute(grid_t<CellType, 3>& grid)
     {
-        auto error = 0.0f;
+        using error_type = decltype(StencilCodeImpl<3>
+            ::template execute<ReadIndex>(grid, 0, 0, 0));
+
+        error_type error = 0;
 
         #pragma omp parallel for reduction (+ : error)
         for (auto z = 1u; z < grid.extents()[2] - 1; ++z)
@@ -80,9 +89,7 @@ struct stencil_iteration
         using iteration_type = iteration<GridType::dim>;
         using return_type = std::tuple<const int, const bool, const DiffType>;
 
-        const auto first_error = iteration_type::template execute<StencilCodeImpl, 0>(grid);
-        if (first_error < epsilon)
-            return return_type(1, true, first_error);
+        iteration_type::template execute<StencilCodeImpl, 0>(grid);
         
         const auto second_error = iteration_type::template execute<StencilCodeImpl, 1>(grid);
         if (second_error < epsilon)

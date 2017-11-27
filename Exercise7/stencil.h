@@ -17,7 +17,7 @@ template<size_t Dim>
 using bounds_t = stencil::bounds_t<cell_t, Dim>;
 
 // stencil code using jacobi iteration
-using stencil_code = stencil::stencil_iteration<stencil::jacobi_iteration>;
+using stencil_code = stencil::stencil_iteration<stencil::jacobi>;
 
 constexpr auto default_epsilon = 1;
 
