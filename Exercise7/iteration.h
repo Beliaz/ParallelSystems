@@ -75,20 +75,20 @@ template<template <size_t Dim> class StencilCodeImpl>
 struct stencil_iteration
 {
     template<class GridType, class DiffType>
-    static std::tuple<const int, const bool, const DiffType>
-    do_iteration(GridType& grid, const DiffType epsilon)
+    static auto do_iteration(GridType& grid, const DiffType epsilon)
     {
         using iteration_type = iteration<GridType::dim>;
+        using return_type = std::tuple<const int, const bool, const DiffType>;
 
         const auto first_error = iteration_type::template execute<StencilCodeImpl, 0>(grid);
         if (first_error < epsilon)
-            return { 1, true, first_error };
+            return return_type(1, true, first_error);
         
         const auto second_error = iteration_type::template execute<StencilCodeImpl, 1>(grid);
         if (second_error < epsilon)
-            return { 2, true, second_error };
+            return return_type(2, true, second_error);
 
-        return { 2, false, second_error };
+        return return_type(2, false, second_error);
     } 
 };
 
