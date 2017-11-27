@@ -1,12 +1,12 @@
 #include "grid.h"
 #include "print.h"
 #include "grid_helper.h"
-#include "chrono_timer.h"
 #include "stencil.h"
 
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <chrono>
 
 template<size_t Dim>
 void execute_stencil_code(const float epsilon, 

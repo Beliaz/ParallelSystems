@@ -52,6 +52,7 @@ int main(int argc, char **argv) {
     for (int i = 0; i < dimension * 2; i++)
         borders[i] = atoi(argv[i+3]);
 
-    std::cout << "Took " << calculate(size, borders, dimension) << "ms to finish the job" << std::endl;
+    calculate(size, borders, dimension);
+
     return EXIT_SUCCESS;
 }

@@ -75,7 +75,17 @@ unsigned long calculate1D(SIZETYPE size, TYPE *borders) {
         }
     }
 
-    printf("iterations: %i\n", iterations);
+    const unsigned long elapsed = finishTime - startTime;
+
+    printf("%lu ms, %i iter", elapsed, iterations);
+
+    if (elapsed > 0)
+    {
+        printf(", %.3e cells/s",
+            iterations * size / (double)elapsed * 1000);
+    }
+
+    printf("\n");
 
     return finishTime - startTime;
 }
