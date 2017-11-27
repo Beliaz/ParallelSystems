@@ -2,7 +2,6 @@
 #define JACOBI_H
 
 #include "grid.h"
-#include <cmath>
 
 namespace stencil
 {
@@ -15,8 +14,10 @@ namespace stencil
         template<class CellType>
         static auto execute(
             grid_t<CellType, 1>& source,
-            const size_t i)
+            const grid_index_t<1>& idx)
         {
+            const auto i = idx[0];
+
             return (
                 source.at(i + 0) +
                 source.at(i - 1) +
@@ -30,9 +31,11 @@ namespace stencil
         template<class CellType>
         static auto execute(
             grid_t<CellType, 2>& source, 
-            const size_t x, 
-            const size_t y)
+            const grid_index_t<2>& idx)
         {
+            const auto x = idx[0];
+            const auto y = idx[1];
+
             return (
                 source.at({ x + 0, y + 0 }) +
                 source.at({ x - 1, y + 0 }) +
@@ -48,10 +51,12 @@ namespace stencil
         template<class CellType>
         static auto execute(
             grid_t<CellType, 3>& source,
-            const size_t x, 
-            const size_t y,
-            const size_t z)
+            const grid_index_t<3>& idx)
         {
+            const auto x = idx[0];
+            const auto y = idx[1];
+            const auto z = idx[2];
+
             return (
                 source.at({ x + 0, y + 0, z + 0 }) +
                 source.at({ x - 1, y + 0, z + 0 }) +

@@ -4,6 +4,7 @@
 #include "grid.h"
 
 #include <numeric>
+#include <cmath>
 
 namespace stencil
 {
@@ -24,7 +25,7 @@ struct iteration<1>
     static auto execute(grid_t<CellType, 1>& source, grid_t<CellType, 1>& target)
     {
         using error_type = decltype(StencilCodeImpl<1>
-            ::template execute(source, 0));
+            ::template execute(source, { 0 }));
 
         error_type error = 0;
 
@@ -32,7 +33,7 @@ struct iteration<1>
         for (auto i = 1u; i < source.extents()[0] - 1; ++i)
         {
             const auto new_value = StencilCodeImpl<1>
-                ::template execute(source, i);
+                ::template execute(source, { i });
 
             error += std::abs(new_value - source.at(i));
 
@@ -50,7 +51,7 @@ struct iteration<2>
     static auto execute(grid_t<CellType, 2>& source, grid_t<CellType, 2>& target)
     {
         using error_type = decltype(StencilCodeImpl<2>
-            ::template execute(source, 0, 0));
+            ::template execute(source, { 0, 0 }));
 
         error_type error = 0;
 
@@ -60,7 +61,7 @@ struct iteration<2>
             for (auto x = 1u; x < source.extents()[0] - 1; ++x)
             {
                 const auto new_value = StencilCodeImpl<2>
-                    ::template execute(source, x, y);
+                    ::template execute(source, { x, y });
 
                 error += std::abs(new_value - source.at({ x, y }));
 
@@ -79,7 +80,7 @@ struct iteration<3>
     static auto execute(grid_t<CellType, 3>& source, grid_t<CellType, 3>& target)
     {
         using error_type = decltype(StencilCodeImpl<3>
-            ::template execute(source, 0, 0, 0));
+            ::template execute(source, { 0, 0, 0 }));
 
         error_type error = 0;
         
@@ -91,7 +92,7 @@ struct iteration<3>
                 for (auto x = 1u; x < source.extents()[0] - 1; ++x)
                 {
                     const auto new_value = StencilCodeImpl<3>
-                        ::template execute(source, x, y, z);
+                        ::template execute(source, { x, y, z });
 
                     error += std::abs(new_value - source.at({ x, y, z }));
 
