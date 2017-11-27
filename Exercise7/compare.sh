@@ -36,15 +36,22 @@ for threads in 1 2 4 8
 do
     export OMP_NUM_THREADS=$threads
 
-    printf "stencil_1:$threads:1D:"$n_1d":"; ./stencil_1 1 1 $n_1d 273 1000
-    printf "stencil_2:$threads:1D:"$n_1d":"; ./stencil_2 1 $n_1d 273 1000
+    echo
+    echo $threads " thread(s) -------------------------------------------------"
+    echo 
+
+    printf "stencil_1:$threads:1D:"$n_1d": "; ./stencil_1 1 1 $n_1d 273 1000
+    printf "stencil_2:$threads:1D:"$n_1d": "; ./stencil_2 1 $n_1d 273 1000
     
-    printf "stencil_1:$threads:2D:"$n_2d":"; ./stencil_1 1 2 $n_2d 273 1000 2000 10
-    printf "stencil_2:$threads:2D:"$n_2d":"; ./stencil_2 2 $n_2d 273 1000 2000 10
+    echo
 
-    printf "stencil_1:$threads:3D:"$n_3d":"; ./stencil_1 1 3 $n_3d 273 1000 2000 10 200 8000
-    printf "stencil_2:$threads:3D:"$n_3d":"; ./stencil_2 3 $n_3d 273 1000 2000 10 200 8000
+    printf "stencil_1:$threads:2D:"$n_2d": "; ./stencil_1 1 2 $n_2d 273 1000 2000 10
+    printf "stencil_2:$threads:2D:"$n_2d": "; ./stencil_2 2 $n_2d 273 1000 2000 10
 
+    echo
+
+    printf "stencil_1:$threads:3D:"$n_3d": "; ./stencil_1 1 3 $n_3d 273 1000 2000 10 200 8000
+    printf "stencil_2:$threads:3D:"$n_3d": "; ./stencil_2 3 $n_3d 273 1000 2000 10 200 8000
 done
 
 #module unload gcc/5.1.0
