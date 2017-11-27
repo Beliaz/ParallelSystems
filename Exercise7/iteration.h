@@ -89,13 +89,30 @@ struct stencil_iteration
         using iteration_type = iteration<GridType::dim>;
         using return_type = std::tuple<const int, const bool, const DiffType>;
 
+        static constexpr auto batch_threshold = 1'000'000;
+        static constexpr auto batch_size = 5;
+
+        const auto iterations = 2 + [&]()
+        {
+            if (stencil::size(grid.extents()) < batch_threshold)
+            {
+                for (auto i = 0u; i < batch_size; ++i)
+                {
+                    iteration_type::template execute<StencilCodeImpl, 0>(grid);
+                    iteration_type::template execute<StencilCodeImpl, 1>(grid);
+                }
+
+                return 2 * batch_size;
+            }
+
+            return 0;
+        }();
+        
         iteration_type::template execute<StencilCodeImpl, 0>(grid);
         
-        const auto second_error = iteration_type::template execute<StencilCodeImpl, 1>(grid);
-        if (second_error < epsilon)
-            return return_type(2, true, second_error);
+        const auto error = iteration_type::template execute<StencilCodeImpl, 1>(grid);
 
-        return return_type(2, false, second_error);
+        return return_type(iterations, error < epsilon, error);
     } 
 };
 
