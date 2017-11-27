@@ -12,69 +12,54 @@ namespace stencil
     template<>
     struct jacobi<1>
     {
-        template<size_t ReadIndex, class CellType>
-        static auto execute(grid_t<CellType, 1>& grid,
+        template<class CellType>
+        static auto execute(
+            grid_t<CellType, 1>& source,
             const size_t i)
         {
-            const auto new_value = (
-                grid.at(i + 0)[ReadIndex] +
-                grid.at(i - 1)[ReadIndex] +
-                grid.at(i + 1)[ReadIndex]) / 3;
-
-            const auto error = std::abs(new_value - grid.at(i)[ReadIndex]);
-
-            grid.at(i)[1 - ReadIndex] = new_value;
-
-            return error;
+            return (
+                source.at(i + 0) +
+                source.at(i - 1) +
+                source.at(i + 1)) / 3;
         }
     };
 
     template<>
     struct jacobi<2>
     {
-        template<size_t ReadIndex, class CellType>
-        static auto execute(grid_t<CellType, 2> &grid, 
+        template<class CellType>
+        static auto execute(
+            grid_t<CellType, 2>& source, 
             const size_t x, 
             const size_t y)
         {
-            const auto new_value = (
-                grid.at({ x - 1, y + 0 })[ReadIndex] +
-                grid.at({ x + 0, y + 0 })[ReadIndex] +
-                grid.at({ x + 1, y + 0 })[ReadIndex] +
-                grid.at({ x + 0, y - 1 })[ReadIndex] +
-                grid.at({ x - 0, y + 1 })[ReadIndex]) / 5;
-
-            const auto error = std::abs(new_value - grid.at({ x, y })[ReadIndex]);
-
-            grid.at({ x, y })[1 - ReadIndex] = new_value;
-
-            return error;
+            return (
+                source.at({ x + 0, y + 0 }) +
+                source.at({ x - 1, y + 0 }) +
+                source.at({ x + 1, y + 0 }) +
+                source.at({ x + 0, y - 1 }) +
+                source.at({ x - 0, y + 1 })) / 5;
         }
     };
 
     template<>
     struct jacobi<3>
     {
-        template<size_t ReadIndex, class CellType>
-        static auto execute(grid_t<CellType, 3>& grid,
+        template<class CellType>
+        static auto execute(
+            grid_t<CellType, 3>& source,
             const size_t x, 
             const size_t y,
             const size_t z)
         {
-            const auto new_value = (
-                grid.at({ x + 0, y + 0, z + 0 })[ReadIndex] +
-                grid.at({ x - 1, y + 0, z + 0 })[ReadIndex] +
-                grid.at({ x + 1, y + 0, z + 0 })[ReadIndex] +
-                grid.at({ x + 0, y - 1, z + 0 })[ReadIndex] +
-                grid.at({ x + 0, y + 1, z + 0 })[ReadIndex] +
-                grid.at({ x + 0, y + 0, z - 1 })[ReadIndex] +
-                grid.at({ x + 0, y + 0, z + 1 })[ReadIndex]) / 7;
-
-            const auto error = std::abs(new_value - grid.at({ x, y, z })[ReadIndex]);
-
-            grid.at({ x, y, z })[1 - ReadIndex] = new_value;
- 
-            return error;
+            return (
+                source.at({ x + 0, y + 0, z + 0 }) +
+                source.at({ x - 1, y + 0, z + 0 }) +
+                source.at({ x + 1, y + 0, z + 0 }) +
+                source.at({ x + 0, y - 1, z + 0 }) +
+                source.at({ x + 0, y + 1, z + 0 }) +
+                source.at({ x + 0, y + 0, z - 1 }) +
+                source.at({ x + 0, y + 0, z + 1 })) / 7;
         }
     };
 }

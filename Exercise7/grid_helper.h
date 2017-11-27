@@ -38,13 +38,11 @@ struct grid_helper<2>
             {
                 auto value = initial_value;
 
-                value[0] += x == 0              ? bounds[0][0] : 0;
-                value[0] += x == extents[0] - 1 ? bounds[1][0] : 0;
+                value += x == 0              ? bounds[0] : 0;
+                value += x == extents[0] - 1 ? bounds[1] : 0;
 
-                value[0] += y == 0              ? bounds[2][0] : 0;
-                value[0] += y == extents[1] - 1 ? bounds[3][0] : 0;
-
-                value[1] = value[0];
+                value += y == 0              ? bounds[2] : 0;
+                value += y == extents[1] - 1 ? bounds[3] : 0;
 
                 grid.at({ x, y }) = value;
             }
@@ -72,16 +70,14 @@ struct grid_helper<3>
                 {
                     auto value = initial_value;
 
-                    value[0] += x == 0              ? bounds[0][0] : 0;
-                    value[0] += x == extents[0] - 1 ? bounds[1][0] : 0;
+                    value += x == 0              ? bounds[0] : 0;
+                    value += x == extents[0] - 1 ? bounds[1] : 0;
 
-                    value[0] += y == 0              ? bounds[2][0] : 0;
-                    value[0] += y == extents[1] - 1 ? bounds[3][0] : 0;
+                    value += y == 0              ? bounds[2] : 0;
+                    value += y == extents[1] - 1 ? bounds[3] : 0;
 
-                    value[0] += z == 0              ? bounds[4][0] : 0;
-                    value[0] += z == extents[2] - 1 ? bounds[5][0] : 0;
-
-                    value[1] = value[0];
+                    value += z == 0              ? bounds[4] : 0;
+                    value += z == extents[2] - 1 ? bounds[5] : 0;
 
                     grid.at({ x, y, z }) = value;
                 }

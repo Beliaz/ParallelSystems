@@ -6,9 +6,7 @@
 
 // ==============================================================================
 // define types
-//using cell_t = float;
-using cell_t = std::array<float, 2>;
-using cell_value_t = cell_t::value_type;
+using cell_t = float;
 
 template<size_t Dim>
 using grid_t = stencil::grid_t<cell_t, Dim>;

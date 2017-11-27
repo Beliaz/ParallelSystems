@@ -19,17 +19,21 @@ static void jacobi_iteration_1d_impl(benchmark::State& state)
     {
         state.PauseTiming();
 
-        auto grid = create_grid<cell_t, dim>({ n }, { 1, 1 }, { 0, 0 });
+        std::array<grid_t<dim>, 2> grids =
+        {
+            create_grid<cell_t, dim>({ n }, { 1, 1 }, 0),
+            create_grid<cell_t, dim>({ n }, { 1, 1 }, 0)
+        };
 
         state.ResumeTiming();
 
         for (auto i = 0u; i < num_iterations; i++)
         {
             benchmark::DoNotOptimize(stencil::iteration<dim>
-                ::template execute<stencil::jacobi, 0>(grid));
+                ::template execute<stencil::jacobi>(grids[0], grids[1]));
 
             benchmark::DoNotOptimize(stencil::iteration<dim>
-                ::template execute<stencil::jacobi, 1>(grid));
+                ::template execute<stencil::jacobi>(grids[1], grids[0]));
         }
     }
 
@@ -48,17 +52,21 @@ static void jacobi_iteration_2d_impl(benchmark::State& state)
     {
         state.PauseTiming();
 
-        auto grid = create_grid<cell_t, dim>({ n, n }, { 1, 1, 1, 1 }, { 0, 0 });
+        std::array<grid_t<dim>, 2> grids =
+        {
+            create_grid<cell_t, dim>({ n, n },{ 1, 1, 1, 1 }, 0),
+            create_grid<cell_t, dim>({ n, n },{ 1, 1, 1, 1 }, 0)
+        };
 
         state.ResumeTiming();
 
         for (auto i = 0u; i < num_iterations; i++)
         {
             benchmark::DoNotOptimize(stencil::iteration<dim>
-                ::template execute<stencil::jacobi, 0>(grid));
+                ::template execute<stencil::jacobi>(grids[0], grids[1]));
 
             benchmark::DoNotOptimize(stencil::iteration<dim>
-                ::template execute<stencil::jacobi, 1>(grid));
+                ::template execute<stencil::jacobi>(grids[1], grids[0]));
         }
     }
 
@@ -77,17 +85,21 @@ static void jacobi_iteration_3d_impl(benchmark::State& state)
     {
         state.PauseTiming();
 
-        auto grid = create_grid<cell_t, dim>({ n, n, n }, { 1, 1, 1, 1, 1, 1 }, { 0, 0 });
+        std::array<grid_t<dim>, 2> grids =
+        {
+            create_grid<cell_t, dim>({ n, n, n }, { 1, 1, 1, 1, 1, 1 }, 0),
+            create_grid<cell_t, dim>({ n, n, n }, { 1, 1, 1, 1, 1, 1 }, 0)
+        };
 
         state.ResumeTiming();
 
-        for(auto i = 0u; i < num_iterations; i++)
+        for (auto i = 0u; i < num_iterations; i++)
         {
             benchmark::DoNotOptimize(stencil::iteration<dim>
-                ::template execute<stencil::jacobi, 0>(grid));
+                ::template execute<stencil::jacobi>(grids[0], grids[1]));
 
             benchmark::DoNotOptimize(stencil::iteration<dim>
-                ::template execute<stencil::jacobi, 1>(grid));
+                ::template execute<stencil::jacobi>(grids[1], grids[0]));
         }
     }
 
