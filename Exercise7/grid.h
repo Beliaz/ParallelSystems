@@ -8,12 +8,6 @@ namespace stencil
 {
 
 // =================================================================
-// cell
-
-template<class CellType>
-struct cell_value;
-
-// =================================================================
 // bounds
 
 template<class CellType, size_t Dim>

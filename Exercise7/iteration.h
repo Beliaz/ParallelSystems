@@ -9,11 +9,26 @@
 namespace stencil
 {
     
-static constexpr auto error_buffer_size = 8;
+template<class GridType>
+struct view_provider;
 
-template<class ErrorType>
-using error_buffer = std::array<ErrorType, error_buffer_size>;
+template<class GridType>
+decltype(auto) get_first(GridType& grid)
+{
+    return view_provider<GridType>::get_first(grid);
+}
 
+template<class GridType>
+decltype(auto) get_second(GridType& grid)
+{
+    return view_provider<GridType>::get_second(grid);
+}
+
+template<class GridType>
+constexpr auto get_dim()
+{
+    return view_provider<GridType>::dim;
+}
 
 template<size_t Dim>
 struct iteration;
@@ -21,8 +36,10 @@ struct iteration;
 template<>
 struct iteration<1>
 {
-    template<template <size_t Dim> class StencilCodeImpl, class CellType>
-    static auto execute(grid_t<CellType, 1>& source, grid_t<CellType, 1>& target)
+    template<template <size_t Dim> class StencilCodeImpl,
+        class GridReadViewType,
+        class GridWriteViewType>
+        static auto execute(GridReadViewType& source, GridWriteViewType& target)
     {
         using error_type = decltype(StencilCodeImpl<1>
             ::template execute(source, { 0 }));
@@ -35,9 +52,9 @@ struct iteration<1>
             const auto new_value = StencilCodeImpl<1>
                 ::template execute(source, { i });
 
-            error += std::abs(new_value - source.at(i));
+            error += std::abs(new_value - source.at({ i }));
 
-            target.at(i) = new_value;
+            target.at({ i }) = new_value;
         }
 
         return error;
@@ -47,14 +64,16 @@ struct iteration<1>
 template<>
 struct iteration<2>
 {
-    template<template <size_t Dim> class StencilCodeImpl, class CellType>
-    static auto execute(grid_t<CellType, 2>& source, grid_t<CellType, 2>& target)
+    template<template <size_t Dim> class StencilCodeImpl, 
+        class GridReadViewType, 
+        class GridWriteViewType>
+    static auto execute(GridReadViewType& source, GridWriteViewType& target)
     {
         using error_type = decltype(StencilCodeImpl<2>
             ::template execute(source, { 0, 0 }));
 
         error_type error = 0;
-
+        
         #pragma omp parallel for reduction(+: error)
         for (auto y = 1u; y < source.extents()[1] - 1; ++y)
         {
@@ -76,8 +95,10 @@ struct iteration<2>
 template<>
 struct iteration<3>
 {
-    template<template <size_t Dim> class StencilCodeImpl, class CellType>
-    static auto execute(grid_t<CellType, 3>& source, grid_t<CellType, 3>& target)
+    template<template <size_t Dim> class StencilCodeImpl,
+        class GridReadViewType,
+        class GridWriteViewType>
+        static auto execute(GridReadViewType& source, GridWriteViewType& target)
     {
         using error_type = decltype(StencilCodeImpl<3>
             ::template execute(source, { 0, 0, 0 }));
@@ -109,22 +130,25 @@ template<template <size_t Dim> class StencilCodeImpl>
 struct stencil_iteration
 {
     template<class GridType, class DiffType>
-    static auto do_iteration(std::array<GridType, 2>& grids, const DiffType epsilon)
+    static auto do_iteration(GridType& grid, const DiffType epsilon)
     {
-        using iteration_type = iteration<GridType::dim>;
+        using iteration_type = iteration<get_dim<GridType>()>;
         using return_type = std::tuple<const int, const bool, const DiffType>;
 
         static constexpr auto batch_threshold = 1000000;
         static constexpr auto batch_size = 4;
 
+        decltype(auto) first = get_first(grid);
+        decltype(auto) second = get_second(grid);
+
         const auto iterations = 2 + [&]()
         {
-            if (stencil::size(grids[0].extents()) < batch_threshold)
+            if (stencil::size(first.extents()) < batch_threshold)
             {
                 for (auto i = 0u; i < batch_size; ++i)
                 {
-                    iteration_type::template execute<StencilCodeImpl>(grids[0], grids[1]);
-                    iteration_type::template execute<StencilCodeImpl>(grids[1], grids[0]);
+                    iteration_type::template execute<StencilCodeImpl>(first, second);
+                    iteration_type::template execute<StencilCodeImpl>(second, first);
                 }
 
                 return 2 * batch_size;
@@ -133,9 +157,9 @@ struct stencil_iteration
             return 0;
         }();
         
-        iteration_type::template execute<StencilCodeImpl>(grids[0], grids[1]);
+        iteration_type::template execute<StencilCodeImpl>(first, second);
         
-        const auto error = iteration_type::template execute<StencilCodeImpl>(grids[1], grids[0]);
+        const auto error = iteration_type::template execute<StencilCodeImpl>(second, first);
 
         return return_type(iterations, error < epsilon, error);
     } 

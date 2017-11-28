@@ -11,26 +11,26 @@ namespace stencil
     template<>
     struct jacobi<1>
     {
-        template<class CellType>
+        template<class GridViewType>
         static auto execute(
-            grid_t<CellType, 1>& source,
+            GridViewType& source,
             const grid_index_t<1>& idx)
         {
             const auto i = idx[0];
 
             return (
-                source.at(i + 0) +
-                source.at(i - 1) +
-                source.at(i + 1)) / 3;
+                source.at({ i + 0 }) +
+                source.at({ i - 1 }) +
+                source.at({ i + 1 })) / 3;
         }
     };
 
     template<>
     struct jacobi<2>
     {
-        template<class CellType>
+        template<class GridViewType>
         static auto execute(
-            grid_t<CellType, 2>& source, 
+            GridViewType& source,
             const grid_index_t<2>& idx)
         {
             const auto x = idx[0];
@@ -48,9 +48,9 @@ namespace stencil
     template<>
     struct jacobi<3>
     {
-        template<class CellType>
+        template<class GridViewType>
         static auto execute(
-            grid_t<CellType, 3>& source,
+            GridViewType& source,
             const grid_index_t<3>& idx)
         {
             const auto x = idx[0];

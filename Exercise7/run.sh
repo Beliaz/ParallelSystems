@@ -1,6 +1,6 @@
 # Name your job. Unless you use the -o and -e options, output will
 # go to a unique file name.ojob_id for each job.
-#$ -N stencil
+#$ -N benchmark
 
 # Execute job in the queue "std.q" unless you have special requirements.
 #$ -q std.q
@@ -9,7 +9,7 @@
 #$ -cwd
 
 # Redirect output stream to this file.
-#$ -o output.dat
+#$ -o benchmark.log
 
 # Join the error stream to the output stream.
 #$ -j yes
