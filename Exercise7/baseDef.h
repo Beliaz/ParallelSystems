@@ -9,7 +9,7 @@
 
 
 #ifndef DOPRINT
-#define DOPRINT false
+#define DOPRINT true
 #endif
 
 //Creates an array based on the dimension an size
