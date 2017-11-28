@@ -1,22 +1,21 @@
 #include "grid.h"
 #include "print.h"
-#include "grid_helper.h"
-#include "stencil.h"
 
 #include <string>
 #include <iostream>
 #include <sstream>
 #include <chrono>
+#include "stencil.h"
 
 template<size_t Dim>
-void execute_stencil_code(const float epsilon, 
+void execute_stencil_code(const double epsilon, 
     const stencil::grid_extents_t<Dim> extents, 
     const bounds_t<Dim> bounds)
 {
     using namespace std::chrono;
     using clock = high_resolution_clock;
 
-    auto grid = create_grid<cell_t, Dim>(extents, bounds, {0, 0});
+    auto grid = create_buffered_grid(extents, bounds, default_value);
 
     constexpr auto printing_threshold = 50;
 
@@ -24,7 +23,7 @@ void execute_stencil_code(const float epsilon,
     {
         std::cout << "\n" << "Start Configuration: " << "\n\n";
 
-        print(grid);
+        print(get_first(grid));
 
         std::cout << std::endl;
     }
@@ -51,7 +50,7 @@ void execute_stencil_code(const float epsilon,
     if(elapsed > 0)
     {
         std::cout << ", " << std::scientific << std::setprecision(3)
-            << iterations * stencil::size(grid.extents()) / static_cast<double>(elapsed) * 1000
+            << iterations * stencil::size(extents) / static_cast<double>(elapsed) * 1000
             << " cells/s";
     }
 
@@ -59,13 +58,9 @@ void execute_stencil_code(const float epsilon,
     
     if (extents[0] > printing_threshold) return;
 
-    // hacky - copies the final values into the first
-    // element as print expects values to be there...
-    if (iterations % 2 == 1) stencil_code::do_iteration(grid, epsilon);
-
     std::cout << "\n" << "Result: " << "\n\n";
 
-    print(grid);
+    print(get_first(grid));
 
     std::cout << std::endl;
 }
@@ -85,10 +80,9 @@ bounds_t<Dim> parse_bounds(const int argc, char* argv[], const size_t offset)
     }
 
     for (auto i = 0u; i < bounds.size(); ++i)
-        bounds[i] = {
-        static_cast<cell_value_t>(atof(argv[offset + i])),
-        static_cast<cell_value_t>(atof(argv[offset + i]))
-    };
+    {
+        bounds[i] = static_cast<std::decay_t<decltype(bounds[i])>>(atof(argv[offset + i]));
+    }
 
     return bounds;
 }
@@ -109,25 +103,25 @@ int main(const int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    const auto epsilon = static_cast<cell_value_t>(atof(argv[1]));
+    const auto epsilon = atof(argv[1]);
     const auto dim = atoi(argv[2]);
     const auto n = static_cast<size_t>(atoi(argv[3]));
 
     if(epsilon <= 0)
     {
-        std::cerr << "epsilon must be greater than 0";
+        std::cerr << "epsilon must be greater than 0" << std::endl;
         return EXIT_FAILURE;
     }
 
     if (n <= 0)
     {
-        std::cerr << "n must be greater than 0";
+        std::cerr << "n must be greater than 0" << std::endl;
         return EXIT_FAILURE;
     }
 
     if(dim == 0 || dim > 3)
     {
-        std::cerr << "dim must be either 1, 2 or 3";
+        std::cerr << "dim must be either 1, 2 or 3" << std::endl;
         return EXIT_FAILURE;
     }
 

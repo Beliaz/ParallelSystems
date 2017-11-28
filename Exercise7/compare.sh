@@ -45,12 +45,12 @@ do
     
     echo
 
-    printf "stencil_1:$threads:2D:"$n_2d": "; ./stencil_1 1 2 $n_2d 273 1000 2000 10
+    printf "stencil_1:$threads:2D:"$n_2d": "; ./stencil_1 1 2 $n_2d 2000 10 273 1000
     printf "stencil_2:$threads:2D:"$n_2d": "; ./stencil_2 2 $n_2d 273 1000 2000 10
 
     echo
 
-    printf "stencil_1:$threads:3D:"$n_3d": "; ./stencil_1 1 3 $n_3d 273 1000 2000 10 200 8000
+    printf "stencil_1:$threads:3D:"$n_3d": "; ./stencil_1 1 3 $n_3d 2000 10 273 1000 8000 200
     printf "stencil_2:$threads:3D:"$n_3d": "; ./stencil_2 3 $n_3d 273 1000 2000 10 200 8000
 done
 
