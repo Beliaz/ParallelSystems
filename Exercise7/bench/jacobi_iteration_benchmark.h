@@ -123,7 +123,7 @@ static void jacobi_iteration_3d_impl(benchmark::State& state)
 #define JACOBI_ITERATION_1_D_BENCHMARK(f) \
     BENCHMARK(f) \
     ->RangeMultiplier(2) \
-    ->Range(4096, 2 << 15) \
+    ->Range(4096, 2 << 14) \
     ->ReportAggregatesOnly() \
     ->Repetitions(5) \
     ->Complexity(); \
@@ -131,7 +131,7 @@ static void jacobi_iteration_3d_impl(benchmark::State& state)
 #define JACOBI_ITERATION_2_D_BENCHMARK(f) \
     BENCHMARK(f) \
     ->RangeMultiplier(2) \
-    ->Range(32, 2 << 9) \
+    ->Range(32, 2 << 8) \
     ->ReportAggregatesOnly() \
     ->Repetitions(5) \
     ->Complexity();
@@ -139,7 +139,7 @@ static void jacobi_iteration_3d_impl(benchmark::State& state)
 #define JACOBI_ITERATION_3_D_BENCHMARK(f) \
     BENCHMARK(f) \
     ->RangeMultiplier(2) \
-    ->Range(32, 2 << 7) \
+    ->Range(32, 2 << 6) \
     ->ReportAggregatesOnly() \
     ->Repetitions(5) \
     ->Complexity();
