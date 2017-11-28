@@ -1,7 +1,43 @@
 #ifndef GRID_HELPER_H
 #define GRID_HELPER_H
 
+#include "requirements.h"
 #include "grid.h"
+
+template<class GridType, size_t ReadIndex>
+class grid_view
+{
+public:
+    using index_type = typename GridType::index_type;
+
+    static constexpr auto dim = GridType::dim;
+
+    explicit grid_view(GridType& grid)
+        : grid_(grid)
+    {
+    }
+
+    auto& at(const index_type& index)
+    {
+        return grid_.at(index)[ReadIndex];
+    }
+
+    const auto& at(const index_type& index) const
+    {
+        return grid_.at(index)[ReadIndex];
+    }
+
+    const auto& extents() const { return grid_.extents(); }
+
+private:
+    GridType& grid_;
+};
+
+template<size_t ReadIndex, class GridType>
+auto create_grid_view(GridType& grid)
+{
+    return grid_view<GridType, ReadIndex>(grid);
+}
 
 template<size_t Dim>
 struct grid_helper;
@@ -106,7 +142,7 @@ struct grid_helper<3>
 };
 
 template<class CellType, size_t Dim, class T>
-stencil::grid_t<CellType, Dim> create_grid(stencil::grid_extents_t<Dim> extents, 
+stencil::grid_t<CellType, Dim> create_grid(stencil::grid_extents_t<Dim> extents,
     const stencil::bounds_t<T, Dim>& bounds,
     const T& initial_value)
 {
@@ -116,41 +152,6 @@ stencil::grid_t<CellType, Dim> create_grid(stencil::grid_extents_t<Dim> extents,
     stencil::grid_t<CellType, Dim> grid(extents);
 
     return grid;
-}
-
-template<class GridType,size_t ReadIndex>
-class grid_view
-{
-public:
-    using index_type = typename GridType::index_type;
-
-    static constexpr auto dim = GridType::dim;
-
-    explicit grid_view(GridType& grid)
-        : grid_(grid)
-    {
-    }
-
-    auto& at(const index_type& index)
-    {
-        return grid_.at(index)[ReadIndex];
-    }
-
-    const auto& at(const index_type& index) const
-    {
-        return grid_.at(index)[ReadIndex];
-    }
-
-    const auto& extents() const { return grid_.extents(); }
-
-private:
-    GridType& grid_;
-}; 
-
-template<size_t ReadIndex, class GridType>
-auto create_grid_view(GridType& grid)
-{
-    return grid_view<GridType, ReadIndex>(grid);
 }
 
 #endif // GRID_HELPER_H

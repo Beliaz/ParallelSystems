@@ -2,6 +2,7 @@
 #define ITERATION_H
 
 #include "grid.h"
+#include "requirements.h"
 
 #include <numeric>
 #include <cmath>
@@ -9,27 +10,6 @@
 namespace stencil
 {
     
-template<class GridType>
-struct view_provider;
-
-template<class GridType>
-decltype(auto) get_first(GridType& grid)
-{
-    return view_provider<GridType>::get_first(grid);
-}
-
-template<class GridType>
-decltype(auto) get_second(GridType& grid)
-{
-    return view_provider<GridType>::get_second(grid);
-}
-
-template<class GridType>
-constexpr auto get_dim()
-{
-    return view_provider<GridType>::dim;
-}
-
 template<size_t Dim>
 struct iteration;
 

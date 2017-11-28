@@ -1,11 +1,14 @@
-#include "grid.h"
-#include "print.h"
-
 #include <string>
 #include <iostream>
 #include <sstream>
 #include <chrono>
+
 #include "stencil.h"
+#include "print.h"
+#include "jacobi.h"
+#include "iteration.h"
+
+using stencil_code = stencil::stencil_iteration<stencil::jacobi>;
 
 template<size_t Dim>
 void execute_stencil_code(const double epsilon, 

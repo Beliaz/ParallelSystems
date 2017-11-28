@@ -1,7 +1,6 @@
-#include "../grid_helper.h"
+#include "../stencil.h"
 #include "../jacobi.h"
 #include "../iteration.h"
-#include "../stencil.h"
 
 int main(int, char*[])
 {

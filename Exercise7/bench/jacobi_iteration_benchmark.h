@@ -4,6 +4,8 @@
 #include "benchmark/benchmark.h"
 #include "../stencil.h"
 #include "../grid_helper.h"
+#include "../iteration.h"
+#include "../jacobi.h"
 
 constexpr auto num_iterations = 100;
 

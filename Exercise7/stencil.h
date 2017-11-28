@@ -1,8 +1,7 @@
-#ifndef STENCIL_SOA_H
-#define STENCIL_SOA_H
+#ifndef STENCIL_H
+#define STENCIL_H
 
-#include "jacobi.h"
-#include "iteration.h"
+#include "requirements.h"
 #include "grid_helper.h"
 
 //#define STRUCTURE_OF_ARRAYS
@@ -22,8 +21,6 @@ using grid_t = stencil::grid_t<cell_t, Dim>;
 template<class GridType>
 using buffered_grid_t = std::array<GridType, 2>;
 
-using stencil_code = stencil::stencil_iteration<stencil::jacobi>;
-
 namespace stencil
 {
     template<class GridType>
@@ -31,12 +28,15 @@ namespace stencil
     {
         static constexpr auto dim = GridType::dim;
 
-        static ::grid_t<dim>& get_first(buffered_grid_t<GridType>& grid)
+        using first_view_type = ::grid_t<dim>&;
+        using second_view_type = ::grid_t<dim>&;
+
+        static first_view_type get_first(buffered_grid_t<GridType>& grid)
         {
             return grid[0];
         }
 
-        static ::grid_t<dim>& get_second(buffered_grid_t<GridType>& grid)
+        static second_view_type get_second(buffered_grid_t<GridType>& grid)
         {
             return grid[1];
         }
@@ -71,8 +71,6 @@ using grid_t = stencil::grid_t<cell_t, Dim>;
 template<size_t Dim>
 using bounds_t = stencil::bounds_t<float, Dim>;
 
-using stencil_code = stencil::stencil_iteration<stencil::jacobi>;
-
 namespace stencil
 {
     template<class GridType>
@@ -80,12 +78,15 @@ namespace stencil
     {
         static constexpr auto dim = GridType::dim;
 
-        static grid_view<GridType, dim> get_first(GridType& grid)
+        using first_view_type = grid_view<GridType, 0>;
+        using second_view_type = grid_view<GridType, 1>;
+
+        static first_view_type get_first(GridType& grid)
         {
             return create_grid_view<0>(grid);
         }
 
-        static grid_view<GridType, dim> get_second(GridType& grid)
+        static second_view_type get_second(GridType& grid)
         {
             return create_grid_view<1>(grid);
         }
@@ -106,4 +107,4 @@ auto create_buffered_grid(stencil::grid_extents_t<Dim> extents,
 
 #endif
 
-#endif // STENCIL_SOA_H
+#endif // STENCIL_H
