@@ -1,6 +1,6 @@
 # Name your job. Unless you use the -o and -e options, output will
 # go to a unique file name.ojob_id for each job.
-#$ -N comparison
+#$ -N compare
 
 # Execute job in the queue "std.q" unless you have special requirements.
 #$ -q std.q
@@ -9,7 +9,7 @@
 #$ -cwd
 
 # Redirect output stream to this file.
-#$ -o output.dat
+#$ -o compare.log
 
 # Join the error stream to the output stream.
 #$ -j yes
@@ -30,7 +30,7 @@ n_1d="20000"
 n_2d="150"
 n_3d="64"
 
-#module load gcc/5.1.0
+module load gcc/5.1.0
 
 for threads in 1 2 4 8
 do
@@ -54,4 +54,4 @@ do
     printf "stencil_2:$threads:3D:"$n_3d": "; ./stencil_2 3 $n_3d 273 1000 2000 10 200 8000
 done
 
-#module unload gcc/5.1.0
+module unload gcc/5.1.0

@@ -2,6 +2,7 @@
 #define ITERATION_H
 #include "grid.h"
 #include <numeric>
+#include <tuple>
 
 namespace stencil
 {
