@@ -1,6 +1,6 @@
 #ifndef PRINT_H
 #define PRINT_H
-#include "grid.h"
+
 #include <iostream>
 #include <iomanip>
 
@@ -10,20 +10,20 @@ struct grid_printer;
 template<>
 struct grid_printer<1>
 {
-    template<class CellType>
-    static void print(const stencil::grid_t<CellType, 1>& grid)
+    template<class GridViewType>
+    static void print(const GridViewType& grid)
     {
         std::cout << std::fixed << std::setprecision(3);
 
-        std::cout << grid.at(0) << " ||";
+        std::cout << grid.at({ 0 }) << " ||";
 
         for (auto i = 1u; i < grid.extents()[0] - 1; ++i)
         {
-            std::cout << " " << grid.at(i) ;
+            std::cout << " " << grid.at({ i });
         }
 
         if(grid.extents()[0] > 1)
-            std::cout << " || " << grid.at(grid.extents()[0] - 1);
+            std::cout << " || " << grid.at({ grid.extents()[0] - 1 });
 
         std::cout << std::endl;
     }
@@ -32,8 +32,8 @@ struct grid_printer<1>
 template<>
 struct grid_printer<2>
 {
-    template<class CellType>
-    static void print(const stencil::grid_t<CellType, 2>& grid)
+    template<class GridViewType>
+    static void print(const GridViewType& grid)
     {
         std::cout << std::fixed << std::setprecision(3);
 
@@ -82,8 +82,8 @@ struct grid_printer<2>
 template<>
 struct grid_printer<3>
 {
-    template<class CellType>
-    static void print(const stencil::grid_t<CellType, 3>& grid)
+    template<class GridViewType>
+    static void print(const GridViewType& grid)
     {
         std::cout << std::fixed << std::setprecision(3);
 
@@ -108,10 +108,10 @@ struct grid_printer<3>
     }
 };
 
-template<class GridType>
-void print(const GridType& grid)
+template<class GridViewType>
+void print(const GridViewType& grid)
 {
-    grid_printer<GridType::dim>::print(grid);
+    grid_printer<GridViewType::dim>::print(grid);
 }
 
 #endif // PRINT_H

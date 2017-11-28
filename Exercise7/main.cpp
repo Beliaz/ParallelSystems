@@ -1,26 +1,21 @@
 #include "grid.h"
 #include "print.h"
-#include "grid_helper.h"
-#include "stencil.h"
 
 #include <string>
 #include <iostream>
 #include <sstream>
 #include <chrono>
+#include "stencil.h"
 
 template<size_t Dim>
-void execute_stencil_code(const float epsilon, 
+void execute_stencil_code(const double epsilon, 
     const stencil::grid_extents_t<Dim> extents, 
     const bounds_t<Dim> bounds)
 {
     using namespace std::chrono;
     using clock = high_resolution_clock;
 
-    std::array<grid_t<Dim>, 2> grids =
-    {
-        create_grid<cell_t, Dim>(extents, bounds, 0),
-        create_grid<cell_t, Dim>(extents, bounds, 0)
-    };
+    auto grid = create_buffered_grid(extents, bounds, default_value);
 
     constexpr auto printing_threshold = 50;
 
@@ -28,7 +23,7 @@ void execute_stencil_code(const float epsilon,
     {
         std::cout << "\n" << "Start Configuration: " << "\n\n";
 
-        print(grids[0]);
+        print(get_first(grid));
 
         std::cout << std::endl;
     }
@@ -40,7 +35,7 @@ void execute_stencil_code(const float epsilon,
     
     for(;;)
     {
-        const auto result = stencil_code::do_iteration(grids, epsilon);
+        const auto result = stencil_code::do_iteration(grid, epsilon);
 
         iterations += std::get<0>(result);
 
@@ -65,7 +60,7 @@ void execute_stencil_code(const float epsilon,
 
     std::cout << "\n" << "Result: " << "\n\n";
 
-    print(grids[0]);
+    print(get_first(grid));
 
     std::cout << std::endl;
 }
@@ -86,10 +81,7 @@ bounds_t<Dim> parse_bounds(const int argc, char* argv[], const size_t offset)
 
     for (auto i = 0u; i < bounds.size(); ++i)
     {
-        bounds[i] =
-        {
-            static_cast<cell_t>(atof(argv[offset + i]))
-        };
+        bounds[i] = static_cast<std::decay_t<decltype(bounds[i])>>(atof(argv[offset + i]));
     }
 
     return bounds;
@@ -111,7 +103,7 @@ int main(const int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    const auto epsilon = static_cast<cell_t>(atof(argv[1]));
+    const auto epsilon = atof(argv[1]);
     const auto dim = atoi(argv[2]);
     const auto n = static_cast<size_t>(atoi(argv[3]));
 
