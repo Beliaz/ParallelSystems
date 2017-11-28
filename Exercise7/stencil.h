@@ -9,8 +9,6 @@
 
 #ifdef STRUCTURE_OF_ARRAYS
 
-// ==============================================================================
-// define types
 using cell_t = float;
 
 static constexpr cell_t default_value = 0;
@@ -63,8 +61,6 @@ auto create_buffered_grid(stencil::grid_extents_t<Dim> extents,
 
 #else
 
-// ==============================================================================
-// define types
 using cell_t = std::array<float, 2>;
 
 static constexpr float default_value = 0;
@@ -84,12 +80,12 @@ namespace stencil
     {
         static constexpr auto dim = GridType::dim;
 
-        static auto get_first(GridType& grid)
+        static grid_view<GridType, dim> get_first(GridType& grid)
         {
             return create_grid_view<0>(grid);
         }
 
-        static auto get_second(GridType& grid)
+        static grid_view<GridType, dim> get_second(GridType& grid)
         {
             return create_grid_view<1>(grid);
         }
