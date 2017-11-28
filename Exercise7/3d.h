@@ -32,6 +32,8 @@ void autoFill3D(TYPE *array, SIZETYPE size) {
         for (SIZETYPE j = 1; j < size + 1; j++)
             for (SIZETYPE k = 1; k < size + 1; k++)
                 array[i * (size + 2) * (size + 2) + j * (size + 2) + k] = 0;
+
+    array[(size + 2) * (size + 2) * (size + 2)/2] = 10000;
 }
 
 //Write Borders so we do not need any border cases.
@@ -74,8 +76,8 @@ TYPE iteration3D(TYPE *source, TYPE *target, SIZETYPE size) {
                         source[i * (size + 2) * (size + 2) + j * (size + 2) + k] +
                         source[i * (size + 2) * (size + 2) + (j-1) * (size + 2) + k] +
                         source[i * (size + 2) * (size + 2) + (j+1) * (size + 2) + k] +
-                        source[(i - 1) * (size + 2) * (size + 2) + (j-1) * (size + 2) + k] +
-                        source[(i + 1) * (size + 2) * (size + 2) + (j-1) * (size + 2) + k]) / 7);
+                        source[(i - 1) * (size + 2) * (size + 2) + j * (size + 2) + k] +
+                        source[(i + 1) * (size + 2) * (size + 2) + j * (size + 2) + k]) / 7);
 
                 target[i * (size + 2) * (size + 2) + j * (size + 2) + k] = newValue;
                 dEpsilon += current - newValue > 0 ? current - newValue : newValue - current;
