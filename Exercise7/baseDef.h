@@ -5,7 +5,7 @@
 
 #define TYPE float
 #define SIZETYPE long
-#define epsilonStop 1
+#define epsilonStop 20
 
 
 #ifndef DOPRINT
