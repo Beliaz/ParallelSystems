@@ -6,9 +6,9 @@ project(Exercise8 LANGUAGES CXX)
 #        ${CMAKE_MODULE_PATH}
 #        ${PROJECT_SOURCE_DIR}/cmake)
 
-#include(CTest)
-#enable_testing()
-#add_subdirectory(${PROJECT_SOURCE_DIR}/test/)
+include(CTest)
+enable_testing()
+add_subdirectory(${PROJECT_SOURCE_DIR}/test/)
 
 add_executable(mpi main.cpp)
 add_executable(pi pi/pi_mpi.cpp)
