@@ -22,4 +22,4 @@ ENDIF()
 
 aux_source_directory(stencil_old SRC_LIST_OLD)
 
-add_executable(stencil_old main.cpp ${SRC_LIST_OLD})
+add_executable(stencil_old main_old.cpp ${SRC_LIST_OLD})
