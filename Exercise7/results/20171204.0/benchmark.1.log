@@ -1,3 +1,4 @@
+
   Loading gcc/5.1.0
 
 1  thread(s) -------------------------------------------------
@@ -19,4 +20,5 @@ stencil_2:4:2D:512: 314 ms, 156 iter, 1.302e+08 cells/s
 
 stencil_1:8:2D:512: 163 ms, 160 iter, 2.573e+08 cells/s
 stencil_2:8:2D:512: 234 ms, 156 iter, 1.748e+08 cells/s
+
   Unloading gcc/5.1.0
