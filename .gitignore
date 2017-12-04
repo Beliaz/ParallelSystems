@@ -45,3 +45,10 @@ Exercise1/.vs/VSWorkspaceState.json
 /CMakeLists.txt
 **/.vs/VSWorkspaceState.json
 /cmake-build-release/*
+Exercise7/bench/lastrun/
+Exercise8/openmpi-2.1.1/
+Exercise8/openmpi-2.1.1.tar.gz
+cmake-3.9.6-Linux-x86_64.sh
+autotools-dev_20150820.1_all.deb
+automake_1.15-4ubuntu1_all.deb
+autoconf_2.69-9_all.deb
