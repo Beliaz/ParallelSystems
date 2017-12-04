@@ -1,0 +1,22 @@
+  Loading gcc/5.1.0
+
+1  thread(s) -------------------------------------------------
+
+stencil_1:1:2D:512: 596 ms, 160 iter, 7.037e+07 cells/s
+stencil_2:1:2D:512: 147 ms, 42 iter, 7.490e+07 cells/s
+
+2  thread(s) -------------------------------------------------
+
+stencil_1:2:2D:512: 327 ms, 160 iter, 1.283e+08 cells/s
+stencil_2:2:2D:512: 74 ms, 42 iter, 1.488e+08 cells/s
+
+4  thread(s) -------------------------------------------------
+
+stencil_1:4:2D:512: 190 ms, 160 iter, 2.208e+08 cells/s
+stencil_2:4:2D:512: 38 ms, 42 iter, 2.897e+08 cells/s
+
+8  thread(s) -------------------------------------------------
+
+stencil_1:8:2D:512: 163 ms, 160 iter, 2.573e+08 cells/s
+stencil_2:8:2D:512: 20 ms, 42 iter, 5.505e+08 cells/s
+  Unloading gcc/5.1.0
