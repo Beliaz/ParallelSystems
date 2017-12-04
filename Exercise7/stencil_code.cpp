@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
     //Array used to write the border cases
     TYPE *borders = new TYPE[size];
     for (int i = 0; i < dimension * 2; i++)
-        borders[i] = atoi(argv[i+3]);
+        borders[i] = atof(argv[i+3]);
 
     calculate(size, borders, dimension);
 

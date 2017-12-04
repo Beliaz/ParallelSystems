@@ -1,0 +1,60 @@
+/usr/sge/lcc2/spool/n001/job_scripts/4333: line 1: B#: command not found
+  Loading gcc/5.1.0
+
+1  thread(s) -------------------------------------------------
+
+stencil_1:1:2D:512: 596 ms, 160 iter, 7.037e+07 cells/s
+stencil_1:1:2D:512: 596 ms, 160 iter, 7.037e+07 cells/s
+stencil_1:1:2D:512: 596 ms, 160 iter, 7.037e+07 cells/s
+stencil_1:1:2D:512: 596 ms, 160 iter, 7.037e+07 cells/s
+stencil_1:1:2D:512: 596 ms, 160 iter, 7.037e+07 cells/s
+
+stencil_2:1:2D:512: 1030 ms, 156 iter, 3.970e+07 cells/s
+stencil_2:1:2D:512: 1029 ms, 156 iter, 3.974e+07 cells/s
+stencil_2:1:2D:512: 1030 ms, 156 iter, 3.970e+07 cells/s
+stencil_2:1:2D:512: 1029 ms, 156 iter, 3.974e+07 cells/s
+stencil_2:1:2D:512: 1029 ms, 156 iter, 3.974e+07 cells/s
+
+2  thread(s) -------------------------------------------------
+
+stencil_1:2:2D:512: 327 ms, 160 iter, 1.283e+08 cells/s
+stencil_1:2:2D:512: 328 ms, 160 iter, 1.279e+08 cells/s
+stencil_1:2:2D:512: 327 ms, 160 iter, 1.283e+08 cells/s
+stencil_1:2:2D:512: 327 ms, 160 iter, 1.283e+08 cells/s
+stencil_1:2:2D:512: 327 ms, 160 iter, 1.283e+08 cells/s
+
+stencil_2:2:2D:512: 552 ms, 156 iter, 7.408e+07 cells/s
+stencil_2:2:2D:512: 553 ms, 156 iter, 7.395e+07 cells/s
+stencil_2:2:2D:512: 552 ms, 156 iter, 7.408e+07 cells/s
+stencil_2:2:2D:512: 552 ms, 156 iter, 7.408e+07 cells/s
+stencil_2:2:2D:512: 552 ms, 156 iter, 7.408e+07 cells/s
+
+4  thread(s) -------------------------------------------------
+
+stencil_1:4:2D:512: 190 ms, 160 iter, 2.208e+08 cells/s
+stencil_1:4:2D:512: 190 ms, 160 iter, 2.208e+08 cells/s
+stencil_1:4:2D:512: 190 ms, 160 iter, 2.208e+08 cells/s
+stencil_1:4:2D:512: 190 ms, 160 iter, 2.208e+08 cells/s
+stencil_1:4:2D:512: 190 ms, 160 iter, 2.208e+08 cells/s
+
+stencil_2:4:2D:512: 313 ms, 156 iter, 1.307e+08 cells/s
+stencil_2:4:2D:512: 314 ms, 156 iter, 1.302e+08 cells/s
+stencil_2:4:2D:512: 314 ms, 156 iter, 1.302e+08 cells/s
+stencil_2:4:2D:512: 314 ms, 156 iter, 1.302e+08 cells/s
+stencil_2:4:2D:512: 314 ms, 156 iter, 1.302e+08 cells/s
+
+8  thread(s) -------------------------------------------------
+
+stencil_1:8:2D:512: 163 ms, 160 iter, 2.573e+08 cells/s
+stencil_1:8:2D:512: 185 ms, 160 iter, 2.267e+08 cells/s
+stencil_1:8:2D:512: 189 ms, 160 iter, 2.219e+08 cells/s
+stencil_1:8:2D:512: 163 ms, 160 iter, 2.573e+08 cells/s
+stencil_1:8:2D:512: 163 ms, 160 iter, 2.573e+08 cells/s
+
+stencil_2:8:2D:512: 234 ms, 156 iter, 1.748e+08 cells/s
+stencil_2:8:2D:512: 233 ms, 156 iter, 1.755e+08 cells/s
+stencil_2:8:2D:512: 233 ms, 156 iter, 1.755e+08 cells/s
+stencil_2:8:2D:512: 233 ms, 156 iter, 1.755e+08 cells/s
+stencil_2:8:2D:512: 233 ms, 156 iter, 1.755e+08 cells/s
+
+  Unloading gcc/5.1.0
