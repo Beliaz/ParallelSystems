@@ -2,7 +2,7 @@
 #include "pi.h"
 #include <iostream>
 #include <string>
-#include "../chrono_timer.h"
+#include "../../chrono_timer.h"
 
 int main(const int argc, char** argv)
 {

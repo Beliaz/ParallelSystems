@@ -11,6 +11,7 @@ project(Exercise8 LANGUAGES CXX)
 #add_subdirectory(${PROJECT_SOURCE_DIR}/test/)
 
 add_executable(mpi main.cpp)
+add_executable(pi pi/pi_mpi.cpp)
 
 FIND_PACKAGE(OpenMP)
 IF(OPENMP_FOUND)
