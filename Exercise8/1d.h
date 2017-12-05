@@ -12,6 +12,33 @@
 
 #endif //PARALLELSYSTEMSTEAM_1D_H
 
+void sendAndReceive(TYPE* array, int length, int neighbourLeft, int neighbourRight) {
+    // Get the rank of the process
+    int world_rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+    TYPE send = 0;
+    TYPE receive = 0;
+
+    send = array[length-1];
+    if (neighbourRight > -1) {
+        MPI_Send(&send, 1, MPI_DOUBLE, neighbourRight, 0, MPI_COMM_WORLD);
+    //    std::cout << neighbourRight << " send: " << send << std::endl;
+    }
+    if (neighbourLeft > -1) {
+        std::cout << "hi, " << neighbourLeft << std::endl;
+        MPI_Recv(&receive, 1, MPI_DOUBLE, neighbourLeft, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        //array[0] = receive;
+    }/*
+
+    send = array[0];
+    if (neighbourLeft > -1)
+        MPI_Send(&send, 1, MPI_DOUBLE, neighbourLeft, 0, MPI_COMM_WORLD);
+    if (neighbourRight > -1) {
+        MPI_Recv(&receive, 1, MPI_DOUBLE, neighbourRight, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        array[length-1] = receive;
+    }*/
+}
+
 void print1D(TYPE *array, SIZETYPE size) {
     for (SIZETYPE i = 0; i <= size+1; i++) {
         TYPE value = array[i];
@@ -29,7 +56,7 @@ void autoFill(TYPE *array, SIZETYPE size) {
 }
 
 //Does the job and returns the delta Epsilon accumulated over all comparisons.
-TYPE iteration(TYPE *source, TYPE *target, SIZETYPE size) {
+TYPE iteration(TYPE *source, TYPE *target, SIZETYPE size, int neigbourLeft, int neigbourRight) {
     TYPE dEpsilon = 0;
 #pragma omp parallel for reduction (+ : dEpsilon)
     for (SIZETYPE i = 1; i < size + 1; i++) {
@@ -39,12 +66,13 @@ TYPE iteration(TYPE *source, TYPE *target, SIZETYPE size) {
         target[i] = newValue;
         dEpsilon += current - newValue > 0 ? current - newValue : newValue - current;
     }
+    sendAndReceive(target, size+2, neigbourLeft, neigbourRight);
     return dEpsilon;
 }
 
 //Function to control and start the computation. Does measure the time as well and returns it
 unsigned long calculate1D(SIZETYPE size, TYPE *borders) {
-    int buffer = 5;
+    int buffer = 1;
     MPI_Init(NULL, NULL);
 
     // Get the number of processes
@@ -62,10 +90,22 @@ unsigned long calculate1D(SIZETYPE size, TYPE *borders) {
     //autoFill(array1, size-2);
     //autoFill(array2, size-2);
     //Write Borders so we do not need any border cases.
-    if (world_rank == 0)
+
+    //Define the neighbours to write and listen to
+    int neighbourRight = world_rank + 1;
+    int neighbourLeft = world_rank - 1;
+    if (world_rank == 0) {
         array1[0] = array2[0] = borders[0];
-    else if (world_rank == world_size - 1)
-        array1[size-1] = array2[size-1] = borders[1];
+        TYPE *localUpperBuffer = new TYPE[buffer];
+        neighbourLeft = -1;
+    } else if (world_rank == world_size - 1) {
+        array1[size - 1] = array2[size - 1] = borders[1];
+        TYPE *localLowerBuffer = new TYPE[buffer];
+        neighbourRight = -1;
+    } else {
+        TYPE *localUpperBuffer = new TYPE[buffer];
+        TYPE *localLowerBuffer = new TYPE[buffer];
+    }
 
     //Start to measure time
     unsigned long startTime = time_ms();
@@ -78,8 +118,8 @@ unsigned long calculate1D(SIZETYPE size, TYPE *borders) {
     print1D(array1, size-2);
     while (true) {
 
-        iteration(array1, array2, size-2);
-        dEpsilon = iteration(array2, array1, size-2);
+        iteration(array1, array2, size-2, neighbourLeft, neighbourRight);
+        dEpsilon = iteration(array2, array1, size-2, neighbourLeft, neighbourRight);
         //print1D(array2, size-1);
 
 
