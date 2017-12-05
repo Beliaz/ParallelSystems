@@ -228,43 +228,43 @@ int main(int argc, char **argv) {
 
 
         if(xpos != 0) {
-            std::cout<<my_rank<<" sending top border to "<<top_proc<<std::endl;
+//            std::cout<<my_rank<<" sending top border to "<<top_proc<<std::endl;
             MPI_Send(send[0].data(), elems_per_block, MPI_DOUBLE, top_proc, 0,
                      MPI_COMM_WORLD);
 
         }if(xpos != blocks-1)
         {
-            std::cout<<my_rank<<" recieving bottom border from "<<bottom_proc<<std::endl;
+//            std::cout<<my_rank<<" recieving bottom border from "<<bottom_proc<<std::endl;
 
             MPI_Recv(recv,elems_per_block,MPI_DOUBLE,bottom_proc,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
             grid2->set_borders(recv,2,from_x,from_y,to_x,to_y);
-            std::cout<<my_rank<<" sending botttom border to "<<bottom_proc<<std::endl;
+//            std::cout<<my_rank<<" sending botttom border to "<<bottom_proc<<std::endl;
             MPI_Send(send[2].data(),elems_per_block,MPI_DOUBLE,bottom_proc,2,MPI_COMM_WORLD);
         }
         if(xpos != 0)
         {
-            std::cout<<my_rank<<" recieving top border from "<<top_proc<<std::endl;
+//            std::cout<<my_rank<<" recieving top border from "<<top_proc<<std::endl;
 
             MPI_Recv(recv,elems_per_block,MPI_DOUBLE,top_proc,2,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
             grid2->set_borders(recv,0,from_x,from_y,to_x,to_y);
         }
         if(ypos != 0) {
-            std::cout<<my_rank<<" sending left border to "<<left_proc<<std::endl;
+//            std::cout<<my_rank<<" sending left border to "<<left_proc<<std::endl;
 
             MPI_Send(send[3].data(), elems_per_block, MPI_DOUBLE, left_proc, 3,
                      MPI_COMM_WORLD);
         }
         if(ypos != blocks-1)
         {
-            std::cout<<my_rank<<" recieving right border from "<<right_proc<<std::endl;
+//            std::cout<<my_rank<<" recieving right border from "<<right_proc<<std::endl;
 
             MPI_Recv(recv,elems_per_block,MPI_DOUBLE,right_proc,3,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
             grid2->set_borders(recv,1,from_x,from_y,to_x,to_y);
-            std::cout<<my_rank<<" sending right border to "<<right_proc<<std::endl;
+//            std::cout<<my_rank<<" sending right border to "<<right_proc<<std::endl;
             MPI_Send(send[1].data(),elems_per_block,MPI_DOUBLE,right_proc,1,MPI_COMM_WORLD);
         }
         if(ypos != 0) {
-            std::cout<<my_rank<<" recieving left border from "<<left_proc<<std::endl;
+//            std::cout<<my_rank<<" recieving left border from "<<left_proc<<std::endl;
 
             MPI_Recv(recv, elems_per_block, MPI_DOUBLE, left_proc, 1,
                      MPI_COMM_WORLD, MPI_STATUS_IGNORE);
@@ -276,43 +276,43 @@ int main(int argc, char **argv) {
         send = grid1->get_borders(from_x,from_y,to_x,to_y);
 
         if(xpos != 0) {
-            std::cout<<my_rank<<" sending top border to "<<top_proc<<std::endl;
+//            std::cout<<my_rank<<" sending top border to "<<top_proc<<std::endl;
             MPI_Send(send[0].data(), elems_per_block, MPI_DOUBLE, top_proc, 0,
                      MPI_COMM_WORLD);
 
         }if(xpos != blocks-1)
         {
-            std::cout<<my_rank<<" recieving bottom border from "<<bottom_proc<<std::endl;
+//            std::cout<<my_rank<<" recieving bottom border from "<<bottom_proc<<std::endl;
 
             MPI_Recv(recv,elems_per_block,MPI_DOUBLE,bottom_proc,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
             grid1->set_borders(recv,2,from_x,from_y,to_x,to_y);
-            std::cout<<my_rank<<" sending botttom border to "<<bottom_proc<<std::endl;
+//            std::cout<<my_rank<<" sending botttom border to "<<bottom_proc<<std::endl;
             MPI_Send(send[2].data(),elems_per_block,MPI_DOUBLE,bottom_proc,2,MPI_COMM_WORLD);
         }
         if(xpos != 0)
         {
-            std::cout<<my_rank<<" recieving top border from "<<top_proc<<std::endl;
+//            std::cout<<my_rank<<" recieving top border from "<<top_proc<<std::endl;
 
             MPI_Recv(recv,elems_per_block,MPI_DOUBLE,top_proc,2,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
             grid1->set_borders(recv,0,from_x,from_y,to_x,to_y);
         }
         if(ypos != 0) {
-            std::cout<<my_rank<<" sending left border to "<<left_proc<<std::endl;
+//            std::cout<<my_rank<<" sending left border to "<<left_proc<<std::endl;
 
             MPI_Send(send[3].data(), elems_per_block, MPI_DOUBLE, left_proc, 3,
                      MPI_COMM_WORLD);
         }
         if(ypos != blocks-1)
         {
-            std::cout<<my_rank<<" recieving right border from "<<right_proc<<std::endl;
+//            std::cout<<my_rank<<" recieving right border from "<<right_proc<<std::endl;
 
             MPI_Recv(recv,elems_per_block,MPI_DOUBLE,right_proc,3,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
             grid1->set_borders(recv,1,from_x,from_y,to_x,to_y);
-            std::cout<<my_rank<<" sending right border to "<<right_proc<<std::endl;
+//            std::cout<<my_rank<<" sending right border to "<<right_proc<<std::endl;
             MPI_Send(send[1].data(),elems_per_block,MPI_DOUBLE,right_proc,1,MPI_COMM_WORLD);
         }
         if(ypos != 0) {
-            std::cout<<my_rank<<" recieving left border from "<<left_proc<<std::endl;
+//            std::cout<<my_rank<<" recieving left border from "<<left_proc<<std::endl;
 
             MPI_Recv(recv, elems_per_block, MPI_DOUBLE, left_proc, 1,
                      MPI_COMM_WORLD, MPI_STATUS_IGNORE);
@@ -340,22 +340,22 @@ int main(int argc, char **argv) {
         MPI_Recv(&quit, 1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
         if(quit==1) break;
     }
-if(my_rank==0){
+    if(my_rank==0){
 
-    const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
-            clock::now() - start).count();
+        const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+                clock::now() - start).count();
 
-    std::cout << elapsed << " ms, " << iterations << " iter";
+        std::cout << elapsed << " ms, " << iterations << " iter";
 
-    if(elapsed > 0)
-    {
-        std::cout << ", " << std::scientific << std::setprecision(3)
-                  << iterations * SIZE / static_cast<double>(elapsed) * 1000
-                  << " cells/s";
+        if(elapsed > 0)
+        {
+            std::cout << ", " << std::scientific << std::setprecision(3)
+                      << iterations * SIZE / static_cast<double>(elapsed) * 1000
+                      << " cells/s";
+        }
+
+        std::cout << std::endl;
     }
-
-    std::cout << std::endl;
-}
 
     //End Parallel Block
     MPI_Finalize();
