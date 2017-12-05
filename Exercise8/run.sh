@@ -8,7 +8,7 @@
 
 # Name your job. Unless you use the -o and -e options, output will
 # go to a unique file name.ojob_id for each job.
-#$ -N name
+#$ -N mpi_stencil
 
 # Redirect output stream to this file.
 #$ -o output.dat
@@ -16,11 +16,6 @@
 # Join the error stream to the output stream.
 #$ -j yes
 
-# Send status information to this email address.
-#$ -M Karl.Mustermann@xxx.com
-
-# Send me an e-mail when the job has finished.
-#$ -m e
 
 # Specify the amount of virtual memory given to each MPI process
 # in the job.

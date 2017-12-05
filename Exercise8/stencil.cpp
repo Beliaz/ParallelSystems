@@ -269,6 +269,7 @@ int main(int argc, char **argv) {
             grid2->set_borders(recv,3,from_x,from_y,to_x,to_y);
         }
 
+        MPI_Barrier(MPI_COMM_WORLD);
         double d_epsilon = iteration(grid2,grid1,from_x,from_y,to_x,to_y);
         send = grid1->get_borders(from_x,from_y,to_x,to_y);
 
@@ -315,6 +316,7 @@ int main(int argc, char **argv) {
                      MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             grid1->set_borders(recv,3,from_x,from_y,to_x,to_y);
         }
+        MPI_Barrier(MPI_COMM_WORLD);
 
         iterations += 2;
 
