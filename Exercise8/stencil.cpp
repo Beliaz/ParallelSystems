@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <vector>
 #include <chrono>
 #include <iomanip>
 #include <mpi.h>
@@ -64,27 +65,66 @@ public:
         }
     }
 
-    double *get_borders(unsigned int from_x,
+    std::vector<std::vector<double> > get_borders(unsigned int from_x,
                         unsigned int from_y,
                         unsigned int to_x,
                         unsigned int to_y)
     {
         int size=to_x-from_x;
-        double * borders = new double[size * 4];
-        int counter=0;
+        std::vector<std::vector<double> > borders = std::vector<std::vector<double> >();
+        borders.push_back(std::vector<double>(size));
+        borders.push_back(std::vector<double>(size));
+        borders.push_back(std::vector<double>(size));
+        borders.push_back(std::vector<double>(size));
         for (int i = 0; i < size; ++i) {
-            borders[counter++] = get(from_x, from_y + i);
+            borders[0][i] = get(from_x , from_y + i);
+      //      borders[0][size + counter++] = get(from_x + 1, from_y + i);
         }
         for (int i = 0; i < size; ++i) {
-            borders[counter++] = get(from_x + i, to_y);
+            borders[1][i] = get(from_x + i, to_y);
+       //     borders[1][size + counter++] = get(from_x + i, to_y - 1);
         }
         for (int i = 0; i < size; ++i) {
-            borders[counter++] = get(to_x, from_y + i);
+            borders[2][i] = get(to_x, from_y + i);
+        //    borders[2][size + counter++] = get(to_x - 1, from_y + i);
         }
         for (int i = 0; i < size; ++i) {
-            borders[counter++] = get(from_x +i, from_y);
+            borders[3][i] = get(from_x + i, from_y);
+         //   borders[3][size + counter++] = get(from_x + i, from_y + 1);
         }
         return borders;
+    }
+    void set_borders(std::vector<double> * borders,
+                                                  unsigned direction,
+                                                  unsigned int from_x,
+                                                  unsigned int from_y,
+                                                  unsigned int to_x,
+                                                  unsigned int to_y)
+    {
+        int size=to_x-from_x;
+
+        switch (direction)
+        {
+            case 0:
+                for (int i = 0; i < size; ++i)
+                    set(from_x - 1, from_y + i,borders->at(i));
+                break;
+            case 1:
+                for (int i = 0; i < size; ++i)
+                    set(from_x + i, to_y + 1,borders->at(i));
+                break;
+            case 2:
+                for (int i = 0; i < size; ++i)
+                    set(to_x + 1, from_y + i,borders->at(i));
+                break;
+            case 3:
+                for (int i = 0; i < size; ++i)
+                    set(from_x + i, from_y - 1,borders->at(i));
+                break;
+
+
+
+        }
     }
 };
 
@@ -176,20 +216,63 @@ int main(int argc, char **argv) {
     while (true) {
 
         iteration(grid1,grid2,from_x,from_y,to_x,to_y);
-        double * border = grid2->get_borders(from_x,from_y,to_x,to_y);
-        for (int i = 0; i < (to_x-from_x) * 4 ; ++i) {
-            std::cout<<border[i]<<", ";
+        std::vector<std::vector<double> > send = grid2->get_borders(from_x,from_y,to_x,to_y);
+        std::vector<std::vector<double> > recv;
+        if(xpos != 0)
+            MPI_Send(&send[0],elems_per_block,MPI_DOUBLE,top_proc,0,MPI_COMM_WORLD);
+        if(xpos != blocks-1)
+        {
+            MPI_Recv(&recv[0],elems_per_block,MPI_DOUBLE,bottom_proc,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+            grid2->set_borders(&recv[0],0,from_x,from_y,to_x,to_y);
+            MPI_Send(&send[2],elems_per_block,MPI_DOUBLE,bottom_proc,2,MPI_COMM_WORLD);
         }
-        MPI_Send(&grid2,SIZE,MPI_DOUBLE,top_proc,0,MPI_COMM_WORLD);
-        MPI_Send(&grid2,SIZE,MPI_DOUBLE,left_proc,1,MPI_COMM_WORLD);
-        MPI_Send(&grid2,SIZE,MPI_DOUBLE,bottom_proc,2,MPI_COMM_WORLD);
-        MPI_Send(&grid2,SIZE,MPI_DOUBLE,right_proc,3,MPI_COMM_WORLD);
-
-        MPI_Recv(&grid2,SIZE,MPI_DOUBLE,top_proc,2,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-        MPI_Recv(&grid2,SIZE,MPI_DOUBLE,left_proc,3,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-        MPI_Recv(&grid2,SIZE,MPI_DOUBLE,bottom_proc,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-        MPI_Recv(&grid2,SIZE,MPI_DOUBLE,right_proc,1,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+        if(xpos != 0)
+        {
+            MPI_Recv(&recv[2],elems_per_block,MPI_DOUBLE,top_proc,2,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+            grid2->set_borders(&recv[2],2,from_x,from_y,to_x,to_y);
+        }
+        if(ypos != 0)
+            MPI_Send(&send[3],elems_per_block,MPI_DOUBLE,left_proc,3,MPI_COMM_WORLD);
+        if(ypos != blocks-1)
+        {
+            MPI_Recv(&recv[3],elems_per_block,MPI_DOUBLE,right_proc,3,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+            grid2->set_borders(&recv[3],3,from_x,from_y,to_x,to_y);
+            MPI_Send(&send[1],elems_per_block,MPI_DOUBLE,right_proc,1,MPI_COMM_WORLD);
+        }
+        if(ypos != 0) {
+            MPI_Recv(&recv[1], elems_per_block, MPI_DOUBLE, left_proc, 2,
+                     MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            grid2->set_borders(&recv[1],1,from_x,from_y,to_x,to_y);
+        }
         double d_epsilon = iteration(grid2,grid1,from_x,from_y,to_x,to_y);
+        send = grid2->get_borders(from_x,from_y,to_x,to_y);
+
+        if(xpos != 0)
+            MPI_Send(&send[0],elems_per_block,MPI_DOUBLE,top_proc,0,MPI_COMM_WORLD);
+        if(xpos != blocks-1)
+        {
+            MPI_Recv(&recv[0],elems_per_block,MPI_DOUBLE,bottom_proc,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+            grid1->set_borders(&recv[0],0,from_x,from_y,to_x,to_y);
+            MPI_Send(&send[2],elems_per_block,MPI_DOUBLE,bottom_proc,2,MPI_COMM_WORLD);
+        }
+        if(xpos != 0)
+        {
+            MPI_Recv(&recv[2],elems_per_block,MPI_DOUBLE,top_proc,2,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+            grid1->set_borders(&recv[2],2,from_x,from_y,to_x,to_y);
+        }
+        if(ypos != 0)
+            MPI_Send(&send[3],elems_per_block,MPI_DOUBLE,left_proc,3,MPI_COMM_WORLD);
+        if(ypos != blocks-1)
+        {
+            MPI_Recv(&recv[3],elems_per_block,MPI_DOUBLE,right_proc,3,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+            grid1->set_borders(&recv[3],3,from_x,from_y,to_x,to_y);
+            MPI_Send(&send[1],elems_per_block,MPI_DOUBLE,right_proc,1,MPI_COMM_WORLD);
+        }
+        if(ypos != 0) {
+            MPI_Recv(&recv[1], elems_per_block, MPI_DOUBLE, left_proc, 2,
+                     MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            grid1->set_borders(&recv[1],1,from_x,from_y,to_x,to_y);
+        }
 
         iterations += 2;
 
