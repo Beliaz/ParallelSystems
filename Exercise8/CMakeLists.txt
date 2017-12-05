@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.12)
-project(Exercise7 LANGUAGES CXX)
+project(Exercise7)
 
 include(CTest)
 enable_testing()
