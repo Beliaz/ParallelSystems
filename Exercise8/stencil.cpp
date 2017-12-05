@@ -137,8 +137,15 @@ double iteration(Grid *source, Grid *target,
                  const unsigned int to_y) {
     double d_epsilon = 0;
     for (long i = from_x; i < to_x; i++) {
+        if(i==0)
+            continue;
+        if(i==N-1)
+            continue;
         for (long j = from_y; j < to_y; j++) {
-
+            if(j==0)
+                continue;
+            if(j==N-1)
+                continue;
             const auto current = source->get( i , j );
             const auto new_value = source->get_five( i , j );
             target->set( i , j , new_value );
@@ -206,23 +213,17 @@ int main(int argc, char **argv) {
     to_x = (xpos + 1) * elems_per_block;
     to_y = (ypos + 1) * elems_per_block;
 
-    if(xpos==0)
-        from_x++;
-    if(ypos==0)
-        from_y++;
-    if(xpos==blocks-1)
-        to_x--;
-    if(ypos==blocks-1)
-        to_y--;
 
     // Always do two iterations, as the arrays have to switch every time.
     // This way, it is not needed to keep track which was the last
+    double * recv=new double[to_x-from_x];
+    std::vector<std::vector<double> > send;
     while (true) {
 
         iteration(grid1,grid2,from_x,from_y,to_x,to_y);
 
-        std::vector<std::vector<double> > send = grid2->get_borders(from_x,from_y,to_x,to_y);
-        double * recv=new double[to_x-from_x];
+        send = grid2->get_borders(from_x,from_y,to_x,to_y);
+
 
 
         if(xpos != 0) {
