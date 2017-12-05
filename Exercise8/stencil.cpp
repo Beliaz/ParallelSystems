@@ -204,8 +204,8 @@ int main(int argc, char **argv) {
     const auto top_proc = ( (xpos - 1) * blocks) + ypos;
     const auto bottom_proc = ( (xpos + 1) * blocks) + ypos;
 
-    std::cout<<"my rank: "<<my_rank<<", top: "<<top_proc
-             <<", left: "<<left_proc<<", bottom: "<<bottom_proc<<", right: "<<right_proc<<std::endl;
+ //   std::cout<<"my rank: "<<my_rank<<", top: "<<top_proc
+  //           <<", left: "<<left_proc<<", bottom: "<<bottom_proc<<", right: "<<right_proc<<std::endl;
 
     const auto elems_per_block = N / blocks;
 
