@@ -94,6 +94,7 @@ public:
         }
         return borders;
     }
+
     void set_borders(double * borders,
                                                   unsigned direction,
                                                   unsigned int from_x,
@@ -319,10 +320,21 @@ int main(int argc, char **argv) {
         }
         MPI_Barrier(MPI_COMM_WORLD);
 
-        iterations += 2;
+        MPI_Send(&d_epsilon,1,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
 
-        if (d_epsilon < EPSILON) {
-            break;
+        if(my_rank==0) {
+            for(int i=1;i<num_procs;i++) {
+                double other_epsi;
+                MPI_Recv(&other_epsi, 1, MPI_DOUBLE, i, 0, MPI_COMM_WORLD,
+                         MPI_STATUS_IGNORE);
+                d_epsilon+=other_epsi;
+            }
+            iterations += 2 * num_procs;
+
+            if (d_epsilon < EPSILON) {
+                break;
+            }
+
         }
     }
 
