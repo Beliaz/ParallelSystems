@@ -321,7 +321,7 @@ int main(int argc, char **argv) {
         MPI_Barrier(MPI_COMM_WORLD);
 
         MPI_Send(&d_epsilon,1,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
-
+        int quit=0;
         if(my_rank==0) {
             for(int i=1;i<num_procs;i++) {
                 double other_epsi;
@@ -332,10 +332,13 @@ int main(int argc, char **argv) {
             iterations += 2 * num_procs;
 
             if (d_epsilon < EPSILON) {
-                break;
+                quit=1;
             }
-
-        }
+            for(int i=1;i<num_procs;i++)
+                MPI_Send(&quit, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
+            } else
+        MPI_Recv(&quit, 1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+        if(quit==1) break;
     }
 
     //End Parallel Block
