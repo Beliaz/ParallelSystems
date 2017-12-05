@@ -340,9 +340,7 @@ int main(int argc, char **argv) {
         MPI_Recv(&quit, 1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
         if(quit==1) break;
     }
-
-    //End Parallel Block
-    MPI_Finalize();
+if(my_rank==0){
 
     const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
             clock::now() - start).count();
@@ -357,6 +355,12 @@ int main(int argc, char **argv) {
     }
 
     std::cout << std::endl;
+}
+
+    //End Parallel Block
+    MPI_Finalize();
+
+
 
     return EXIT_SUCCESS;
 }
