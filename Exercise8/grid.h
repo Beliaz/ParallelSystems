@@ -9,14 +9,11 @@
 #include <vector>
 #include <cmath>
 
-constexpr auto N = 512;
-constexpr auto SIZE = N * N;
+constexpr auto n = 512;
+constexpr auto size = n * n;
 
-class Grid
+class grid
 {
-private:
-    double * data;
-    double * data2;
 public:
 
     unsigned int xpos;
@@ -28,7 +25,11 @@ public:
     unsigned int blocksize;
 
 
-    void set_from_to(unsigned int from_x, unsigned int to_x, unsigned int from_y, unsigned int to_y)
+    void set_from_to(
+        const unsigned int from_x, 
+        const unsigned int to_x, 
+        const unsigned int from_y, 
+        const unsigned int to_y)
     {
         this->from_x=from_x;
         this->to_x=to_x;
@@ -37,30 +38,42 @@ public:
         this->blocksize=to_x-from_x;
     }
 
-    Grid(double * borders)
+    explicit grid(double * borders) 
+        :   xpos(0), 
+            ypos(0), 
+            from_x(0), 
+            to_x(0), 
+            from_y(0), 
+            to_y(0), 
+            blocksize(0),
+            data2_(nullptr)
     {
-        data = new double[ SIZE ];
+        data_ = new double[ size ];
 
-        for (long i = 0; i < SIZE; i++) {
-            data[i] = 0;
+        for (long i = 0; i < size; i++)
+        {
+            data_[i] = 0;
         }
 
-        for (long i = 0; i < N; i++) {
-            data[i] = borders[0];
-            data[(SIZE) - 1 - i] = borders[2];
+        for (long i = 0; i < n; i++)
+        {
+            data_[i] = borders[0];
+            data_[(size) - 1 - i] = borders[2];
         }
-        for(long i = 1; i < N -1; i++) {
-            data[(N-1)+i*N] = borders[1];
-            data[(i*N)] = borders[3];
+        for (long i = 1; i < n - 1; i++)
+        {
+            data_[(n - 1) + i * n] = borders[1];
+            data_[(i * n)] = borders[3];
         }
-
     }
 
-    double get(unsigned int row, unsigned int column){
-        return data[ (row * N) + column ];
+    double get(const unsigned int row, const unsigned int column) const
+    {
+        return data_[ (row * n) + column ];
     }
 
-    double get_five(unsigned int row, unsigned int column){
+    double get_five(const unsigned int row, const unsigned int column) const
+    {
         return (get(row,column) +
                 get(row - 1, column) +
                 get(row + 1, column) +
@@ -68,80 +81,115 @@ public:
                 get(row, column +1 ) ) / 5.0;
     }
 
-    void set(unsigned int row, unsigned int column, double value){
-        data[ (row * N) + column ] = value;
+    void set(const unsigned int row, const unsigned int column, const double value) const
+    {
+        data_[ (row * n) + column ] = value;
     }
 
 
-    const void print() {
-        for (long i = 0; i < N; i++) {
-            for(long j = 0; j < N; j++)
-                std::cout << data[ (i * N) + j ] << " | ";
+    void print() 
+    {
+        for (long i = 0; i < n; i++) 
+        {
+            for (long j = 0; j < n; j++)
+            {
+                std::cout << data_[i * n + j] << " | ";
+            }
+
             std::cout << std::endl;
         }
     }
 
-    std::vector<std::vector<double> > get_block_borders()
+    std::vector<std::vector<double>> get_block_borders()
     {
-        int size=to_x-from_x;
-        std::vector<std::vector<double> > borders = std::vector<std::vector<double> >();
+        const auto size = to_x - from_x;
+
+        auto borders = std::vector<std::vector<double>>();
+
         borders.push_back(std::vector<double>(size));
         borders.push_back(std::vector<double>(size));
         borders.push_back(std::vector<double>(size));
         borders.push_back(std::vector<double>(size));
-        for (int i = 0; i < size; ++i) {
+
+        for (auto i = 0u; i < size; ++i) {
             borders[0][i] = get(from_x , from_y + i);
             //      borders[0][size + counter++] = get(from_x + 1, from_y + i);
         }
-        for (int i = 0; i < size; ++i) {
+
+        for (auto i = 0u; i < size; ++i) {
             borders[1][i] = get(from_x + i, to_y);
             //     borders[1][size + counter++] = get(from_x + i, to_y - 1);
         }
-        for (int i = 0; i < size; ++i) {
+
+        for (auto i = 0u; i < size; ++i) {
             borders[2][i] = get(to_x, from_y + i);
             //    borders[2][size + counter++] = get(to_x - 1, from_y + i);
         }
-        for (int i = 0; i < size; ++i) {
+
+        for (auto i = 0u; i < size; ++i) {
             borders[3][i] = get(from_x + i, from_y);
             //   borders[3][size + counter++] = get(from_x + i, from_y + 1);
         }
+
         return borders;
     }
 
-    void set_block_borders(double * borders,
-                     unsigned direction)
+    void set_block_borders(double* borders,
+                           const unsigned direction) const
     {
-        int size=to_x-from_x;
+        const auto size = to_x - from_x;
 
         switch (direction)
         {
             case 0:
-                for (int i = 0; i < size; ++i)
-                    set(from_x - 1, from_y + i,borders[i]);
-                break;
+            {
+                for (auto i = 0u; i < size; ++i)
+                    set(from_x - 1, from_y + i, borders[i]);
+
+            } break;
+
             case 1:
-                for (int i = 0; i < size; ++i)
-                    set(from_x + i, to_y + 1,borders[i]);
-                break;
+            {
+                for (auto i = 0u; i < size; ++i)
+                    set(from_x + i, to_y + 1, borders[i]);
+
+            } break;
+
             case 2:
-                for (int i = 0; i < size; ++i)
-                    set(to_x + 1, from_y + i,borders[i]);
-                break;
+            {
+                for (auto i = 0u; i < size; ++i)
+                    set(to_x + 1, from_y + i, borders[i]);
+
+            } break;
+
             case 3:
-                for (int i = 0; i < size; ++i)
-                    set(from_x + i, from_y - 1,borders[i]);
-                break;
+            {
+                for (auto i = 0u; i < size; ++i)
+                    set(from_x + i, from_y - 1, borders[i]);
+
+            } break;
+
+            default: throw std::logic_error("unexpected direction");
         }
     }
 
-    void set_block(int my_rank, int blocks)
+    void set_block(const int my_rank, const int blocks)
     {
-        xpos=my_rank / blocks;
-        ypos=my_rank % blocks;
-        int elems_per_block = N / blocks;
-        this->set_from_to(xpos * elems_per_block, (xpos + 1) * elems_per_block, ypos * elems_per_block, (ypos + 1) * elems_per_block);
+        xpos = my_rank / blocks;
+        ypos = my_rank % blocks;
+
+        const auto elems_per_block = n / blocks;
+
+        set_from_to(
+            xpos * elems_per_block, 
+            (xpos + 1) * elems_per_block, 
+            ypos * elems_per_block, 
+            (ypos + 1) * elems_per_block);
     }
 
+private:
+    double * data_;
+    double * data2_;
 };
 
 #endif //PARALLELSYSTEMS_GRID_H
