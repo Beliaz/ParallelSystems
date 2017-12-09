@@ -80,7 +80,7 @@ int main(int argc, char **argv)
             break;
     }
 
-    MPI_Reduce(&iterations,&sum_iterations,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+    MPI_Reduce(&iterations,&sum_iterations,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
 
     MPI_Finalize();
 
