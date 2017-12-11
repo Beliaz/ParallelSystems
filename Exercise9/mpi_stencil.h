@@ -35,7 +35,7 @@ public:
         {
             top_rank = -1;
         }
-        else if (static_cast<int>(grid1.xpos) == num_blocks - 1)
+        if (static_cast<int>(grid1.xpos) == num_blocks - 1)
         {
             bottom_rank = -1;
         }
@@ -44,7 +44,7 @@ public:
         {
             left_rank = -1;
         }
-        else if(static_cast<int>(grid1.ypos) == num_blocks - 1)
+        if(static_cast<int>(grid1.ypos) == num_blocks - 1)
         {
             right_rank = -1;
         }
@@ -81,76 +81,64 @@ public:
 
     void send_recv_border(grid& current_grid) const
     {
-        // SEND if neighbor exist
-        const auto send = current_grid.get_block_borders();
+
+        if (top_rank != -1)
+            MPI_Send(current_grid.get_block_borders(0), elements_per_block,
+                     MPI_DOUBLE, top_rank, my_rank, communicator);
+
+        if (right_rank != -1)
+            MPI_Send(current_grid.get_block_borders(1), elements_per_block,
+                     MPI_DOUBLE, right_rank, my_rank, communicator);
+
+        if (bottom_rank != -1)
+            MPI_Send(current_grid.get_block_borders(2), elements_per_block,
+                     MPI_DOUBLE, bottom_rank, my_rank, communicator);
+
+        if (left_rank != -1)
+            MPI_Send(current_grid.get_block_borders(3), elements_per_block,
+                     MPI_DOUBLE, left_rank, my_rank, communicator);
+
+        const auto border_element_count = current_grid.to_x - current_grid.from_x;
+        auto recv = std::make_unique<double[]>(elements_per_block);
 
         if (top_rank != -1)
         {
-            MPI_Send(send[0].data(), elements_per_block, MPI_DOUBLE, top_rank,
-                my_rank, MPI_COMM_WORLD);
-        }
-
-        if (right_rank != -1)
-        {
-            MPI_Send(send[1].data(), elements_per_block, MPI_DOUBLE, right_rank,
-                my_rank, MPI_COMM_WORLD);
-        }
-
-        if (bottom_rank != -1)
-        {
-            MPI_Send(send[2].data(), elements_per_block, MPI_DOUBLE,
-                bottom_rank, my_rank, MPI_COMM_WORLD);
-        }
-
-        if (left_rank != -1)
-        {
-            MPI_Send(send[3].data(), elements_per_block, MPI_DOUBLE, left_rank,
-                my_rank, MPI_COMM_WORLD);
-        }
-
-
-        // receive if neighbor exist
-        const auto border_element_count = current_grid.to_x - current_grid.from_x;
-        auto recv = std::make_unique<double[]>(border_element_count);
-
-        if (top_rank != -1) 
-        {
             MPI_Recv(recv.get(), elements_per_block, MPI_DOUBLE, top_rank,
-                     top_rank, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                     top_rank, communicator, MPI_STATUS_IGNORE);
 
             current_grid.set_block_borders(
-                gsl::span<double>(recv.get(), border_element_count),
-                0);
+                    gsl::span<double>(recv.get(), border_element_count),
+                    0);
         }
 
         if (right_rank != -1)
         {
             MPI_Recv(recv.get(), elements_per_block, MPI_DOUBLE, right_rank,
-                     right_rank, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                     right_rank, communicator, MPI_STATUS_IGNORE);
 
             current_grid.set_block_borders(
-                gsl::span<double>(recv.get(), border_element_count),
-                1);
+                    gsl::span<double>(recv.get(), border_element_count),
+                    1);
         }
 
-        if (bottom_rank != -1) 
+        if (bottom_rank != -1)
         {
             MPI_Recv(recv.get(), elements_per_block, MPI_DOUBLE, bottom_rank,
-                     bottom_rank, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                     bottom_rank, communicator, MPI_STATUS_IGNORE);
 
             current_grid.set_block_borders(
-                gsl::span<double>(recv.get(), border_element_count),
-                2);
+                    gsl::span<double>(recv.get(), border_element_count),
+                    2);
         }
 
-        if (left_rank != -1) 
+        if (left_rank != -1)
         {
             MPI_Recv(recv.get(), elements_per_block, MPI_DOUBLE, left_rank,
-                     left_rank, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                     left_rank, communicator, MPI_STATUS_IGNORE);
 
             current_grid.set_block_borders(
-                gsl::span<double>(recv.get(), border_element_count),
-                3);
+                    gsl::span<double>(recv.get(), border_element_count),
+                    3);
         }
     }
 };

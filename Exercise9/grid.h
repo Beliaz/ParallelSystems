@@ -13,6 +13,7 @@
 constexpr auto n = 512;
 constexpr auto size = n * n;
 
+MPI_Comm communicator;
 
 
 class grid
@@ -106,35 +107,42 @@ public:
         }
     }
 
-    std::vector<std::vector<double>> get_block_borders() const
+    double * get_block_borders(int direction)
     {
-        const auto size = to_x - from_x;
 
-        auto borders = std::vector<std::vector<double>>();
+        double * borders = new double[blocksize];
 
-        borders.push_back(std::vector<double>(size));
-        borders.push_back(std::vector<double>(size));
-        borders.push_back(std::vector<double>(size));
-        borders.push_back(std::vector<double>(size));
+        switch (direction)
+        {
+            case 0:
+            {
+                for (auto i = 0u; i < blocksize; ++i)
+                    borders[i] = get(from_x , from_y + i);
 
-        for (auto i = 0u; i < size; ++i) {
-            borders[0][i] = get(from_x , from_y + i);
-            //      borders[0][size + counter++] = get(from_x + 1, from_y + i);
-        }
+            } break;
 
-        for (auto i = 0u; i < size; ++i) {
-            borders[1][i] = get(from_x + i, to_y);
-            //     borders[1][size + counter++] = get(from_x + i, to_y - 1);
-        }
+            case 1:
+            {
+                for (auto i = 0u; i < blocksize; ++i)
+                    borders[i] = get(from_x + i, to_y - 1);
 
-        for (auto i = 0u; i < size; ++i) {
-            borders[2][i] = get(to_x, from_y + i);
-            //    borders[2][size + counter++] = get(to_x - 1, from_y + i);
-        }
+            } break;
 
-        for (auto i = 0u; i < size; ++i) {
-            borders[3][i] = get(from_x + i, from_y);
-            //   borders[3][size + counter++] = get(from_x + i, from_y + 1);
+            case 2:
+            {
+                for (auto i = 0u; i < blocksize; ++i)
+                    borders[i] = get(to_x - 1, from_y + i);
+
+            } break;
+
+            case 3:
+            {
+                for (auto i = 0u; i < blocksize; ++i)
+                    borders[i] = get(from_x + i, from_y);
+
+            } break;
+
+            default: throw std::logic_error("unexpected direction");
         }
 
         return borders;
