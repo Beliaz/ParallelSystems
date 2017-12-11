@@ -6,7 +6,8 @@
 #define PARALLELSYSTEMS_MPI_STENCIL_H
 
 #include "grid.h"
-
+#include <string>
+#include <iostream>
 class stencil
 {
 public:
@@ -24,43 +25,38 @@ public:
         num_blocks(sqrt(num_procs)), 
         elements_per_block(n / sqrt(num_procs))
     {
-
-        left_rank = grid1->xpos * num_blocks + grid1->ypos - 1;
-        right_rank = grid1->xpos * num_blocks + grid1->ypos + 1;
         top_rank = (grid1->xpos - 1) * num_blocks + grid1->ypos;
+        right_rank = grid1->xpos * num_blocks + grid1->ypos + 1;
         bottom_rank = (grid1->xpos + 1) * num_blocks + grid1->ypos;
+        left_rank = grid1->xpos * num_blocks + grid1->ypos - 1;
 
         if (grid1->xpos == 0u)
-        {
             top_rank = -1;
-        }
-        else if (static_cast<int>(grid1->xpos) == num_blocks - 1)
-        {
+
+        if (static_cast<int>(grid1->xpos) == num_blocks - 1)
             bottom_rank = -1;
-        }
 
         if(grid1->ypos == 0u)
-        {
             left_rank = -1;
-        }
-        else if(static_cast<int>(grid1->ypos) == num_blocks - 1)
-        {
+
+        if(static_cast<int>(grid1->ypos) == num_blocks - 1)
             right_rank = -1;
-        }
+
+
     }
 
 
     //Does the job and returns the delta Epsilon accumulated over all comparisons.
-    static double iteration(grid *source, grid *target) 
+    static double iteration(grid *source, grid *target)
     {
         auto d_epsilon = 0.0;
 
-        for (long i = source->from_x; i < source->to_x; i++) 
+        for (long i = source->from_x; i < source->to_x; i++)
         {
             if (i == 0)     continue;
             if (i == n - 1) continue;
 
-            for (auto j = source->from_y; j < source->to_y; j++) 
+            for (auto j = source->from_y; j < source->to_y; j++)
             {
                 if (j == 0)     continue;
                 if (j == n - 1) continue;
@@ -79,44 +75,35 @@ public:
         return d_epsilon;
     }
 
-
     void send_recv_border(grid *current_grid)
     {
         // SEND if neighbor exist
-        const auto send = current_grid->get_block_borders();
+
 
         if (top_rank != -1)
-        {
-            MPI_Send(send[0].data(), elements_per_block, MPI_DOUBLE, top_rank,
-                my_rank, MPI_COMM_WORLD);
-        }
+            MPI_Send(current_grid->get_block_borders(0), elements_per_block,
+                     MPI_DOUBLE, top_rank, my_rank, communicator);
 
         if (right_rank != -1)
-        {
-            MPI_Send(send[1].data(), elements_per_block, MPI_DOUBLE, right_rank,
-                my_rank, MPI_COMM_WORLD);
-        }
+            MPI_Send(current_grid->get_block_borders(1), elements_per_block,
+                     MPI_DOUBLE, right_rank, my_rank, communicator);
 
         if (bottom_rank != -1)
-        {
-            MPI_Send(send[2].data(), elements_per_block, MPI_DOUBLE,
-                bottom_rank, my_rank, MPI_COMM_WORLD);
-        }
+            MPI_Send(current_grid->get_block_borders(2), elements_per_block,
+                     MPI_DOUBLE, bottom_rank, my_rank, communicator);
 
         if (left_rank != -1)
-        {
-            MPI_Send(send[3].data(), elements_per_block, MPI_DOUBLE, left_rank,
-                my_rank, MPI_COMM_WORLD);
-        }
+            MPI_Send(current_grid->get_block_borders(3), elements_per_block,
+                     MPI_DOUBLE, left_rank, my_rank, communicator);
 
 
         // receive if neighbor exist
-        auto recv = std::make_unique<double[]>(current_grid->to_x - current_grid->from_x);
+        auto recv = std::make_unique<double[]>(elements_per_block);
 
         if (top_rank != -1) 
         {
             MPI_Recv(recv.get(), elements_per_block, MPI_DOUBLE, top_rank,
-                     top_rank, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                     top_rank, communicator, MPI_STATUS_IGNORE);
 
             current_grid->set_block_borders(recv.get(), 0);
         }
@@ -124,7 +111,7 @@ public:
         if (right_rank != -1)
         {
             MPI_Recv(recv.get(), elements_per_block, MPI_DOUBLE, right_rank,
-                     right_rank, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                     right_rank, communicator, MPI_STATUS_IGNORE);
 
             current_grid->set_block_borders(recv.get(), 1);
         }
@@ -132,7 +119,7 @@ public:
         if (bottom_rank != -1) 
         {
             MPI_Recv(recv.get(), elements_per_block, MPI_DOUBLE, bottom_rank,
-                     bottom_rank, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                     bottom_rank, communicator, MPI_STATUS_IGNORE);
 
             current_grid->set_block_borders(recv.get(), 2);
         }
@@ -140,11 +127,12 @@ public:
         if (left_rank != -1) 
         {
             MPI_Recv(recv.get(), elements_per_block, MPI_DOUBLE, left_rank,
-                     left_rank, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                     left_rank, communicator, MPI_STATUS_IGNORE);
 
             current_grid->set_block_borders(recv.get(), 3);
         }
     }
+
 };
 
 

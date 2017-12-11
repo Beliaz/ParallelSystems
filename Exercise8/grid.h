@@ -9,8 +9,10 @@
 #include <vector>
 #include <cmath>
 
-constexpr auto n = 512;
+constexpr auto n = 512
+;
 constexpr auto size = n * n;
+MPI_Comm communicator;
 
 class grid
 {
@@ -45,8 +47,7 @@ public:
             to_x(0), 
             from_y(0), 
             to_y(0), 
-            blocksize(0),
-            data2_(nullptr)
+            blocksize(0)
     {
         data_ = new double[ size ];
 
@@ -67,23 +68,23 @@ public:
         }
     }
 
-    double get(const unsigned int row, const unsigned int column) const
+    double get(const unsigned int x, const unsigned int y) const
     {
-        return data_[ (row * n) + column ];
+        return data_[ (x * n) + y ];
     }
 
-    double get_five(const unsigned int row, const unsigned int column) const
+    double get_five(const unsigned int x, const unsigned int y) const
     {
-        return (get(row,column) +
-                get(row - 1, column) +
-                get(row + 1, column) +
-                get(row, column - 1) +
-                get(row, column +1 ) ) / 5.0;
+        return (get(x,y) +
+                get(x - 1, y) +
+                get(x + 1, y) +
+                get(x, y - 1) +
+                get(x, y +1 ) ) / 5.0;
     }
 
-    void set(const unsigned int row, const unsigned int column, const double value) const
+    void set(const unsigned int x, const unsigned int y, const double value) const
     {
-        data_[ (row * n) + column ] = value;
+        data_[ (x * n) + y ] = value;
     }
 
 
@@ -100,35 +101,42 @@ public:
         }
     }
 
-    std::vector<std::vector<double>> get_block_borders()
+    double * get_block_borders(int direction)
     {
-        const auto size = to_x - from_x;
 
-        auto borders = std::vector<std::vector<double>>();
+        double * borders = new double[blocksize];
 
-        borders.push_back(std::vector<double>(size));
-        borders.push_back(std::vector<double>(size));
-        borders.push_back(std::vector<double>(size));
-        borders.push_back(std::vector<double>(size));
+        switch (direction)
+        {
+            case 0:
+            {
+                for (auto i = 0u; i < blocksize; ++i)
+                    borders[i] = get(from_x , from_y + i);
 
-        for (auto i = 0u; i < size; ++i) {
-            borders[0][i] = get(from_x , from_y + i);
-            //      borders[0][size + counter++] = get(from_x + 1, from_y + i);
-        }
+            } break;
 
-        for (auto i = 0u; i < size; ++i) {
-            borders[1][i] = get(from_x + i, to_y);
-            //     borders[1][size + counter++] = get(from_x + i, to_y - 1);
-        }
+            case 1:
+            {
+                for (auto i = 0u; i < blocksize; ++i)
+                    borders[i] = get(from_x + i, to_y - 1);
 
-        for (auto i = 0u; i < size; ++i) {
-            borders[2][i] = get(to_x, from_y + i);
-            //    borders[2][size + counter++] = get(to_x - 1, from_y + i);
-        }
+            } break;
 
-        for (auto i = 0u; i < size; ++i) {
-            borders[3][i] = get(from_x + i, from_y);
-            //   borders[3][size + counter++] = get(from_x + i, from_y + 1);
+            case 2:
+            {
+                for (auto i = 0u; i < blocksize; ++i)
+                    borders[i] = get(to_x - 1, from_y + i);
+
+            } break;
+
+            case 3:
+            {
+                for (auto i = 0u; i < blocksize; ++i)
+                    borders[i] = get(from_x + i, from_y);
+
+            } break;
+
+            default: throw std::logic_error("unexpected direction");
         }
 
         return borders;
@@ -137,34 +145,33 @@ public:
     void set_block_borders(double* borders,
                            const unsigned direction) const
     {
-        const auto size = to_x - from_x;
 
         switch (direction)
         {
             case 0:
             {
-                for (auto i = 0u; i < size; ++i)
+                for (auto i = 0u; i < blocksize; ++i)
                     set(from_x - 1, from_y + i, borders[i]);
 
             } break;
 
             case 1:
             {
-                for (auto i = 0u; i < size; ++i)
-                    set(from_x + i, to_y + 1, borders[i]);
+                for (auto i = 0u; i < blocksize; ++i)
+                    set(from_x + i, to_y , borders[i]);
 
             } break;
 
             case 2:
             {
-                for (auto i = 0u; i < size; ++i)
-                    set(to_x + 1, from_y + i, borders[i]);
+                for (auto i = 0u; i < blocksize; ++i)
+                    set(to_x, from_y + i, borders[i]);
 
             } break;
 
             case 3:
             {
-                for (auto i = 0u; i < size; ++i)
+                for (auto i = 0u; i < blocksize; ++i)
                     set(from_x + i, from_y - 1, borders[i]);
 
             } break;
@@ -189,7 +196,6 @@ public:
 
 private:
     double * data_;
-    double * data2_;
 };
 
 #endif //PARALLELSYSTEMS_GRID_H

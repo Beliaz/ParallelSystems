@@ -19,12 +19,12 @@
 
 # Specify the amount of virtual memory given to each MPI process
 # in the job.
-#$ -l h_vmem=1G
+#$ -l h_vmem=2G
 
 # Use the parallel environment "openmpi-fillup", which assigns as many processes
 # as available on each host. Start 16 MPI processes across an arbitrary number of
 # hosts. For each process, SGE will reserve one CPU-core.
-#$ -pe openmpi-fillup 4
+#$ -pe openmpi-fillup 64
 
 module load gcc/5.1.0
 module load openmpi/2.1.1
