@@ -74,14 +74,14 @@ public:
 
     double get_five(const unsigned int row, const unsigned int column) const
     {
-        Expects(row >= 0 && row < n);
-        Expects(column >= 0 && column < n);
+        Expects(row > 0 && row < n - 1);
+        Expects(column > 0 && column < n - 1);
 
         return (get(row,column) +
                 get(row - 1, column) +
                 get(row + 1, column) +
                 get(row, column - 1) +
-                get(row, column +1 ) ) / 5.0;
+                get(row, column + 1 ) ) / 5.0;
     }
 
     void set(const unsigned int row, const unsigned int column, const double value)
