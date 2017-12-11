@@ -41,16 +41,17 @@ int execute(stencil &s, grid &grid1, grid &grid2)
 
 #else
 
-int execute(const stencil &s, grid &grid1, grid &grid2)
+int execute(const stencil &s, grid& primary, grid& secondary)
 {
     auto iterations = 0;
 
     while (true)
     {
-        s.iteration(grid1, grid2);
-        s.send_recv_border(grid1);
-        const auto d_epsilon = s.iteration(grid2, grid1);
-        s.send_recv_border(grid1);
+        s.iteration(primary, secondary);
+        s.send_recv_border(primary);
+
+        const auto d_epsilon = s.iteration(secondary, primary);
+        s.send_recv_border(primary);
 
         iterations += 2;
 
@@ -102,17 +103,17 @@ int main(int argc, char **argv)
         1.0, 0.5, 0, -0.5
     };
 
-    grid grid1(my_rank, blocks, borders);
-    grid grid2(my_rank, blocks, borders);
+    grid primary(my_rank, blocks, borders);
+    grid secondary(my_rank, blocks, borders);
 
-    const stencil s(num_procs, my_rank, grid1);
+    const stencil s(num_procs, my_rank, primary);
 
     using clock = std::chrono::high_resolution_clock;
     const auto start = clock::now();
 
     ///////////////////////////////////////////////////////////
     // Actual loop
-    const auto iterations = execute(s, grid1, grid2);
+    const auto iterations = execute(s, primary, secondary);
 
     MPI_Finalize();
 

@@ -158,7 +158,7 @@ private:
 
     static size_t linearize(const unsigned int row, const unsigned int column)
     {
-        return row * n + column;
+        return column * n + row;
     }
 };
 

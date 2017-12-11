@@ -17,8 +17,11 @@ public:
     int bottom_rank;
     int left_rank;
 
-    const int num_blocks;
-    const int elements_per_block;
+    using neighbour_t = std::tuple<direction, int>;
+    std::vector<neighbour_t> neighbours;
+
+    const size_t num_blocks;
+    const size_t elements_per_block;
 
     stencil(const int num_procs, const int my_rank, const grid& grid1) :
         my_rank(my_rank), 
@@ -26,29 +29,23 @@ public:
         elements_per_block(n / num_blocks)
     {
 
-        left_rank = grid1.idx_x() * num_blocks + grid1.idx_y() - 1;
-        right_rank = grid1.idx_x() * num_blocks + grid1.idx_y() + 1;
+        left_rank = grid1.idx_y() * num_blocks + grid1.idx_x() - 1;
+        right_rank = grid1.idx_y() * num_blocks + grid1.idx_x() + 1;
 
-        top_rank = (grid1.idx_x() - 1) * num_blocks + grid1.idx_y();
-        bottom_rank = (grid1.idx_x() + 1) * num_blocks + grid1.idx_y();
+        top_rank = (grid1.idx_y() - 1) * num_blocks + grid1.idx_x();
+        bottom_rank = (grid1.idx_y() + 1) * num_blocks + grid1.idx_x();
 
-        if (grid1.idx_x() == 0u)
-        {
-            top_rank = -1;
-        }
-        if (static_cast<int>(grid1.idx_x()) == num_blocks - 1)
-        {
-            bottom_rank = -1;
-        }
+        if (grid1.idx_x() > 0u)          
+            neighbours.push_back(neighbour_t(direction::east, left_rank));
 
-        if(grid1.idx_y() == 0u)
-        {
-            left_rank = -1;
-        }
-        if(static_cast<int>(grid1.idx_y()) == num_blocks - 1)
-        {
-            right_rank = -1;
-        }
+        if (grid1.idx_x() < num_blocks - 1) 
+            neighbours.push_back(neighbour_t(direction::west, right_rank));
+
+        if(grid1.idx_y() > 0u)
+            neighbours.push_back(neighbour_t(direction::north, top_rank));
+
+        if(grid1.idx_y() < num_blocks - 1)
+            neighbours.push_back(neighbour_t(direction::south, bottom_rank));
     }
 
 
@@ -80,76 +77,42 @@ public:
     }
 
 
-    void send_recv_border(grid& current_grid) const
+    void send_borders(grid& current_grid) const
     {
-
-        if (top_rank != -1)
+        for(const auto& neighbour : neighbours)
         {
-            const auto border = current_grid.get_block_borders(direction::north);
+            const auto direction = std::get<0>(neighbour);
+            const auto rank = std::get<1>(neighbour);
+
+            const auto border = current_grid.get_block_borders(direction);
 
             MPI_Send(border.data(), border.size(), MPI_DOUBLE, 
-                top_rank, my_rank, communicator);
+                rank, my_rank, communicator);
         }
+    }
 
-        if (right_rank != -1)
-        {
-            const auto border = current_grid.get_block_borders(direction::east);
-
-            MPI_Send(border.data(), border.size(), MPI_DOUBLE,
-                right_rank, my_rank, communicator);
-        }
-
-        if (bottom_rank != -1)
-        {
-            const auto border = current_grid.get_block_borders(direction::south);
-
-            MPI_Send(border.data(), border.size(), MPI_DOUBLE,
-                bottom_rank, my_rank, communicator);
-        }
-
-        if (left_rank != -1)
-        {
-            const auto border = current_grid.get_block_borders(direction::west);
-
-            MPI_Send(border.data(), border.size(), MPI_DOUBLE,
-                left_rank, my_rank, communicator);
-        }
+    void receive_borders(grid& current_grid) const
+    {
+        Expects(current_grid.extent_x() == current_grid.extent_y());
 
         auto receive_buffer = std::vector<double>(current_grid.extent_x());
 
-        Expects(current_grid.extent_x() == current_grid.extent_y());
-
-        if (top_rank != -1)
+        for (const auto& neighbour : neighbours)
         {
-            MPI_Recv(receive_buffer.data(), receive_buffer.size(), MPI_DOUBLE, top_rank,
-                     top_rank, communicator, MPI_STATUS_IGNORE);
+            const auto direction = std::get<0>(neighbour);
+            const auto rank = std::get<1>(neighbour);
 
-            current_grid.set_block_borders(receive_buffer, direction::north);
+            MPI_Recv(receive_buffer.data(), receive_buffer.size(), MPI_DOUBLE, rank,
+                     rank, communicator, MPI_STATUS_IGNORE);
+
+            current_grid.set_block_borders(receive_buffer, direction);
         }
+    }
 
-        if (right_rank != -1)
-        {
-            MPI_Recv(receive_buffer.data(), receive_buffer.size(), MPI_DOUBLE, right_rank,
-                     right_rank, communicator, MPI_STATUS_IGNORE);
-
-            current_grid.set_block_borders(receive_buffer, direction::east);
-        }
-
-        if (bottom_rank != -1)
-        {
-            MPI_Recv(receive_buffer.data(), receive_buffer.size(), MPI_DOUBLE, bottom_rank,
-                     bottom_rank, communicator, MPI_STATUS_IGNORE);
-
-            current_grid.set_block_borders(receive_buffer, direction::south);
-        }
-
-        if (left_rank != -1)
-        {
-            MPI_Recv(receive_buffer.data(), receive_buffer.size(), MPI_DOUBLE, left_rank,
-                     left_rank, communicator, MPI_STATUS_IGNORE);
-
-            current_grid.set_block_borders(receive_buffer, direction::west);
-        }
+    void send_recv_border(grid& current_grid) const
+    {
+        send_borders(current_grid);
+        receive_borders(current_grid);
     }
 };
 
