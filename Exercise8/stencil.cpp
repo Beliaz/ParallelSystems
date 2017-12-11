@@ -118,11 +118,6 @@ int main(int argc, char **argv)
 
     MPI_Reduce(&iterations,&sum_iterations,1,MPI_INT,MPI_MAX,0,communicator);
 
-        if (sum_epsilon < epsilon) 
-            break;
-    }
-
-    MPI_Reduce(&iterations,&sum_iterations,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
 
     MPI_Finalize();
 
