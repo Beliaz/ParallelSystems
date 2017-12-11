@@ -45,4 +45,6 @@ foreach(ONE_TEST_CPP ${ALL_TEST_CPP})
 
 	set(CMAKE_BUILD_TYPE Release)
 
+	include_directories(${PROJECT_SOURCE_DIR})
+
 endforeach()
