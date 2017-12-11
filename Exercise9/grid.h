@@ -9,6 +9,7 @@
 #include <vector>
 #include <cmath>
 #include <gsl/gsl>
+#include <mpi.h>
 
 #if defined(N768)
 constexpr auto n = 768;
