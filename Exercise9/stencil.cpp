@@ -2,8 +2,9 @@
 // Created by ivan on 04/12/17.
 //
 
+#define GSL_THROW_ON_CONTRACT_VIOLATION
+
 #include <iostream>
-#include <sstream>
 #include <chrono>
 #include <iomanip>
 #include <mpi.h>
