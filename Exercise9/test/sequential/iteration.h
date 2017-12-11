@@ -7,7 +7,7 @@
 #include <numeric>
 #include <cmath>
 
-namespace stencil
+namespace stencil_code
 {
     
 template<size_t Dim>
@@ -123,7 +123,7 @@ struct stencil_iteration
 
         const auto iterations = 2 + [&]()
         {
-            if (stencil::size(first.extents()) < batch_threshold)
+            if (stencil_code::size(first.extents()) < batch_threshold)
             {
                 for (auto i = 0u; i < batch_size; ++i)
                 {

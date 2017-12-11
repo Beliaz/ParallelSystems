@@ -45,6 +45,7 @@ int main(int argc, char **argv)
 
     MPI_Comm_size(communicator, &num_procs);
     MPI_Comm_rank(communicator, &my_rank);
+
     blocks = static_cast<int>(sqrt(num_procs));
 
     const std::array<const double, 4> borders

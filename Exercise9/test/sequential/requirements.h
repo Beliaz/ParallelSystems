@@ -1,7 +1,7 @@
 #ifndef REQUIREMENTS_H
 #define REQUIREMENTS_H
 
-namespace stencil
+namespace stencil_code
 {
     template<class GridType>
     struct view_provider;

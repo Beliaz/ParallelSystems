@@ -3,7 +3,7 @@
 
 #include "grid.h"
 
-namespace stencil
+namespace stencil_code
 {
     template<size_t Dim>
     struct jacobi;

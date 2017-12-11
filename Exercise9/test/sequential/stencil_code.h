@@ -21,7 +21,7 @@ using grid_t = stencil::grid_t<cell_t, Dim>;
 template<class GridType>
 using buffered_grid_t = std::array<GridType, 2>;
 
-namespace stencil
+namespace stencil_code
 {
     template<class GridType>
     struct view_provider<buffered_grid_t<GridType>>
@@ -66,12 +66,12 @@ using cell_t = std::array<float, 2>;
 static constexpr float default_value = 0;
 
 template<size_t Dim>
-using grid_t = stencil::grid_t<cell_t, Dim>;
+using grid_t = stencil_code::grid_t<cell_t, Dim>;
 
 template<size_t Dim>
-using bounds_t = stencil::bounds_t<float, Dim>;
+using bounds_t = stencil_code::bounds_t<float, Dim>;
 
-namespace stencil
+namespace stencil_code
 {
     template<class GridType>
     struct view_provider
@@ -94,7 +94,7 @@ namespace stencil
 }
 
 template<size_t Dim, class T>
-auto create_buffered_grid(stencil::grid_extents_t<Dim> extents,
+auto create_buffered_grid(stencil_code::grid_extents_t<Dim> extents,
     const ::bounds_t<Dim>& bounds,
     const T& initial_value)
 {

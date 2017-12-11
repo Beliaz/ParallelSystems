@@ -6,7 +6,7 @@
 #define PARALLELSYSTEMS_MPI_STENCIL_H
 
 #include "grid.h"
-#include <memory>
+#include <mpi.h>
 
 constexpr auto epsilon = 20;
 

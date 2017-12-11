@@ -4,7 +4,7 @@
 #include <vector>
 #include <array>
 
-namespace stencil
+namespace stencil_code
 {
 
 // =================================================================

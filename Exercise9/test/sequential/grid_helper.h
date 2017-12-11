@@ -47,7 +47,7 @@ struct grid_helper<1>
 {
     template<class GridType, class T>
     static void initialize(GridType& grid,
-        const stencil::bounds_t<T, 1>& bounds,
+        const stencil_code::bounds_t<T, 1>& bounds,
         const T& initial_value)
     {
         decltype(auto) first = get_first(grid);
@@ -74,7 +74,7 @@ struct grid_helper<2>
 {
     template<class GridType, class T>
     static void initialize(GridType& grid,
-        const stencil::bounds_t<T, 2>& bounds, 
+        const stencil_code::bounds_t<T, 2>& bounds, 
         const T& initial_value)
     {
         decltype(auto) first = get_first(grid);
@@ -106,7 +106,7 @@ struct grid_helper<3>
 {
     template<class GridType, class T>
     static void initialize(GridType& grid,
-        const stencil::bounds_t<T, 3>& bounds,
+        const stencil_code::bounds_t<T, 3>& bounds,
         const T& initial_value)
     {
         decltype(auto) first = get_first(grid);
@@ -142,14 +142,14 @@ struct grid_helper<3>
 };
 
 template<class CellType, size_t Dim, class T>
-stencil::grid_t<CellType, Dim> create_grid(stencil::grid_extents_t<Dim> extents,
-    const stencil::bounds_t<T, Dim>& bounds,
+stencil_code::grid_t<CellType, Dim> create_grid(stencil_code::grid_extents_t<Dim> extents,
+    const stencil_code::bounds_t<T, Dim>& bounds,
     const T& initial_value)
 {
     for (auto& extent : extents)
         extent += 2; // make place for bounds
 
-    stencil::grid_t<CellType, Dim> grid(extents);
+    stencil_code::grid_t<CellType, Dim> grid(extents);
 
     return grid;
 }
