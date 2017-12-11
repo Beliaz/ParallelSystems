@@ -10,46 +10,33 @@
 #include <cmath>
 #include <gsl/gsl>
 
-constexpr auto n = 768;
+constexpr auto n = 512;
 constexpr auto size = n * n;
 
 MPI_Comm communicator;
 
+enum class direction
+{
+    north,
+    east,
+    south,
+    west
+};
 
 class grid
 {
 public:
-
-    unsigned int xpos;
-    unsigned int ypos;
-    unsigned int from_x;
-    unsigned int to_x;
-    unsigned int from_y;
-    unsigned int to_y;
-    unsigned int blocksize;
-
-
-    void set_from_to(
-        const unsigned int from_x, 
-        const unsigned int to_x, 
-        const unsigned int from_y, 
-        const unsigned int to_y)
-    {
-        this->from_x=from_x;
-        this->to_x=to_x;
-        this->from_y=from_y;
-        this->to_y=to_y;
-        this->blocksize=to_x-from_x;
-    }
-
-    explicit grid(const gsl::span<const double, 4> borders) 
-        :   xpos(0), 
-            ypos(0), 
-            from_x(0), 
-            to_x(0), 
-            from_y(0), 
-            to_y(0), 
-            blocksize(0),
+    explicit grid(
+        const int my_rank, 
+        const int blocks, 
+        const gsl::span<const double, 4> borders)
+        :   x_idx_(my_rank / blocks),
+            y_idx_(my_rank % blocks),
+            from_x_(x_idx_ * n / blocks),
+            to_x_((x_idx_ + 1) * n / blocks),
+            from_y_(y_idx_ * n / blocks),
+            to_y_((y_idx_ + 1) * n / blocks),
+            blocksize_(0),
             data_(size)
     {
         for (auto i = 0; i < n; i++)
@@ -65,12 +52,20 @@ public:
         }
     }
 
-    double get(const unsigned int row, const unsigned int column) const
+    double& get(const unsigned int row, const unsigned int column)
     {
         Expects(row >= 0 && row < n);
         Expects(column >= 0 && column < n);
 
-        return data_[row * n + column];
+        return data_[linearize(row, column)];
+    }
+
+    const double& get(const unsigned int row, const unsigned int column) const
+    {
+        Expects(row >= 0 && row < n);
+        Expects(column >= 0 && column < n);
+
+        return data_[linearize(row, column)];
     }
 
     double get_five(const unsigned int row, const unsigned int column) const
@@ -87,12 +82,8 @@ public:
 
     void set(const unsigned int row, const unsigned int column, const double value)
     {
-        Expects(row >= 0 && row < n);
-        Expects(column >= 0 && column < n);
-
-        data_[row * n + column] = value;
+        get(row, column) = value;
     }
-
 
     void print() 
     {
@@ -107,102 +98,68 @@ public:
         }
     }
 
-    double * get_block_borders(int direction)
+    std::vector<double> get_block_borders(const direction direction) const
     {
+        std::vector<double> borders(blocksize_);
 
-        double * borders = new double[blocksize];
-
-        switch (direction)
-        {
-            case 0:
-            {
-                for (auto i = 0u; i < blocksize; ++i)
-                    borders[i] = get(from_x , from_y + i);
-
-            } break;
-
-            case 1:
-            {
-                for (auto i = 0u; i < blocksize; ++i)
-                    borders[i] = get(from_x + i, to_y - 1);
-
-            } break;
-
-            case 2:
-            {
-                for (auto i = 0u; i < blocksize; ++i)
-                    borders[i] = get(to_x - 1, from_y + i);
-
-            } break;
-
-            case 3:
-            {
-                for (auto i = 0u; i < blocksize; ++i)
-                    borders[i] = get(from_x + i, from_y);
-
-            } break;
-
-            default: throw std::logic_error("unexpected direction");
-        }
-
+        for (auto i = 0u; i < blocksize_; ++i)
+            borders[i] = get_border_element(direction, i);
+        
         return borders;
     }
 
     void set_block_borders(const gsl::span<const double> borders,
-                           const unsigned direction)
+                           const direction direction)
     {
-        const auto size = to_x - from_x;
+        for (auto i = 0u; i < blocksize_; ++i)
+            get_border_element(direction, i) = borders[i];
+    }
 
+    size_t idx_x() const { return x_idx_; }
+    size_t idx_y() const { return y_idx_; }
+
+    size_t left_x() const { return from_x_; }
+    size_t top_y() const { return from_y_; }
+
+    size_t right_x() const { return to_x_; }
+    size_t bottom_y() const { return to_y_; }
+
+    size_t extent_x() const { return blocksize_; }
+    size_t extent_y() const { return blocksize_; }
+
+private:
+    const size_t x_idx_;
+    const size_t y_idx_;
+    const size_t from_x_;
+    const size_t to_x_;
+    const size_t from_y_;
+    const size_t to_y_;
+    const size_t blocksize_;
+    
+    std::vector<double> data_;
+    
+    double& get_border_element(const direction direction, const size_t idx)
+    {
         switch (direction)
         {
-            case 0:
-            {
-                for (auto i = 0u; i < size; ++i)
-                    set(from_x - 1, from_y + i, borders[i]);
+        case direction::north:  return get(from_x_ + idx, from_y_);
+        case direction::east:   return get(to_x_ - 1, from_y_ + idx);
+        case direction::south:  return get(from_x_ + idx, to_y_ - 1);
+        case direction::west:   return get(from_x_, from_y_ + idx);
 
-            } break;
-
-            case 1:
-            {
-                for (auto i = 0u; i < size; ++i)
-                    set(from_x + i, to_y + 1, borders[i]);
-
-            } break;
-
-            case 2:
-            {
-                for (auto i = 0u; i < size; ++i)
-                    set(to_x + 1, from_y + i, borders[i]);
-
-            } break;
-
-            case 3:
-            {
-                for (auto i = 0u; i < size; ++i)
-                    set(from_x + i, from_y - 1, borders[i]);
-
-            } break;
-
-            default: throw std::logic_error("unexpected direction");
+        default: throw std::logic_error("invalid direction");
         }
     }
 
-    void set_block(const int my_rank, const int blocks)
+    const double& get_border_element(const direction direction, const size_t element) const
     {
-        xpos = my_rank / blocks;
-        ypos = my_rank % blocks;
-
-        const auto elems_per_block = n / blocks;
-
-        set_from_to(
-            xpos * elems_per_block, 
-            (xpos + 1) * elems_per_block, 
-            ypos * elems_per_block, 
-            (ypos + 1) * elems_per_block);
+        return const_cast<grid&>(*this).get_border_element(direction, element);
     }
 
-private:
-    std::vector<double> data_;
+    static size_t linearize(const unsigned int row, const unsigned int column)
+    {
+        return row * n + column;
+    }
 };
 
 #endif //PARALLELSYSTEMS_GRID_H

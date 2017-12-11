@@ -26,25 +26,26 @@ public:
         elements_per_block(n / num_blocks)
     {
 
-        left_rank = grid1.xpos * num_blocks + grid1.ypos - 1;
-        right_rank = grid1.xpos * num_blocks + grid1.ypos + 1;
-        top_rank = (grid1.xpos - 1) * num_blocks + grid1.ypos;
-        bottom_rank = (grid1.xpos + 1) * num_blocks + grid1.ypos;
+        left_rank = grid1.idx_x() * num_blocks + grid1.idx_y() - 1;
+        right_rank = grid1.idx_x() * num_blocks + grid1.idx_y() + 1;
 
-        if (grid1.xpos == 0u)
+        top_rank = (grid1.idx_x() - 1) * num_blocks + grid1.idx_y();
+        bottom_rank = (grid1.idx_x() + 1) * num_blocks + grid1.idx_y();
+
+        if (grid1.idx_x() == 0u)
         {
             top_rank = -1;
         }
-        if (static_cast<int>(grid1.xpos) == num_blocks - 1)
+        if (static_cast<int>(grid1.idx_x()) == num_blocks - 1)
         {
             bottom_rank = -1;
         }
 
-        if(grid1.ypos == 0u)
+        if(grid1.idx_y() == 0u)
         {
             left_rank = -1;
         }
-        if(static_cast<int>(grid1.ypos) == num_blocks - 1)
+        if(static_cast<int>(grid1.idx_y()) == num_blocks - 1)
         {
             right_rank = -1;
         }
@@ -56,12 +57,12 @@ public:
     {
         auto epsilon = 0.0;
 
-        for (auto i = source.from_x; i < source.to_x; i++) 
+        for (auto i = source.left_x(); i < source.right_x(); i++) 
         {
             if (i == 0)     continue;
             if (i == n - 1) continue;
 
-            for (auto j = source.from_y; j < source.to_y; j++) 
+            for (auto j = source.top_y(); j < source.bottom_y(); j++) 
             {
                 if (j == 0)     continue;
                 if (j == n - 1) continue;
@@ -83,62 +84,71 @@ public:
     {
 
         if (top_rank != -1)
-            MPI_Send(current_grid.get_block_borders(0), elements_per_block,
-                     MPI_DOUBLE, top_rank, my_rank, communicator);
+        {
+            const auto border = current_grid.get_block_borders(direction::north);
+
+            MPI_Send(border.data(), border.size(), MPI_DOUBLE, 
+                top_rank, my_rank, communicator);
+        }
 
         if (right_rank != -1)
-            MPI_Send(current_grid.get_block_borders(1), elements_per_block,
-                     MPI_DOUBLE, right_rank, my_rank, communicator);
+        {
+            const auto border = current_grid.get_block_borders(direction::east);
+
+            MPI_Send(border.data(), border.size(), MPI_DOUBLE,
+                right_rank, my_rank, communicator);
+        }
 
         if (bottom_rank != -1)
-            MPI_Send(current_grid.get_block_borders(2), elements_per_block,
-                     MPI_DOUBLE, bottom_rank, my_rank, communicator);
+        {
+            const auto border = current_grid.get_block_borders(direction::south);
+
+            MPI_Send(border.data(), border.size(), MPI_DOUBLE,
+                bottom_rank, my_rank, communicator);
+        }
 
         if (left_rank != -1)
-            MPI_Send(current_grid.get_block_borders(3), elements_per_block,
-                     MPI_DOUBLE, left_rank, my_rank, communicator);
+        {
+            const auto border = current_grid.get_block_borders(direction::west);
 
-        const auto border_element_count = current_grid.to_x - current_grid.from_x;
-        auto recv = std::make_unique<double[]>(elements_per_block);
+            MPI_Send(border.data(), border.size(), MPI_DOUBLE,
+                left_rank, my_rank, communicator);
+        }
+
+        auto receive_buffer = std::vector<double>(current_grid.extent_x());
+
+        Expects(current_grid.extent_x() == current_grid.extent_y());
 
         if (top_rank != -1)
         {
-            MPI_Recv(recv.get(), elements_per_block, MPI_DOUBLE, top_rank,
+            MPI_Recv(receive_buffer.data(), receive_buffer.size(), MPI_DOUBLE, top_rank,
                      top_rank, communicator, MPI_STATUS_IGNORE);
 
-            current_grid.set_block_borders(
-                    gsl::span<double>(recv.get(), border_element_count),
-                    0);
+            current_grid.set_block_borders(receive_buffer, direction::north);
         }
 
         if (right_rank != -1)
         {
-            MPI_Recv(recv.get(), elements_per_block, MPI_DOUBLE, right_rank,
+            MPI_Recv(receive_buffer.data(), receive_buffer.size(), MPI_DOUBLE, right_rank,
                      right_rank, communicator, MPI_STATUS_IGNORE);
 
-            current_grid.set_block_borders(
-                    gsl::span<double>(recv.get(), border_element_count),
-                    1);
+            current_grid.set_block_borders(receive_buffer, direction::east);
         }
 
         if (bottom_rank != -1)
         {
-            MPI_Recv(recv.get(), elements_per_block, MPI_DOUBLE, bottom_rank,
+            MPI_Recv(receive_buffer.data(), receive_buffer.size(), MPI_DOUBLE, bottom_rank,
                      bottom_rank, communicator, MPI_STATUS_IGNORE);
 
-            current_grid.set_block_borders(
-                    gsl::span<double>(recv.get(), border_element_count),
-                    2);
+            current_grid.set_block_borders(receive_buffer, direction::south);
         }
 
         if (left_rank != -1)
         {
-            MPI_Recv(recv.get(), elements_per_block, MPI_DOUBLE, left_rank,
+            MPI_Recv(receive_buffer.data(), receive_buffer.size(), MPI_DOUBLE, left_rank,
                      left_rank, communicator, MPI_STATUS_IGNORE);
 
-            current_grid.set_block_borders(
-                    gsl::span<double>(recv.get(), border_element_count),
-                    3);
+            current_grid.set_block_borders(receive_buffer, direction::west);
         }
     }
 };
