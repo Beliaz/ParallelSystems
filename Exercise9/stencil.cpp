@@ -61,7 +61,7 @@ int main(int argc, char **argv)
 
     ///////////////////////////////////////////////////////////
     // Actual loop
-    const auto iterations = s.execute(grid1, grid2);
+    const auto iterations = s.execute(primary, secondary);
 
     MPI_Finalize();
 
