@@ -65,6 +65,10 @@ int main(int argc, char **argv)
     // Actual loop
     const auto iterations = s.execute(primary, secondary);
 
+    int max_iter;
+
+    MPI_Reduce(&iterations,&max_iter,1,MPI_INT,MPI_MAX,0,communicator);
+
     MPI_Finalize();
 
     if (my_rank != 0) return EXIT_SUCCESS;
@@ -72,16 +76,8 @@ int main(int argc, char **argv)
     const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
             clock::now() - start).count();
 
-    std::cout << elapsed << " ms, " << iterations << " iter";
-
-    if(elapsed > 0)
-    {
-        std::cout << ", " << std::scientific << std::setprecision(3)
-                  << iterations * size / static_cast<double>(elapsed) * 1000
-                  << " cells/s";
-    }
-
-    std::cout << std::endl;
+    std::cout << elapsed << ";" << max_iter << ";" << std::scientific << std::setprecision(3)
+                  << max_iter * size / static_cast<double>(elapsed) * 1000 << std::endl;
 
     return EXIT_SUCCESS;
 }

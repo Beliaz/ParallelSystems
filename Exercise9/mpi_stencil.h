@@ -8,7 +8,7 @@
 #include "grid.h"
 #include <mpi.h>
 
-constexpr auto epsilon = 20;
+constexpr auto epsilon = 10;
 
 class stencil
 {
