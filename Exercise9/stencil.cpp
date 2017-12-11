@@ -53,7 +53,7 @@ int optimization(const stencil &s, grid &grid1, grid &grid2)
         iteration+=2;
 
         double sum_epsilon;
-        MPI_Allreduce(&d_epsilon, &sum_epsilon, 1, MPI_DOUBLE, MPI_SUM, communicator);
+        MPI_Allreduce(&d_epsilon, &sum_epsilon, 1, MPI_DOUBLE_PRECISION, MPI_SUM, communicator);
 
         if (sum_epsilon < epsilon)
             break;

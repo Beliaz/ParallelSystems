@@ -10,7 +10,7 @@
 #include <cmath>
 #include <gsl/gsl>
 
-constexpr auto n = 512;
+constexpr auto n = 768;
 constexpr auto size = n * n;
 
 MPI_Comm communicator;
