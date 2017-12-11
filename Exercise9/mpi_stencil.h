@@ -8,6 +8,9 @@
 #include "grid.h"
 #include <memory>
 
+constexpr auto epsilon = 10;
+
+
 class stencil
 {
 public:
@@ -114,6 +117,53 @@ public:
         send_borders(current_grid);
         receive_borders(current_grid);
     }
+
+#if defined(TRIANGULAR)
+
+    int execute(stencil &s, grid &grid1, grid &grid2)
+    {
+        int iteration=0;
+        while (true)
+        {
+            s->iteration(grid1, grid2, 1);
+            const auto d_epsilon = s->iteration(grid2, grid1, 0);
+            s->send_recv_two_border(grid1);
+
+            iteration+=2;
+
+            double sum_epsilon;
+            MPI_Allreduce(&d_epsilon, &sum_epsilon, 1, MPI_DOUBLE, MPI_SUM, communicator);
+
+            if (sum_epsilon < epsilon)
+                break;
+        }
+        return iteration;
+    }
+
+#else
+
+    int execute(grid &grid1, grid &grid2) const
+    {
+        int iteration=0;
+        while (true)
+        {
+            this->iteration(grid1, grid2);
+            this->send_recv_border(grid1);
+            const auto d_epsilon = this->iteration(grid2, grid1);
+            this->send_recv_border(grid1);
+
+            iteration+=2;
+
+            double sum_epsilon;
+            MPI_Allreduce(&d_epsilon, &sum_epsilon, 1, MPI_DOUBLE_PRECISION, MPI_SUM, communicator);
+
+            if (sum_epsilon < epsilon)
+                break;
+        }
+        return iteration;
+    }
+
+#endif
 };
 
 
