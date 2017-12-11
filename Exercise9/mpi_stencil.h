@@ -10,7 +10,6 @@
 
 constexpr auto epsilon = 10;
 
-
 class stencil
 {
 public:
@@ -20,7 +19,7 @@ public:
     int bottom_rank;
     int left_rank;
 
-    using neighbour_t = std::tuple<direction, int>;
+    using neighbour_t = std::tuple<Direction, int>;
     std::vector<neighbour_t> neighbours;
 
     const size_t num_blocks;
@@ -39,16 +38,16 @@ public:
         bottom_rank = (grid1.idx_y() + 1) * num_blocks + grid1.idx_x();
 
         if (grid1.idx_x() > 0u)          
-            neighbours.push_back(neighbour_t(direction::east, left_rank));
+            neighbours.push_back(neighbour_t(Direction::east, left_rank));
 
         if (grid1.idx_x() < num_blocks - 1) 
-            neighbours.push_back(neighbour_t(direction::west, right_rank));
+            neighbours.push_back(neighbour_t(Direction::west, right_rank));
 
         if(grid1.idx_y() > 0u)
-            neighbours.push_back(neighbour_t(direction::north, top_rank));
+            neighbours.push_back(neighbour_t(Direction::north, top_rank));
 
         if(grid1.idx_y() < num_blocks - 1)
-            neighbours.push_back(neighbour_t(direction::south, bottom_rank));
+            neighbours.push_back(neighbour_t(Direction::south, bottom_rank));
     }
 
 

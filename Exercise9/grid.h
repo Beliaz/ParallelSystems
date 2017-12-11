@@ -10,13 +10,16 @@
 #include <cmath>
 #include <gsl/gsl>
 
-
+#if defined(N768)
+constexpr auto n = 768;
+#else
 constexpr auto n = 512;
+#endif
 constexpr auto size = n * n;
 
 MPI_Comm communicator;
 
-enum class direction
+enum class Direction
 {
     north,
     east,
@@ -99,7 +102,7 @@ public:
         }
     }
 
-    std::vector<double> get_block_borders(const direction direction) const
+    std::vector<double> get_block_borders(const Direction direction) const
     {
         std::vector<double> borders(blocksize_);
 
@@ -110,7 +113,7 @@ public:
     }
 
     void set_block_borders(const gsl::span<const double> borders,
-                           const direction direction)
+                           const Direction direction)
     {
         for (auto i = 0u; i < blocksize_; ++i)
             get_border_element(direction, i) = borders[i];
@@ -139,20 +142,20 @@ private:
 
     std::vector<double> data_;
 
-    double& get_border_element(const direction direction, const size_t idx)
+    double& get_border_element(const Direction direction, const size_t idx)
     {
         switch (direction)
         {
-        case direction::north:  return get(from_x_ + idx, from_y_);
-        case direction::east:   return get(to_x_ - 1, from_y_ + idx);
-        case direction::south:  return get(from_x_ + idx, to_y_ - 1);
-        case direction::west:   return get(from_x_, from_y_ + idx);
+        case Direction::north:  return get(from_x_ + idx, from_y_);
+        case Direction::east:   return get(to_x_ - 1, from_y_ + idx);
+        case Direction::south:  return get(from_x_ + idx, to_y_ - 1);
+        case Direction::west:   return get(from_x_, from_y_ + idx);
 
         default: throw std::logic_error("invalid direction");
         }
     }
 
-    const double& get_border_element(const direction direction, const size_t element) const
+    const double& get_border_element(const Direction direction, const size_t element) const
     {
         return const_cast<grid&>(*this).get_border_element(direction, element);
     }

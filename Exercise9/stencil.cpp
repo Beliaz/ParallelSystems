@@ -25,7 +25,7 @@ int main(int argc, char **argv)
     auto my_rank = -1;
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
-    const auto blocks = static_cast<int>(sqrt(num_procs));
+    auto blocks = static_cast<int>(sqrt(num_procs));
 
     if (blocks * blocks != num_procs)
     {
@@ -45,6 +45,7 @@ int main(int argc, char **argv)
 
     MPI_Comm_size(communicator, &num_procs);
     MPI_Comm_rank(communicator, &my_rank);
+    blocks = static_cast<int>(sqrt(num_procs));
 
     const std::array<const double, 4> borders
     {
@@ -61,7 +62,7 @@ int main(int argc, char **argv)
 
     ///////////////////////////////////////////////////////////
     // Actual loop
-    const auto iterations = s.execute(grid1, grid2);
+    const auto iterations = s.execute(primary, secondary);
 
     MPI_Finalize();
 
