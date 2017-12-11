@@ -56,15 +56,24 @@ int main(int argc, char **argv)
         if (std::get<1>(result)) break;
     }
 
+    const auto iteration_diff = std::abs(iterations - iterations_old);
+    if(iteration_diff > 10)
+    {
+        std::cout << "Error: iteration count differences greater 10 (diff: " 
+            << iteration_diff << ")" << std::endl;
+    }
+
     decltype(auto) first = stencil_code::get_first(grid_old);
   
-    for (auto i = 0; i < n; ++i) {
-        for (auto j = 0; j < n; ++j) {
-            if(std::abs(first.at({i,j}) - grid2.get(i,j)) > 0.5)
-                std::cout << "Error at " << i << "|" << j 
-                          << ", old: " << first.at({i,j}) 
-                          << "    new: " << grid2.get(i,j)
-                          << std::endl;
+    for (auto i = 0u; i < n; ++i) 
+    {
+        for (auto j = 0u; j < n; ++j) 
+        {
+            if(std::abs(first.at({i,j}) - grid2.get(i,j)) < 0.001) continue;
+
+            std::cout << "Error at " << i << "|" << j 
+                << ", old: " << first.at({i,j}) << "    new: " << grid2.get(i,j)
+                << std::endl;
         }
     }
     return EXIT_SUCCESS;
