@@ -15,56 +15,8 @@
 #include "grid.h"
 #include "mpi_stencil.h"
 
-constexpr auto epsilon = 20;
 
-#if defined(TRIANGULAR)
 
-int execute(stencil &s, grid &grid1, grid &grid2)
-{
-    int iteration=0;
-    while (true)
-    {
-        s->iteration(grid1, grid2, 1);
-        const auto d_epsilon = s->iteration(grid2, grid1, 0);
-        s->send_recv_two_border(grid1);
-
-        iteration+=2;
-
-        double sum_epsilon;
-        MPI_Allreduce(&d_epsilon, &sum_epsilon, 1, MPI_DOUBLE, MPI_SUM, communicator);
-
-        if (sum_epsilon < epsilon)
-            break;
-    }
-    return iteration;
-}
-
-#else
-
-int execute(const stencil &s, grid &grid1, grid &grid2)
-{
-    auto iterations = 0;
-
-    while (true)
-    {
-        s.iteration(grid1, grid2);
-        s.send_recv_border(grid1);
-        const auto d_epsilon = s.iteration(grid2, grid1);
-        s.send_recv_border(grid1);
-
-        iterations += 2;
-
-        double sum_epsilon;
-        MPI_Allreduce(&d_epsilon, &sum_epsilon, 1, MPI_DOUBLE, MPI_SUM, communicator);
-
-        if (sum_epsilon < epsilon)
-            break;
-    }
-
-    return iterations;
-}
-
-#endif
 
 int main(int argc, char **argv)
 {
@@ -88,7 +40,7 @@ int main(int argc, char **argv)
         }
 
         MPI_Comm_split(MPI_COMM_WORLD, 0, my_rank, &communicator);
-    } 
+    }
     else
     {
         communicator = MPI_COMM_WORLD;
@@ -112,7 +64,7 @@ int main(int argc, char **argv)
 
     ///////////////////////////////////////////////////////////
     // Actual loop
-    const auto iterations = execute(s, grid1, grid2);
+    const auto iterations = s.execute(grid1, grid2);
 
     MPI_Finalize();
 

@@ -10,6 +10,7 @@
 #include <cmath>
 #include <gsl/gsl>
 
+
 constexpr auto n = 512;
 constexpr auto size = n * n;
 
@@ -27,8 +28,8 @@ class grid
 {
 public:
     explicit grid(
-        const int my_rank, 
-        const int blocks, 
+        const int my_rank,
+        const int blocks,
         const gsl::span<const double, 4> borders)
         :   x_idx_(my_rank / blocks),
             y_idx_(my_rank % blocks),
@@ -104,7 +105,7 @@ public:
 
         for (auto i = 0u; i < blocksize_; ++i)
             borders[i] = get_border_element(direction, i);
-        
+
         return borders;
     }
 
@@ -135,9 +136,9 @@ private:
     const size_t from_y_;
     const size_t to_y_;
     const size_t blocksize_;
-    
+
     std::vector<double> data_;
-    
+
     double& get_border_element(const direction direction, const size_t idx)
     {
         switch (direction)
