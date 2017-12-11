@@ -74,6 +74,9 @@ public:
 
     double get_five(const unsigned int row, const unsigned int column) const
     {
+        Expects(row >= 0 && row < n);
+        Expects(column >= 0 && column < n);
+
         return (get(row,column) +
                 get(row - 1, column) +
                 get(row + 1, column) +
@@ -83,7 +86,10 @@ public:
 
     void set(const unsigned int row, const unsigned int column, const double value)
     {
-        data_[ (row * n) + column ] = value;
+        Expects(row >= 0 && row < n);
+        Expects(column >= 0 && column < n);
+
+        data_[row * n + column] = value;
     }
 
 
@@ -134,7 +140,7 @@ public:
         return borders;
     }
 
-    void set_block_borders(double* borders,
+    void set_block_borders(const gsl::span<const double> borders,
                            const unsigned direction)
     {
         const auto size = to_x - from_x;

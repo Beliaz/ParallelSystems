@@ -22,8 +22,8 @@ int main(int argc, char **argv)
         1.0, 0.5, 0, -0.5
     };
 
-    auto grid1 = new grid(borders);
-    auto grid2 = new grid(borders);
+    grid grid1(borders);
+    grid grid2(borders);
 
     unsigned iterations = 0;
     unsigned sum_iterations;
@@ -55,10 +55,10 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    grid1->set_block(my_rank, blocks);
-    grid2->set_block(my_rank, blocks);
+    grid1.set_block(my_rank, blocks);
+    grid2.set_block(my_rank, blocks);
 
-    stencil s(num_procs, my_rank, grid1);
+    const stencil s(num_procs, my_rank, grid1);
     
     // Always do two iterations, as the arrays have to switch every time.
     // This way, it is not needed to keep track which was the last
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
         const auto d_epsilon = s.iteration(grid2, grid1);
         s.send_recv_border(grid1);
 
-        iterations+=2;
+        iterations += 2;
 
         double sum_epsilon;
         MPI_Allreduce(&d_epsilon, &sum_epsilon, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
