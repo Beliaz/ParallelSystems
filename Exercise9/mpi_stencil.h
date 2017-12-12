@@ -48,10 +48,10 @@ public:
             neighbours.push_back(neighbour_t(Direction::south, bottom_rank));
 
         if (grid1.idx_y() > 0u)
-            neighbours.push_back(neighbour_t(Direction::east, left_rank));
+            neighbours.push_back(neighbour_t(Direction::west, right_rank));
 
         if (grid1.idx_y() < num_blocks - 1)
-            neighbours.push_back(neighbour_t(Direction::west, right_rank));
+            neighbours.push_back(neighbour_t(Direction::east, left_rank));
 
   /*      for (const auto &neighbour : neighbours) {
             const auto direction = std::get<0>(neighbour);
