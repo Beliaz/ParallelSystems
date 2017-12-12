@@ -5,26 +5,53 @@
 #include <cmath>
 #include <string>
 #include <iostream>
-#include <sstream>
 #include <chrono>
 
-#define N768
+#define N512
 
 #include "../mpi_stencil.h"
-#include "sequential/grid_helper.h"
 #include "sequential/jacobi.h"
 #include "sequential/iteration.h"
 #include "sequential/stencil_code.h"
 #include "sequential/print.h"
 
+#include <mpi.h>
+
 using stencil_code_t = stencil_code::stencil_iteration<stencil_code::jacobi>;
 
 int main(int argc, char **argv)
 {
-    auto my_rank = 0;
-    auto num_procs = 1;
+    MPI_Init(&argc, &argv);
 
-    const auto blocks = static_cast<int>(sqrt(num_procs));
+    auto num_procs = -1;
+    MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
+
+    auto my_rank = -1;
+    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+
+    auto blocks = static_cast<int>(sqrt(num_procs));
+
+    if (blocks * blocks != num_procs)
+    {
+        if (my_rank >= blocks * blocks)
+        {
+            MPI_Comm_split(MPI_COMM_WORLD, 1, my_rank, &communicator);
+            MPI_Finalize();
+
+            throw std::runtime_error("invalid rank");
+        }
+
+        MPI_Comm_split(MPI_COMM_WORLD, 0, my_rank, &communicator);
+    }
+    else
+    {
+        communicator = MPI_COMM_WORLD;
+    }
+
+    MPI_Comm_size(communicator, &num_procs);
+    MPI_Comm_rank(communicator, &my_rank);
+
+    blocks = static_cast<int>(sqrt(num_procs));
 
     const std::array<const double, 4> borders
     {
@@ -38,11 +65,14 @@ int main(int argc, char **argv)
 
     const auto iterations = s.execute(grid1, grid2);
 
-    constexpr auto epsilon = 10;
-    constexpr auto n = 768;
+    MPI_Finalize();
 
-    constexpr ::bounds_t<2> bounds = { 1.0, 0.5, 0, -0.5 };
-    const stencil_code::grid_extents_t<2> extents = { n, n};
+    if (my_rank != 0) return EXIT_SUCCESS;
+
+    // sequential
+
+    constexpr ::bounds_t<2> bounds = { -0.5, 0.5, 1.0, 0 };
+    const stencil_code::grid_extents_t<2> extents = { n, n };
 
     auto grid_old = create_buffered_grid(extents, bounds, default_value);
     auto iterations_old = 0;
@@ -63,7 +93,7 @@ int main(int argc, char **argv)
             << iteration_diff << ")" << std::endl;
     }
 
-    decltype(auto) first = stencil_code::get_first(grid_old);
+    /*decltype(auto) first = stencil_code::get_first(grid_old);
   
     for (auto i = 0u; i < n; ++i) 
     {
@@ -74,7 +104,11 @@ int main(int argc, char **argv)
             std::cout << "Error at " << i << "|" << j 
                 << ", old: " << first.at({i,j}) << "    new: " << grid2.get(i,j)
                 << std::endl;
+
+            throw std::runtime_error("incorrect result");
         }
     }
+    */
+
     return EXIT_SUCCESS;
 }
