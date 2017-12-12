@@ -108,8 +108,97 @@ public:
         return epsilon;
     }
 
+    static double inner_border_iteration(const grid& source, grid& target)
+    {
+        auto epsilon = 0.0;
 
-    void send_borders(grid& current_grid) const
+        for (auto row = source.top_y(); row < source.bottom_y(); row++)
+        {
+            if (row == 0)     continue;
+            if (row == n - 1) continue;
+
+            if (row == source.top_y() || row == source.bottom_y())
+            {
+                for (auto column = source.left_x(); column < source.right_x(); column++)
+                {
+                    if (column == 0)     continue;
+                    if (column == n - 1) continue;
+
+                    const auto current = source.get(row, column);
+                    const auto new_value = source.get_five(row, column);
+
+                    target.set(row, column, new_value);
+
+                    epsilon += std::abs(new_value - current);
+                }
+
+                continue;
+            }
+
+
+            auto column = source.left_x();
+
+            if(column > 0 && column < n - 1)
+            {
+                const auto current = source.get(row, column);
+                const auto new_value = source.get_five(row, column);
+
+                target.set(row, column, new_value);
+
+                epsilon += std::abs(new_value - current);
+            }
+
+            column = source.right_x();
+
+            if (column > 0 && column < n - 1)
+            {
+                const auto current = source.get(row, column);
+                const auto new_value = source.get_five(row, column);
+
+                target.set(row, column, new_value);
+
+                epsilon += std::abs(new_value - current);
+            }
+        }
+
+        return epsilon;
+    }
+
+    static double inner_iteration(const grid& source, grid& target)
+    {
+        auto epsilon = 0.0;
+
+        for (auto row = source.top_y() + 1; row < source.bottom_y() - 1; row++)
+        {
+            for (auto column = source.left_x() + 1; column < source.right_x() - 1; column++)
+            {
+                const auto current = source.get(row, column);
+                const auto new_value = source.get_five(row, column);
+
+                target.set(row, column, new_value);
+
+                epsilon += std::abs(new_value - current);
+            }
+        }
+
+        return epsilon;
+    }
+
+    double optimized_iteration(const grid& source, grid& target) const
+    {
+        auto epsilon = inner_border_iteration(source, target);
+
+        send_borders(target);
+
+        epsilon += inner_iteration(source, target);
+
+        receive_borders(target);
+
+        return epsilon;
+    }
+
+
+    void send_borders(const grid& current_grid) const
     {
         for(const auto& neighbour : neighbours)
         {
@@ -147,43 +236,15 @@ public:
         receive_borders(current_grid);
     }
 
-#if defined(TRIANGULAR)
-
-    int execute(stencil &s, grid &grid1, grid &grid2)
-    {
-        int iteration=0;
-        while (true)
-        {
-            s->iteration(grid1, grid2, 1);
-            const auto d_epsilon = s->iteration(grid2, grid1, 0);
-            s->send_recv_two_border(grid1);
-
-            iteration+=2;
-
-            double sum_epsilon;
-            MPI_Allreduce(&d_epsilon, &sum_epsilon, 1, MPI_DOUBLE, MPI_SUM, communicator);
-
-            if (sum_epsilon < epsilon)
-                break;
-        }
-        return iteration;
-    }
-
-#else
-
     int execute(grid &grid1, grid &grid2) const
     {
         auto iterations = 0;
 
         while (true)
         {
-            iteration(grid1, grid2);
+            optimized_iteration(grid1, grid2);
 
-            send_recv_border(grid2);
-
-            const auto d_epsilon = iteration(grid2, grid1);
-
-            send_recv_border(grid1);
+            const auto d_epsilon = optimized_iteration(grid2, grid1);
 
             iterations += 2;
 
@@ -196,8 +257,6 @@ public:
 
         return iterations;
     }
-
-#endif
 };
 
 
