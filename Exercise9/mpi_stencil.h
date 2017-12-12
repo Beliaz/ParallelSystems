@@ -26,7 +26,7 @@ public:
         elements_per_block(n / num_blocks)
     {
 
-        if (my_rank == 0)
+        /*if (my_rank == 0)
         {
             std::cout << "num_blocks: " << num_blocks << std::endl;
             std::cout << "elements_per_block: " << elements_per_block << std::endl;
@@ -38,6 +38,7 @@ public:
                     << "from x: " << grid1.left_x() << ", to_x: " << grid1.right_x() << std::endl
                     << "from y: " << grid1.top_y() << ", to_y: " << grid1.bottom_y() << std::endl 
                     << "neighbours: ";
+        */
 
         const auto left_rank = grid1.idx_y() * num_blocks + grid1.idx_x() - 1;
         const auto right_rank = grid1.idx_y() * num_blocks + grid1.idx_x() + 1;
@@ -57,7 +58,7 @@ public:
         if (grid1.idx_x() < num_blocks - 1)
             neighbours.push_back(neighbour_t(direction_t::east, right_rank));
 
-        for (const auto &neighbour : neighbours) 
+        /*for (const auto &neighbour : neighbours) 
         {
             const auto direction = std::get<0>(neighbour);
             const auto rank = std::get<1>(neighbour);
@@ -76,6 +77,7 @@ public:
 
         std::cout << std::endl;
         std::cout << std::endl;
+        */
     }
 
 
