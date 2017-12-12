@@ -238,18 +238,26 @@ public:
 
     int execute(grid &grid1, grid &grid2) const
     {
+        constexpr auto mini_batch_size = 50;
+
         auto iterations = 0;
 
         while (true)
         {
+            for(auto i = 0; i < mini_batch_size; i++)
+            {
+                optimized_iteration(grid1, grid2);
+                optimized_iteration(grid2, grid1);
+            }
+            
             optimized_iteration(grid1, grid2);
 
-            const auto d_epsilon = optimized_iteration(grid2, grid1);
+            const auto actual_epsilon = optimized_iteration(grid2, grid1);
 
-            iterations += 2;
+            iterations += 2 + mini_batch_size * 2;;
 
             double sum_epsilon;
-            MPI_Allreduce(&d_epsilon, &sum_epsilon, 1, MPI_DOUBLE, MPI_SUM, communicator);
+            MPI_Allreduce(&actual_epsilon, &sum_epsilon, 1, MPI_DOUBLE, MPI_SUM, communicator);
 
             if (sum_epsilon < epsilon)
                 break;
