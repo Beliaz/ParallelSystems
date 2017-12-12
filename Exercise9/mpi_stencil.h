@@ -31,12 +31,12 @@ public:
         num_blocks(static_cast<int>(sqrt(num_procs))),
         elements_per_block(n / num_blocks)
     {
-
-    //    std::cout << "My_rank: " << my_rank << ", fromx: " << grid1.left_x()
-      //            << ", tox: " << grid1.right_x() << "neighbours: ";
-
-        left_rank = grid1.idx_x() * num_blocks + grid1.idx_y() - 1;
-        right_rank = grid1.idx_x() * num_blocks + grid1.idx_y() + 1;
+/*
+        std::cout << "My_rank: " << my_rank << ", fromx: " << grid1.left_x()
+                  << ", tox: " << grid1.right_x() << "neighbours: ";
+*/
+        left_rank = grid1.idx_x() * num_blocks + grid1.idx_y() + 1;
+        right_rank = grid1.idx_x() * num_blocks + grid1.idx_y() - 1;
 
         top_rank = (grid1.idx_x() - 1) * num_blocks + grid1.idx_y();
         bottom_rank = (grid1.idx_x() + 1) * num_blocks + grid1.idx_y();
@@ -52,13 +52,13 @@ public:
 
         if (grid1.idx_y() < num_blocks - 1)
             neighbours.push_back(neighbour_t(Direction::east, left_rank));
-
-  /*      for (const auto &neighbour : neighbours) {
+/*
+        for (const auto &neighbour : neighbours) {
             const auto direction = std::get<0>(neighbour);
             const auto rank = std::get<1>(neighbour);
             std::cout << ((direction==Direction::north)?"north":(direction==Direction::east)?"east":(direction==Direction::south)?"south":"west")<< ", rank: " << rank << ", ";
         }
-    */
+*/
     }
 
 
