@@ -9,18 +9,12 @@
 #include <mpi.h>
 #include <iostream>
 
-constexpr auto epsilon = 10;
-
 class stencil
 {
 public:
     const int my_rank;
-    int top_rank;
-    int right_rank;
-    int bottom_rank;
-    int left_rank;
 
-    using neighbour_t = std::tuple<Direction, int>;
+    using neighbour_t = std::tuple<direction_t, int>;
     std::vector<neighbour_t> neighbours;
 
     const size_t num_blocks;
@@ -31,34 +25,57 @@ public:
         num_blocks(static_cast<int>(sqrt(num_procs))),
         elements_per_block(n / num_blocks)
     {
-/*
-        std::cout << "My_rank: " << my_rank << ", fromx: " << grid1.left_x()
-                  << ", tox: " << grid1.right_x() << "neighbours: ";
-*/
-        left_rank = grid1.idx_x() * num_blocks + grid1.idx_y() + 1;
-        right_rank = grid1.idx_x() * num_blocks + grid1.idx_y() - 1;
 
-        top_rank = (grid1.idx_x() - 1) * num_blocks + grid1.idx_y();
-        bottom_rank = (grid1.idx_x() + 1) * num_blocks + grid1.idx_y();
+        if (my_rank == 0)
+        {
+            std::cout << "num_blocks: " << num_blocks << std::endl;
+            std::cout << "elements_per_block: " << elements_per_block << std::endl;
+            std::cout << std::endl;
+        }
 
-        if (grid1.idx_x() > 0u)
-            neighbours.push_back(neighbour_t(Direction::north, top_rank));
+        std::cout   << "my_rank: " << my_rank << std::endl
+                    << "idx_x: " << grid1.idx_x() << ", idx_y: " << grid1.idx_y() << std::endl
+                    << "from x: " << grid1.left_x() << ", to_x: " << grid1.right_x() << std::endl
+                    << "from y: " << grid1.top_y() << ", to_y: " << grid1.bottom_y() << std::endl 
+                    << "neighbours: ";
 
-        if (grid1.idx_x() < num_blocks - 1)
-            neighbours.push_back(neighbour_t(Direction::south, bottom_rank));
+        const auto left_rank = grid1.idx_y() * num_blocks + grid1.idx_x() - 1;
+        const auto right_rank = grid1.idx_y() * num_blocks + grid1.idx_x() + 1;
 
-        if (grid1.idx_y() > 0u)
-            neighbours.push_back(neighbour_t(Direction::west, right_rank));
+        const auto top_rank = (grid1.idx_y() - 1) * num_blocks + grid1.idx_x();
+        const auto bottom_rank = (grid1.idx_y() + 1) * num_blocks + grid1.idx_x();
+
+        if (grid1.idx_y() > 0)
+            neighbours.push_back(neighbour_t(direction_t::north, top_rank));
 
         if (grid1.idx_y() < num_blocks - 1)
-            neighbours.push_back(neighbour_t(Direction::east, left_rank));
-/*
-        for (const auto &neighbour : neighbours) {
+            neighbours.push_back(neighbour_t(direction_t::south, bottom_rank));
+
+        if (grid1.idx_x() > 0)
+            neighbours.push_back(neighbour_t(direction_t::west, left_rank));
+
+        if (grid1.idx_x() < num_blocks - 1)
+            neighbours.push_back(neighbour_t(direction_t::east, right_rank));
+
+        for (const auto &neighbour : neighbours) 
+        {
             const auto direction = std::get<0>(neighbour);
             const auto rank = std::get<1>(neighbour);
-            std::cout << ((direction==Direction::north)?"north":(direction==Direction::east)?"east":(direction==Direction::south)?"south":"west")<< ", rank: " << rank << ", ";
+
+            switch (direction)
+            {
+            case direction_t::north:    std::cout << "north"; break;
+            case direction_t::east:     std::cout << "east";  break;
+            case direction_t::south:    std::cout << "south"; break;
+            case direction_t::west:     std::cout << "west";  break;
+            default: throw "invalid direction";
+            }
+
+            std::cout << "(" << rank << "), ";
         }
-*/
+
+        std::cout << std::endl;
+        std::cout << std::endl;
     }
 
 
@@ -67,20 +84,20 @@ public:
     {
         auto epsilon = 0.0;
 
-        for (auto i = source.left_x(); i < source.right_x(); i++) 
+        for (auto row = source.top_y(); row < source.bottom_y(); row++) 
         {
-            if (i == 0)     continue;
-            if (i == n - 1) continue;
+            if (row == 0)     continue;
+            if (row == n - 1) continue;
 
-            for (auto j = source.top_y(); j < source.bottom_y(); j++) 
+            for (auto column = source.left_x(); column < source.right_x(); column++) 
             {
-                if (j == 0)     continue;
-                if (j == n - 1) continue;
+                if (column == 0)     continue;
+                if (column == n - 1) continue;
                   
-                const auto current = source.get(i , j);
-                const auto new_value = source.get_five(i , j);
+                const auto current = source.get(row , column);
+                const auto new_value = source.get_five(row , column);
 
-                target.set(i , j , new_value);
+                target.set(row , column , new_value);
 
                 epsilon += std::abs(new_value - current);
             }
@@ -154,23 +171,28 @@ public:
 
     int execute(grid &grid1, grid &grid2) const
     {
-        int iteration=0;
+        auto iterations = 0;
+
         while (true)
         {
-            this->iteration(grid1, grid2);
-            this->send_recv_border(grid1);
-            const auto d_epsilon = this->iteration(grid2, grid1);
-            this->send_recv_border(grid1);
+            iteration(grid1, grid2);
 
-            iteration+=2;
+            send_recv_border(grid2);
+
+            const auto d_epsilon = iteration(grid2, grid1);
+
+            send_recv_border(grid1);
+
+            iterations += 2;
 
             double sum_epsilon;
-            MPI_Allreduce(&d_epsilon, &sum_epsilon, 1, MPI_DOUBLE_PRECISION, MPI_SUM, communicator);
+            MPI_Allreduce(&d_epsilon, &sum_epsilon, 1, MPI_DOUBLE, MPI_SUM, communicator);
 
             if (sum_epsilon < epsilon)
                 break;
         }
-        return iteration;
+
+        return iterations;
     }
 
 #endif

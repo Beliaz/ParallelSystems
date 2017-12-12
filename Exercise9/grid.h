@@ -13,14 +13,17 @@
 
 #if defined(N768)
 constexpr auto n = 768;
+constexpr auto epsilon = 100.0;
 #else
 constexpr auto n = 512;
+constexpr auto epsilon = 20.0;
 #endif
+
 constexpr auto size = n * n;
 
 MPI_Comm communicator;
 
-enum class Direction
+enum class direction_t
 {
     north,
     east,
@@ -35,25 +38,26 @@ public:
         const int my_rank,
         const int blocks,
         const gsl::span<const double, 4> borders)
-        :   x_idx_(my_rank / blocks),
-            y_idx_(my_rank % blocks),
-            from_x_(x_idx_ * n / blocks),
-            to_x_((x_idx_ + 1) * n / blocks),
-            from_y_(y_idx_ * n / blocks),
-            to_y_((y_idx_ + 1) * n / blocks),
-            blocksize_(to_x_-from_x_),
+        :   blocksize_(n / blocks),
+            x_idx_(my_rank % blocks),
+            y_idx_(my_rank / blocks),
+            from_x_(x_idx_ * blocksize_),
+            to_x_((x_idx_ + 1) * blocksize_),
+            from_y_(y_idx_ * blocksize_),
+            to_y_((y_idx_ + 1) * blocksize_),
+    
             data_(size)
     {
         for (auto i = 0; i < n; i++)
         {
-            data_[i] = borders[0];
-            data_[size - 1 - i] = borders[2];
+            set(0, i, borders[0]);
+            set(n - 1, i, borders[2]);
         }
 
         for (auto i = 1; i < n - 1; i++)
         {
-            data_[n - 1 + i * n] = borders[1];
-            data_[i * n] = borders[3];
+            set(i, 0, borders[1]);
+            set(i, n - 1, borders[3]);
         }
     }
 
@@ -78,7 +82,7 @@ public:
         Expects(row > 0 && row < n - 1);
         Expects(column > 0 && column < n - 1);
 
-        return (get(row,column) +
+        return (get(row, column) +
                 get(row - 1, column) +
                 get(row + 1, column) +
                 get(row, column - 1) +
@@ -103,25 +107,25 @@ public:
         }
     }
 
-    std::vector<double> get_block_borders(const Direction direction) const
+    std::vector<double> get_block_borders(const direction_t direction) const
     {
         std::vector<double> borders(blocksize_);
 
         for (auto i = 0u; i < blocksize_; ++i)
-            borders[i] = get_border_element(direction, i, 0);
+            borders[i] = get_inner_border_element(direction, i);
 
         return borders;
     }
 
     void set_block_borders(const gsl::span<const double> borders,
-                           const Direction direction)
+                           const direction_t direction)
     {
         for (auto i = 0u; i < blocksize_; ++i)
-            get_border_element(direction, i, 1) = borders[i];
+            get_outer_border_element(direction, i) = borders[i];
     }
 
-    size_t idx_x() const { return x_idx_; }
     size_t idx_y() const { return y_idx_; }
+    size_t idx_x() const { return x_idx_; }
 
     size_t left_x() const { return from_x_; }
     size_t top_y() const { return from_y_; }
@@ -133,32 +137,37 @@ public:
     size_t extent_y() const { return blocksize_; }
 
 private:
+    const size_t blocksize_;
     const size_t x_idx_;
     const size_t y_idx_;
     const size_t from_x_;
     const size_t to_x_;
     const size_t from_y_;
     const size_t to_y_;
-    const size_t blocksize_;
 
     std::vector<double> data_;
 
-    double& get_border_element(const Direction direction, const size_t idx, const size_t offset)
+    double& get_border_element(const direction_t direction, const size_t idx, const size_t offset)
     {
         switch (direction)
         {
-        case Direction::north:  return get(from_x_ - offset, from_y_ + idx);
-        case Direction::east:   return get(from_x_ + idx, to_y_ - 1 + offset);
-        case Direction::south:  return get(to_x_ - 1 + offset, from_y_ + idx);
-        case Direction::west:   return get(from_x_ + idx , from_y_ - offset);
+        case direction_t::north:  return get(from_y_ - offset, from_x_ + idx);
+        case direction_t::east:   return get(from_y_ + idx, to_x_ - 1 + offset);
+        case direction_t::south:  return get(to_y_ - 1 + offset, from_x_ + idx);
+        case direction_t::west:   return get(from_y_ + idx , from_x_ - offset);
 
         default: throw std::logic_error("invalid direction");
         }
     }
 
-    const double& get_border_element(const Direction direction, const size_t element, const size_t offset) const
+    const double& get_inner_border_element(const direction_t direction, const size_t element) const
     {
-        return const_cast<grid&>(*this).get_border_element(direction, element, offset);
+        return const_cast<grid&>(*this).get_border_element(direction, element, 0);
+    }
+
+    double& get_outer_border_element(const direction_t direction, const size_t element)
+    {
+        return get_border_element(direction, element, 1);
     }
 
     static size_t linearize(const unsigned int row, const unsigned int column)

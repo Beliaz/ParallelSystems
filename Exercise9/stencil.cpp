@@ -52,6 +52,7 @@ int main(int argc, char **argv)
     {
         1.0, 0.5, 0, -0.5
     };
+
     grid primary(my_rank, blocks, borders);
     grid secondary(my_rank, blocks, borders);
 
