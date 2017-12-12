@@ -52,3 +52,5 @@ cmake-3.9.6-Linux-x86_64.sh
 autotools-dev_20150820.1_all.deb
 automake_1.15-4ubuntu1_all.deb
 autoconf_2.69-9_all.deb
+automake-1.15/
+openmpi-2.1.2/
