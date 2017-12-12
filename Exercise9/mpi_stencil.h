@@ -7,6 +7,7 @@
 
 #include "grid.h"
 #include <mpi.h>
+#include <iostream>
 
 constexpr auto epsilon = 10;
 
@@ -26,28 +27,38 @@ public:
     const size_t elements_per_block;
 
     stencil(const int num_procs, const int my_rank, const grid& grid1) :
-        my_rank(my_rank), 
-        num_blocks(static_cast<int>(sqrt(num_procs))), 
+        my_rank(my_rank),
+        num_blocks(static_cast<int>(sqrt(num_procs))),
         elements_per_block(n / num_blocks)
     {
 
-        left_rank = grid1.idx_y() * num_blocks + grid1.idx_x() - 1;
-        right_rank = grid1.idx_y() * num_blocks + grid1.idx_x() + 1;
+    //    std::cout << "My_rank: " << my_rank << ", fromx: " << grid1.left_x()
+      //            << ", tox: " << grid1.right_x() << "neighbours: ";
 
-        top_rank = (grid1.idx_y() - 1) * num_blocks + grid1.idx_x();
-        bottom_rank = (grid1.idx_y() + 1) * num_blocks + grid1.idx_x();
+        left_rank = grid1.idx_x() * num_blocks + grid1.idx_y() - 1;
+        right_rank = grid1.idx_x() * num_blocks + grid1.idx_y() + 1;
 
-        if (grid1.idx_x() > 0u)          
-            neighbours.push_back(neighbour_t(Direction::east, left_rank));
+        top_rank = (grid1.idx_x() - 1) * num_blocks + grid1.idx_y();
+        bottom_rank = (grid1.idx_x() + 1) * num_blocks + grid1.idx_y();
 
-        if (grid1.idx_x() < num_blocks - 1) 
-            neighbours.push_back(neighbour_t(Direction::west, right_rank));
-
-        if(grid1.idx_y() > 0u)
+        if (grid1.idx_x() > 0u)
             neighbours.push_back(neighbour_t(Direction::north, top_rank));
 
-        if(grid1.idx_y() < num_blocks - 1)
+        if (grid1.idx_x() < num_blocks - 1)
             neighbours.push_back(neighbour_t(Direction::south, bottom_rank));
+
+        if (grid1.idx_y() > 0u)
+            neighbours.push_back(neighbour_t(Direction::east, left_rank));
+
+        if (grid1.idx_y() < num_blocks - 1)
+            neighbours.push_back(neighbour_t(Direction::west, right_rank));
+
+  /*      for (const auto &neighbour : neighbours) {
+            const auto direction = std::get<0>(neighbour);
+            const auto rank = std::get<1>(neighbour);
+            std::cout << ((direction==Direction::north)?"north":(direction==Direction::east)?"east":(direction==Direction::south)?"south":"west")<< ", rank: " << rank << ", ";
+        }
+    */
     }
 
 
@@ -154,7 +165,7 @@ public:
             iteration+=2;
 
             double sum_epsilon;
-            MPI_Allreduce(&d_epsilon, &sum_epsilon, 1, MPI_DOUBLE, MPI_SUM, communicator);
+            MPI_Allreduce(&d_epsilon, &sum_epsilon, 1, MPI_DOUBLE_PRECISION, MPI_SUM, communicator);
 
             if (sum_epsilon < epsilon)
                 break;

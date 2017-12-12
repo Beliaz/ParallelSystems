@@ -52,11 +52,13 @@ int main(int argc, char **argv)
     {
         1.0, 0.5, 0, -0.5
     };
-
+    std::cout<<"start"<<std::endl;
     grid primary(my_rank, blocks, borders);
     grid secondary(my_rank, blocks, borders);
+    std::cout<<"start2"<<std::endl;
 
     const stencil s(num_procs, my_rank, primary);
+    std::cout<<"start3"<<std::endl;
 
     using clock = std::chrono::high_resolution_clock;
     const auto start = clock::now();

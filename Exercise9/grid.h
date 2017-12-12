@@ -41,7 +41,7 @@ public:
             to_x_((x_idx_ + 1) * n / blocks),
             from_y_(y_idx_ * n / blocks),
             to_y_((y_idx_ + 1) * n / blocks),
-            blocksize_(0),
+            blocksize_(to_x_-from_x_),
             data_(size)
     {
         for (auto i = 0; i < n; i++)
@@ -147,10 +147,10 @@ private:
     {
         switch (direction)
         {
-        case Direction::north:  return get(from_x_ + idx, from_y_);
-        case Direction::east:   return get(to_x_ - 1, from_y_ + idx);
-        case Direction::south:  return get(from_x_ + idx, to_y_ - 1);
-        case Direction::west:   return get(from_x_, from_y_ + idx);
+        case Direction::north:  return get(from_x_, from_y_ + idx);
+        case Direction::east:   return get(from_x_ + idx, to_y_ - 1);
+        case Direction::south:  return get(to_x_ - 1, from_y_ + idx);
+        case Direction::west:   return get(from_x_ + idx , from_y_);
 
         default: throw std::logic_error("invalid direction");
         }
@@ -163,7 +163,7 @@ private:
 
     static size_t linearize(const unsigned int row, const unsigned int column)
     {
-        return column * n + row;
+        return row * n + column;
     }
 };
 
