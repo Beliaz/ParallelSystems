@@ -108,7 +108,7 @@ public:
         std::vector<double> borders(blocksize_);
 
         for (auto i = 0u; i < blocksize_; ++i)
-            borders[i] = get_border_element(direction, i);
+            borders[i] = get_border_element(direction, i, 0);
 
         return borders;
     }
@@ -117,7 +117,7 @@ public:
                            const Direction direction)
     {
         for (auto i = 0u; i < blocksize_; ++i)
-            get_border_element(direction, i) = borders[i];
+            get_border_element(direction, i, 1) = borders[i];
     }
 
     size_t idx_x() const { return x_idx_; }
@@ -143,22 +143,22 @@ private:
 
     std::vector<double> data_;
 
-    double& get_border_element(const Direction direction, const size_t idx)
+    double& get_border_element(const Direction direction, const size_t idx, const size_t offset)
     {
         switch (direction)
         {
-        case Direction::north:  return get(from_x_, from_y_ + idx);
-        case Direction::east:   return get(from_x_ + idx, to_y_ - 1);
-        case Direction::south:  return get(to_x_ - 1, from_y_ + idx);
-        case Direction::west:   return get(from_x_ + idx , from_y_);
+        case Direction::north:  return get(from_x_ - offset, from_y_ + idx);
+        case Direction::east:   return get(from_x_ + idx, to_y_ - 1 + offset);
+        case Direction::south:  return get(to_x_ - 1 + offset, from_y_ + idx);
+        case Direction::west:   return get(from_x_ + idx , from_y_ - offset);
 
         default: throw std::logic_error("invalid direction");
         }
     }
 
-    const double& get_border_element(const Direction direction, const size_t element) const
+    const double& get_border_element(const Direction direction, const size_t element, const size_t offset) const
     {
-        return const_cast<grid&>(*this).get_border_element(direction, element);
+        return const_cast<grid&>(*this).get_border_element(direction, element, offset);
     }
 
     static size_t linearize(const unsigned int row, const unsigned int column)
