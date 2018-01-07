@@ -8,7 +8,7 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/test/)
 add_executable(mmul mmul.cpp)
 
 if(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /std:c++latest /wd4141 /arch:AVX2")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D_SCL_SECURE_NO_WARNINGS /W4 /std:c++latest /wd4141 /arch:AVX2")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ox /arch:AVX2 /DNDEBUG")
 else()
 	set(CMAKE_C_COMPILER mpicc)
