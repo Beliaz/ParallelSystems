@@ -39,14 +39,12 @@ int main(int argc, char* argv[])
     const auto c = multiply(a, b, summa_distributed{ 4, true });
         
     MPI_Finalize();
-
-    if(my_rank != 0) return EXIT_SUCCESS;
+    
+    if (my_rank != 0) return EXIT_SUCCESS;
 
     const auto diff = duration_cast<milliseconds>(clock::now() - start);
 
     std::cout << diff.count() << " ms" << std::endl;
-
-    std::cin.get();
 
     if(!(c == a))
     {
