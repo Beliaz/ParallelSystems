@@ -23,10 +23,10 @@ matrix<T> compute_outer_product(
     const typename matrix<T>::size_type row_index);
 
 template<typename T>
-void print_blocks(block_grid_t<T> blocks);
+void print_blocks(const block_grid_t<T>& blocks);
 
 template<typename T>
-void update_blocks(std::vector<std::vector<std::array<T, 3>>>& blocks, const size_t k);
+void update_blocks(block_grid_t<T>& blocks, const size_t k);
 
 template<typename T>
 void update_block(std::array<matrix<T>, 3>& block, size_t k);
@@ -53,7 +53,7 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, summa_sequential)
 
     const auto block_size = n / blocks_per_dim;
 
-    std::vector<std::vector<std::array<matrix_t, 3>>> blocks;
+    block_grid_t<T> blocks;
 
     blocks.resize(blocks_per_dim);
     for (auto& row : blocks)
@@ -216,7 +216,7 @@ matrix<T> compute_outer_product(
 }
 
 template<typename T>
-void print_blocks(std::vector<std::vector<std::array<matrix<T>, 3>>> blocks)
+void print_blocks(const block_grid_t<T>& blocks)
 {
     const auto block_size = blocks[0][0][0].n();
     const auto num_blocks = blocks.size();
@@ -288,7 +288,7 @@ void copy_col(matrix<T>& dest, const matrix<T>& src, size_t column)
 }
 
 template<typename T>
-void update_block(std::array<matrix<T>, 3>& block, size_t k)
+void update_block(block_t<T>& block, size_t k)
 {
     const auto& a = block[0];
     const auto& b = block[1];
@@ -298,7 +298,7 @@ void update_block(std::array<matrix<T>, 3>& block, size_t k)
 }
 
 template<typename T>
-void update_blocks(std::vector<std::vector<std::array<T, 3>>>& blocks, const size_t k)
+void update_blocks(block_grid_t<T>& blocks, const size_t k)
 {
     for (auto& block_row : blocks)
     {
