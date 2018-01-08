@@ -12,11 +12,8 @@ foreach(ONE_TEST_CPP ${ALL_TEST_CPP})
     set_target_properties(${TARGET_NAME} PROPERTIES OUTPUT_NAME ${ONE_TEST_EXEC}) 
 
     add_test(NAME ${TARGET_NAME}_1 COMMAND "mpirun" -n 1 ${ONE_TEST_EXEC})
-    add_test(NAME ${TARGET_NAME}_2 COMMAND "mpirun" -n 2 ${ONE_TEST_EXEC})
     add_test(NAME ${TARGET_NAME}_4 COMMAND "mpirun" -n 4 ${ONE_TEST_EXEC})
-    add_test(NAME ${TARGET_NAME}_8 COMMAND "mpirun" -n 8 ${ONE_TEST_EXEC})
     add_test(NAME ${TARGET_NAME}_16 COMMAND "mpirun" -n 16 ${ONE_TEST_EXEC})
-    add_test(NAME ${TARGET_NAME}_32 COMMAND "mpirun" -n 32 ${ONE_TEST_EXEC})
     add_test(NAME ${TARGET_NAME}_64 COMMAND "mpirun" -n 64 ${ONE_TEST_EXEC})
 
     find_package(MPI REQUIRED)
