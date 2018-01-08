@@ -68,10 +68,11 @@ int mpi(int problemSize) {
         foundIterations += placeNewQueen(array, 1, problemSize);
     }
 
-    std::cout << "I'm Processor " << processor << " and found " << foundIterations << " solutions." << std::endl;
+    int total = 0;
+    MPI_Reduce(&foundIterations, &total, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
     MPI_Finalize();
 
-    return processor;
+    return total;
 }
 
 int main(int argc, char** argv) {
@@ -95,7 +96,8 @@ int main(int argc, char** argv) {
         }
     }
 #elif defined(MPI)
-    if (mpi(problemSize) != 0)
+    foundPermutations =mpi(problemSize);
+    if (foundPermutations == 0)
         return EXIT_SUCCESS;
 #else
     auto *array = new int[problemSize];
