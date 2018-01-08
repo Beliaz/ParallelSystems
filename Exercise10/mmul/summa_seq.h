@@ -6,8 +6,9 @@
 #include <iostream>
 #include "naive_seq.h"
 #include <iomanip>
+#include <cmath>
 
-struct summa_sequential { };
+struct summa_sequential { size_t blocks = 4; bool print = false; };
 
 template<typename T>
 using block_t = std::array<matrix<T>, 3>;
@@ -37,14 +38,16 @@ void copy_col(matrix<T>& dest, const matrix<T>& src, size_t column);
 template<typename T>
 void copy_row(matrix<T>& dest, const matrix<T>& src, size_t row);
 
+inline size_t get_num_blocks_per_dim(const size_t n, const size_t num_procs);
+
 template<typename T>
-matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, summa_sequential)
+matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, const summa_sequential opt)
 {
     Expects(a.n() == b.n());
 
     const auto n = a.n();
 
-    const auto blocks_per_dim = get_num_blocks_per_dim(n, 16);
+    const auto blocks_per_dim = get_num_blocks_per_dim(n, opt.blocks);
 
     if (blocks_per_dim == 1)
     {
@@ -59,17 +62,17 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, summa_sequential)
     {
         row.resize(blocks_per_dim,
         {
-            matrix_t(block_size),
-            matrix_t(block_size),
-            matrix_t(block_size, 0)
+            matrix<T>(block_size),
+            matrix<T>(block_size),
+            matrix<T>(block_size, 0)
         });
     }
 
 	// build blocks  
 
-    for (long i = 0; i < n; ++i)
+    for (size_t i = 0; i < n; ++i)
     {
-        for (long j = 0; j < n; ++j)
+        for (size_t j = 0; j < n; ++j)
         {
             const auto block_y = i / block_size;
             const auto block_x = j / block_size;
@@ -87,7 +90,7 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, summa_sequential)
         }
     }
 
-    print_blocks(blocks);
+    if(opt.print) print_blocks(blocks);
 
 	// assign initial data distribution 
 
@@ -110,7 +113,7 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, summa_sequential)
 
 	// main loop
 
-    print_blocks(blocks);
+    if (opt.print) print_blocks(blocks);
 
     for (size_t k = 0; k < a.n(); ++k)
     {
@@ -143,27 +146,27 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, summa_sequential)
             }
         }
 
-        print_blocks(blocks);
+        if (opt.print) print_blocks(blocks);
     }
 
-    auto c = matrix_t(n);
+    auto c = matrix<T>(n);
 
-    for (size_t i = 0; i < n; i += block_size)
+    for (size_t i = 0; i < n; ++i)
     {
-        for (size_t j = 0; j < n; j += block_size)
+        for (size_t j = 0; j < n; ++j)
         {
-            const auto block_i = i / block_size;
-            const auto block_j = j / block_size;
+            const auto block_y = i / block_size;
+            const auto block_x = j / block_size;
 
-            const auto block_offset_i = block_i * block_size;
-            const auto block_offset_j = block_j * block_size;
+            auto& block = blocks[block_y][block_x];
 
-            auto& block = blocks[block_i][block_j];
+            const auto block_offset_x = block_x * block_size;
+            const auto local_x = j - block_offset_x;
 
-            const auto local_i = i - block_offset_i;
-            const auto local_j = j - block_offset_j;
+            const auto block_offset_y = block_y * block_size;
+            const auto local_y = i - block_offset_y;
 
-            c(i, j) = block[2](local_i, local_j);
+            c(i, j) = block[2](local_y, local_x);
         }
     }
 
