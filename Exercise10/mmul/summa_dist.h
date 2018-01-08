@@ -84,7 +84,7 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, const summa_distribut
                 const auto block_y = i / block_size;
                 const auto block_x = j / block_size;
 
-                auto& block = blocks[block_y][block_x];
+                auto& current_block = blocks[block_y][block_x];
 
                 const auto block_offset_x = block_x * block_size;
                 const auto local_x = j - block_offset_x;
@@ -92,8 +92,8 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, const summa_distribut
                 const auto block_offset_y = block_y * block_size;
                 const auto local_y = i - block_offset_y;
 
-                block[0](local_y, local_x) = a(i, j);
-                block[1](local_y, local_x) = b(i, j);
+                current_block[0](local_y, local_x) = a(i, j);
+                current_block[1](local_y, local_x) = b(i, j);
             }
         }
 
@@ -105,11 +105,12 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, const summa_distribut
             print_blocks(blocks);
         }
 
+   
         // assign initial data distribution 
 
-        for (auto y = 0; y < gsl::narrow<long>(blocks_per_dim); ++y)
+        for (auto y = 0l; y < gsl::narrow<long>(blocks_per_dim); ++y)
         {
-            for (auto x = 0; x < gsl::narrow<long>(blocks_per_dim); ++x)
+            for (auto x = 0l; x < gsl::narrow<long>(blocks_per_dim); ++x)
             {
                 if (y == 0 && x == 0) continue;
 
@@ -119,26 +120,28 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, const summa_distribut
                 const auto src_b_y = (-x - y) % blocks_per_dim;
                 const auto src_b_x = x % blocks_per_dim;
 
-                //blocks[y][x][0] = old_blocks[src_a_y][src_a_x][0];
-                //blocks[y][x][1] = old_blocks[src_b_y][src_b_x][1];
+                const auto& local_a = blocks[src_a_y][src_a_x][0];
+                const auto& local_b = blocks[src_b_y][src_b_x][1];
+
+                const auto dest_rank = get_processor_rank(y, x, blocks_per_dim);
 
                 MPI_Request requests[2];
 
-                MPI_Isend(blocks[src_a_y][src_a_x][0].begin(), 
-                    gsl::narrow<int>(block_size * block_size),
+                MPI_Send(local_a.begin(),
+                    gsl::narrow<int>(local_a.size()),
                     MPI_DOUBLE, 
-                    gsl::narrow<int>(get_processor_rank(y, x, blocks_per_dim)),
+                    gsl::narrow<int>(dest_rank),
                     block_a, 
-                    MPI_COMM_WORLD,
-                    &requests[0]);
+                    MPI_COMM_WORLD/*,
+                    &requests[0]*/);
 
-                MPI_Isend(blocks[src_b_y][src_b_x][1].begin(),
-                    gsl::narrow<int>(block_size * block_size),
+                MPI_Send(local_b.begin(),
+                    gsl::narrow<int>(local_b.size()),
                     MPI_DOUBLE, 
-                    gsl::narrow<int>(get_processor_rank(y, x, blocks_per_dim)),
+                    gsl::narrow<int>(dest_rank),
                     block_b, 
-                    MPI_COMM_WORLD,
-                    &requests[1]);
+                    MPI_COMM_WORLD/*,
+                    &requests[1]*/);
             }
         }
 
@@ -188,7 +191,6 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, const summa_distribut
     Ensures(neighbour_left_rank < num_blocks);
     Ensures(neighbour_top_rank < num_blocks);
     
-    
     for (size_t it = 0; it < n; ++it)
     {
         //std::cout << "(" << rank << "): iteration " << it << std::endl;
@@ -206,9 +208,9 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, const summa_distribut
             MPI_COMM_WORLD,
             &row_send_request);
 
-        std::vector<T> column(n);
+        std::vector<T> column(block_size);
 
-        for (size_t i = 0; i < block_size; ++i)
+        for (size_t i = 0; i < column.size(); ++i)
         {
             column[i] = block[0](i, k);
         }
@@ -255,7 +257,7 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, const summa_distribut
         //std::cout << "(" << rank << "): receiving col" << std::endl;
         MPI_Wait(&col_recv_request, nullptr);
 
-        for (size_t i = 0; i < block_size; ++i)
+        for (size_t i = 0; i < column.size(); ++i)
         {
             block[0](i, k) = column[i];
         }
