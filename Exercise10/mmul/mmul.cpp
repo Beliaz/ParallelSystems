@@ -5,14 +5,7 @@
 #include <iostream>
 #include <chrono>
 
-#include "matrix.h"
-#include "summa_seq.h"
-#include "matrix_factory.h"
-
-using value_t = double;
-using factory_t = matrix_factory<value_t>;
-using matrix_t = matrix<value_t>;
-using technique_t = summa_sequential;
+#include "mmul.h"
 
 int main(int argc, char* argv[])
 {
@@ -35,8 +28,6 @@ int main(int argc, char* argv[])
     
     const auto n = atol(argv[1]);
 
-    const auto factory = factory_t();
-
     const auto a = my_rank == 0
         ? factory_t::create_index_range(n)
         : matrix_t(n);
@@ -45,7 +36,7 @@ int main(int argc, char* argv[])
         ? factory_t::create_identity(n)
         : matrix_t(n);
 
-    const auto c = multiply(a, b, technique_t());
+    const auto c = multiply(a, b, summa_distributed{ 4, true });
         
     MPI_Finalize();
 
@@ -57,7 +48,10 @@ int main(int argc, char* argv[])
 
     std::cin.get();
 
-    Ensures(c == a);
+    if(!(c == a))
+    {
+        std::cout << "incorrect result" << std::endl;
+    }
     
     return EXIT_SUCCESS;
 }

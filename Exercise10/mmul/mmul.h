@@ -3,6 +3,7 @@
 
 #include "matrix.h"
 #include "summa_seq.h"
+#include "summa_dist.h"
 #include "matrix_factory.h"
 
 using value_t = double;

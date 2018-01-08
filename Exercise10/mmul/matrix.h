@@ -4,6 +4,8 @@
 #include <vector>
 #include <algorithm>
 
+#include "gsl/gsl"
+
 template<typename T>
 class matrix
 {
@@ -56,6 +58,7 @@ public:
     }
     
     size_type n() const { return row_size_; }
+    size_type size() const { return row_size_ * row_size_; }
 
     value_type* begin() { return &data_.front(); }
     value_type* end() { return &data_.back(); }
