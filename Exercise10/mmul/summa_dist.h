@@ -108,6 +108,8 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, const summa_distribut
    
         // assign initial data distribution 
 
+        std::vector<MPI_Request> requests;
+
         for (auto y = 0l; y < gsl::narrow<long>(blocks_per_dim); ++y)
         {
             for (auto x = 0l; x < gsl::narrow<long>(blocks_per_dim); ++x)
@@ -125,27 +127,31 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, const summa_distribut
 
                 const auto dest_rank = get_processor_rank(y, x, blocks_per_dim);
 
-                MPI_Request requests[2];
+                requests.push_back(MPI_Request());
 
-                MPI_Send(local_a.begin(),
+                MPI_Isend(local_a.begin(),
                     gsl::narrow<int>(local_a.size()),
                     MPI_DOUBLE, 
                     gsl::narrow<int>(dest_rank),
                     block_a, 
-                    MPI_COMM_WORLD/*,
-                    &requests[0]*/);
+                    MPI_COMM_WORLD,
+                    &requests.back());
 
-                MPI_Send(local_b.begin(),
+                requests.push_back(MPI_Request());
+
+                MPI_Isend(local_b.begin(),
                     gsl::narrow<int>(local_b.size()),
                     MPI_DOUBLE, 
                     gsl::narrow<int>(dest_rank),
                     block_b, 
-                    MPI_COMM_WORLD/*,
-                    &requests[1]*/);
+                    MPI_COMM_WORLD,
+                    &requests.back());
             }
         }
 
         block = blocks[0][0];
+
+        MPI_Waitall(requests.size(), requests.data(), nullptr);
     }
     else
     {
