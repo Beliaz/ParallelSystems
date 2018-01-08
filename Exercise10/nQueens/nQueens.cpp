@@ -1,5 +1,8 @@
 #include <iostream>
 #include <chrono>
+#include <mpi.h>
+
+#define MPI
 
 void printArray(int* array, int problemSize) {
     for (int i = 0; i < problemSize; i++) {
@@ -48,6 +51,29 @@ int placeNewQueen(int* array, int position, int problemSize) {
     return foundPermutations;
 }
 
+int mpi(int problemSize) {
+    MPI_Init(NULL, NULL);
+    int processor;
+    MPI_Comm_rank(MPI_COMM_WORLD, &processor);
+
+    //basic scheduler
+    int processorCount;
+    MPI_Comm_size(MPI_COMM_WORLD, &processorCount);
+
+    int foundIterations = 0;
+    auto *array = new int[problemSize];
+
+    for (int i = processor; i < problemSize; i+=processorCount) {
+        array[0] = i;
+        foundIterations += placeNewQueen(array, 1, problemSize);
+    }
+
+    std::cout << "I'm Processor " << processor << " and found " << foundIterations << " solutions." << std::endl;
+    MPI_Finalize();
+
+    return processor;
+}
+
 int main(int argc, char** argv) {
     //Test if problem size was specified
     if (argc != 2) {
@@ -68,6 +94,9 @@ int main(int argc, char** argv) {
             foundPermutations += placeNewQueen(array, 1, problemSize);
         }
     }
+#elif defined(MPI)
+    if (mpi(problemSize) != 0)
+        return EXIT_SUCCESS;
 #else
     auto *array = new int[problemSize];
     foundPermutations = placeNewQueen(array, 0, problemSize);
