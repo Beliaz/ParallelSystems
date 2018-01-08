@@ -53,9 +53,8 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, summa_sequential)
 
     const auto block_size = n / blocks_per_dim;
 
-    block_grid_t<T> blocks;
+    block_grid_t<T> blocks(blocks_per_dim);
 
-    blocks.resize(blocks_per_dim);
     for (auto& row : blocks)
     {
         row.resize(blocks_per_dim,
@@ -65,6 +64,8 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, summa_sequential)
             matrix_t(block_size, 0)
         });
     }
+
+	// build blocks  
 
     for (long i = 0; i < n; ++i)
     {
@@ -88,6 +89,8 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, summa_sequential)
 
     print_blocks(blocks);
 
+	// assign initial data distribution 
+
     auto old_blocks = blocks;
 
     for (auto y = gsl::narrow<long>(blocks_per_dim - 1); y >= 0; --y)
@@ -105,15 +108,21 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, summa_sequential)
         }
     }
 
+	// main loop
+
     print_blocks(blocks);
 
     for (size_t k = 0; k < a.n(); ++k)
     {
+		// update local block 
+
         update_blocks(blocks, k % block_size);
+
+		// send/receive new rows/columns
 
         old_blocks = blocks;
 
-        for (auto y = gsl::narrow<long>(blocks_per_dim - 1); y >= 0; --y)
+		for (auto y = gsl::narrow<long>(blocks_per_dim - 1); y >= 0; --y)
         {
             for (auto x = gsl::narrow<long>(blocks_per_dim - 1); x >= 0; --x)
             {
