@@ -68,6 +68,7 @@ public:
         return m;
     }
 
+
 private:
     static std::default_random_engine engine_;
     static std::uniform_real_distribution<T> distribution_;
