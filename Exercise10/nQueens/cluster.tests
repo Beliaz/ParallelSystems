@@ -4,3 +4,8 @@ MPI 2                  13.0s
 MPI 4                   6.4s
 MPI 8                   3.66s
 MPI 16                  2.07s
+OpenMP 1               24.17s
+OpenMP 2               12.08s
+OpenMP 4                7.57s
+OpenMP 8                3.84s
+Single                 24.73s
