@@ -1,8 +1,9 @@
 #include <iostream>
 #include <chrono>
+//#define MPI
+#ifdef MPI
 #include <mpi.h>
-
-#define MPI
+#endif
 
 void printArray(int* array, int problemSize) {
     for (int i = 0; i < problemSize; i++) {
@@ -51,7 +52,7 @@ int placeNewQueen(int* array, int position, int problemSize) {
     }
     return foundPermutations;
 }
-
+#ifdef MPI
 int mpi(int problemSize) {
     MPI_Init(NULL, NULL);
     int processor;
@@ -91,6 +92,7 @@ int mpi(int problemSize) {
 
     return total;
 }
+#endif
 
 int main(int argc, char** argv) {
     //Test if problem size was specified
