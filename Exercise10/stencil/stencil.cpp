@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 
     ///////////////////////////////////////////////////////////
     // Actual loop
-    const auto iterations = s.execute(primary, secondary);
+    const auto iterations = s.executev2(primary, secondary);
 
     MPI_Finalize();
 

@@ -67,20 +67,20 @@ public:
     }
 
     //Does the job and returns the delta Epsilon accumulated over all comparisons.
-    static double iteration(const grid& source, grid& target) 
+    static double iteration(const grid& source, grid& target)
     {
         auto epsilon = 0.0;
 
-        for (auto row = source.top_y(); row < source.bottom_y(); row++) 
+        for (auto row = source.top_y(); row < source.bottom_y(); row++)
         {
             if (row == 0)     continue;
             if (row == n - 1) continue;
 
-            for (auto column = source.left_x(); column < source.right_x(); column++) 
+            for (auto column = source.left_x(); column < source.right_x(); column++)
             {
                 if (column == 0)     continue;
                 if (column == n - 1) continue;
-                  
+
                 const auto current = source.get(row , column);
                 const auto new_value = source.get_five(row , column);
 
@@ -190,52 +190,135 @@ public:
     //////////////////////////////////////// NEW OPTIMIZION
 
 
-    double optimized_iteration_v2(const grid& source, grid& target) const
+    double optimized_iteration_v2(grid& source, grid& target,int pyramids) const
     {
-        auto epsilon = full_iteration(source, target);
+        //DO PYRAMID ITERATIONS SOME TIMES
+        pyramid(source,target,elements_per_block,0);
+        for(int i=0;i<pyramids;i++) {
+            if (higher(source, target)) {
+                send_data(source);
+                pyramid(source, target, 0, -elements_per_block / 2);
+            } else {
+                send_data(target);
+                pyramid(target, source, 0, -elements_per_block / 2);
+            }
+            if (higher(source, target)) {
+                receive_data(source);
+                pyramid(source,target,elements_per_block,0);
+            } else {
+                receive_data(target);
+                pyramid(source,target,elements_per_block,0);
+            }
+        }
+        //BRING ALL ELEMENTS OF GRIT TO SAME HIGHT
+        if (higher(source, target)) {
+            send_data(source);
+            pyramid(source, target, 0, -elements_per_block / 2);
+        } else {
+            send_data(target);
+            pyramid(target, source, 0, -elements_per_block / 2);
+        }
+        if (higher(source, target)) {
+            receive_data(source);
+            correct_iterations(source,target);
+        } else {
+            receive_data(target);
+            correct_iterations(source,target);
+        }
+        //CALC EPSILON
+        double epsilon=0;
+        if(higher(source,target))
+            epsilon=epsilon_iteration(source,target);
+        else
+            epsilon=epsilon_iteration(target,source);
 
-
+        //FINAL SENDRECEIVE
+        if (higher(source, target))
+            send_data(source);
+         else
+            send_data(target);
+        if (higher(source, target))
+            receive_data(source);
+        else
+            receive_data(target);
         return epsilon;
     }
 
     bool higher(const grid& g1, const grid& g2) const {
-        int middle = g1.bottom_y() - g1.top_y();
+        int middle = ( g1.bottom_y() - g1.top_y() ) / 2;
         if(g1.get(g1.top_y() + middle, g1.left_x() + middle) > g2.get(g2.top_y() + middle, g2.left_x() + middle))
             return true;
         else
             return false;
     }
 
-    double full_iteration(const grid& source, grid& target) const
-    {
-        pyramid(source,target,elements_per_block,0);
-        if(higher(source,target)) {
-            send_data(source,iterations);
-            pyramid(source,target,0,-elements_per_block/2);
-        }else {
-            send_data(target,iterations);
-            pyramid(target,source,0,-elements_per_block/2);
-        }
-        if(higher(source,target))
-            receive_data(source);
-        else
-            receive_data(target);
-
-        auto epsilon = epsilon_iteration(source,target);
-        return epsilon;
-    }
-
-    void pyramid(const grid& source, grid& target, int offset, int quit_cond) const
+    void pyramid(grid& source, grid& target, int offset, int quit_cond) const
     {
         if(offset == quit_cond)
             return;
 
         for (auto row = source.top_y() - offset; row < source.bottom_y() + offset; row++)
         {
+            if (row <= 0)     continue;
+            if (row >= n - 1) continue;
+
+            for (auto column = source.left_x() - offset; column < source.right_x() + offset; column++)
+            {
+                if (column <= 0)     continue;
+                if (column >= n - 1) continue;
+
+                const auto new_value = source.get_five(row , column);
+
+                target.set(row , column , new_value);
+                target.incr_iteration(row,column);
+            }
+        }
+
+        pyramid(target,source,offset-1,quit_cond);
+    }
+
+    void correct_iterations(grid& source, grid& target) const
+    {
+        int updates=0;
+
+        int middle = ( source.bottom_y() - source.top_y() ) / 2;
+        int max_iter = source.get_iteration(source.top_y()+middle,source.left_x()+middle);
+
+        for (auto row = source.top_y(); row < source.bottom_y(); row++)
+        {
             if (row < 0)     continue;
             if (row > n - 1) continue;
 
-            for (auto column = source.left_x() - offset; column < source.right_x() + offset; column++)
+            for (auto column = source.left_x(); column < source.right_x(); column++)
+            {
+                if (column == 0)     continue;
+                if (column > n - 1) continue;
+
+                if(source.get_iteration(row,column) == max_iter)
+                    continue;
+                updates++;
+
+                const auto new_value = source.get_five(row , column);
+
+                target.set(row , column , new_value);
+                target.incr_iteration(row,column);
+            }
+        }
+        if(updates==0)
+            return;
+        return correct_iterations(target,source);
+    }
+
+
+    double epsilon_iteration(const grid& source, grid& target) const
+    {
+        double epsilon = 0;
+        for (auto row = source.top_y(); row < source.bottom_y(); row++)
+        {
+            if (row < 0)     continue;
+            if (row > n - 1) continue;
+
+            for (auto column = source.left_x(); column < source.right_x(); column++)
             {
                 if (column == 0)     continue;
                 if (column > n - 1) continue;
@@ -245,22 +328,17 @@ public:
 
                 target.set(row , column , new_value);
                 target.incr_iteration(row,column);
+
+                epsilon += abs(current-new_value);
             }
         }
-
-        pyramid(target,source,offset-1);
-    }
-
-    double inner_iteration(const grid& source, grid& target) const
-    {
-
+        return epsilon;
     }
 
     void send_data(const grid& current_grid) const {
         const auto own_data = current_grid.own_data();
         for(const auto& neighbour : neighbours)
         {
-            const auto direction = std::get<0>(neighbour);
             const auto rank = std::get<1>(neighbour);
 
             MPI_Send(own_data.data(), own_data.size(), MPI_DOUBLE,
@@ -268,7 +346,7 @@ public:
         }
     }
 
-    void receive_data(const grid& current_grid) const {
+    void receive_data(grid& current_grid) const {
         auto receive_buffer = std::vector<double>(current_grid.extent_x()*current_grid.extent_y());
         for (const auto& neighbour : neighbours)
         {
@@ -303,10 +381,12 @@ public:
         {
             const auto direction = std::get<0>(neighbour);
             const auto rank = std::get<1>(neighbour);
-
+            if(direction == direction_t::northwest || direction == direction_t::northeast
+               || direction == direction_t::southwest || direction == direction_t::southeast)
+                continue;
             const auto border = current_grid.get_block_borders(direction);
 
-            MPI_Send(border.data(), border.size(), MPI_DOUBLE, 
+            MPI_Send(border.data(), border.size(), MPI_DOUBLE,
                 rank, my_rank, communicator);
         }
     }
@@ -321,7 +401,9 @@ public:
         {
             const auto direction = std::get<0>(neighbour);
             const auto rank = std::get<1>(neighbour);
-
+            if(direction == direction_t::northwest || direction == direction_t::northeast
+               || direction == direction_t::southwest || direction == direction_t::southeast)
+                return;
             MPI_Recv(receive_buffer.data(), receive_buffer.size(), MPI_DOUBLE, rank,
                      rank, communicator, MPI_STATUS_IGNORE);
 
@@ -345,13 +427,13 @@ public:
         {
             for(unsigned int i = 0; i < mini_batch_size; i++)
             {
-                iteration(grid1, grid2);
-                iteration(grid2, grid1);
+                optimized_iteration(grid1, grid2);
+                optimized_iteration(grid2, grid1);
             }
 
-            iteration(grid1, grid2);
+            optimized_iteration(grid1, grid2);
 
-            const auto actual_epsilon = iteration(grid2, grid1);
+            const auto actual_epsilon = optimized_iteration(grid2, grid1);
 
             iterations += 2 + mini_batch_size * 2;;
 
@@ -365,6 +447,26 @@ public:
         }
 
         return iterations;
+    }
+
+    int executev2(grid &grid1, grid &grid2) const
+    {
+        unsigned int mini_batch_size = 100 / epsilon;
+
+        while (true)
+        {
+            const auto actual_epsilon=optimized_iteration_v2(grid1,grid2,mini_batch_size);
+
+            double sum_epsilon;
+            MPI_Allreduce(&actual_epsilon, &sum_epsilon, 1, MPI_DOUBLE, MPI_SUM, communicator);
+
+            if (sum_epsilon < epsilon)
+                break;
+
+            mini_batch_size = sum_epsilon / epsilon * 10;
+        }
+        int middle = ( grid1.bottom_y() - grid1.top_y() ) / 2;
+        return grid1.get_iteration(grid1.top_y()+middle,grid1.left_x()+middle);
     }
 };
 

@@ -115,7 +115,7 @@ int main(int argc, char** argv) {
         }
     }
 #elif defined(MPI)
-    foundPermutations =mpi(problemSize);
+    foundPermutations = mpi(problemSize);
     if (foundPermutations == 0)
         return EXIT_SUCCESS;
 #else
