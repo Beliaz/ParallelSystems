@@ -1,7 +1,6 @@
 #include "stdlib.h"
 #include <mpi.h>
 #include "gsl/gsl"
-#include <random>
 #include <iostream>
 #include <chrono>
 

@@ -1,9 +1,7 @@
 #ifndef SUMMA_DIST_H
 #define SUMMA_DIST_H
 
-#ifndef _MSVC_LANG
 #include <mpi.h>
-#endif
 
 #include "matrix.h"
 #include "gsl/gsl"
@@ -151,7 +149,7 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, const summa_distribut
 
         block = blocks[0][0];
 
-        MPI_Waitall(requests.size(), requests.data(), nullptr);
+        MPI_Waitall(gsl::narrow<int>(requests.size()), requests.data(), nullptr);
     }
     else
     {

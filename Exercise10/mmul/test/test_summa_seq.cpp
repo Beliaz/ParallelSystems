@@ -1,11 +1,5 @@
 #include "mmul.h"
-#include <chrono>
-
-#ifdef _MSVC_LANG
-#include "../../../../../../Program Files (x86)/IntelSWTools/compilers_and_libraries_2018.1.156/windows/mpi/intel64/include/mpi.h"
-#else
 #include <mpi.h>
-#endif
 
 int main(int argc, char* argv[])
 {
