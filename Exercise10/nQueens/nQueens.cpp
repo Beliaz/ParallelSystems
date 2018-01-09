@@ -1,9 +1,7 @@
 #include <iostream>
 #include <chrono>
-//#define MPI
-#ifdef MPI
 #include <mpi.h>
-#endif
+#define MPI
 
 void printArray(int* array, int problemSize) {
     for (int i = 0; i < problemSize; i++) {
