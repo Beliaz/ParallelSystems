@@ -13,11 +13,11 @@
 
 #if defined(N768)
 constexpr auto n = 768;
-constexpr auto epsilon = 100.0;
 #else
 constexpr auto n = 512;
-constexpr auto epsilon = 10.0;
 #endif
+
+constexpr auto epsilon = 1.0;
 
 constexpr auto size = n * n;
 
