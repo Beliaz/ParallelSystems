@@ -46,7 +46,6 @@ int placeNewQueen(int* array, int position, int problemSize) {
         }
         else {
             foundPermutations++;
-            printArray(array, problemSize);
         }
     }
     return foundPermutations;
@@ -57,7 +56,7 @@ int mpi(int problemSize) {
     int processor;
     MPI_Comm_rank(MPI_COMM_WORLD, &processor);
 
-    //basic scheduler
+    //prepare scheduler
     int processorCount;
     MPI_Comm_size(MPI_COMM_WORLD, &processorCount);
 
@@ -66,14 +65,14 @@ int mpi(int problemSize) {
 
     int offsetStart = problemSize - problemSize % processorCount;
 
-    std::cout << offsetStart << std::endl;
+    //start scheduler
     for (int i = processor; i < offsetStart; i+=processorCount) {
         array[0] = i;
         foundIterations += placeNewQueen(array, 1, problemSize);
     }
 
-    //todo optimize for big processor count and small n
-    //second layer, if necessary
+    //second layer, if necessary.
+    //This layer additionally allows a better utilization if the processor count is bigger than the problem size
     for (int i = offsetStart; i < problemSize; i++) {
         for (int j = processor; j < problemSize; j+=processorCount) {
             array[0] = i;
