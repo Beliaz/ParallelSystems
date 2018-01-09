@@ -11,7 +11,8 @@ void printArray(int* array, int problemSize) {
     std::cout << std::endl;
 }
 
-//Tests if a newly placed queen can be part of a solution. This method is described by the backtracking algorithm.
+//Tests if a new queen can be set at the given Position. If so, it gets placed there and returns true, otherwise
+// false gets returned. This method is described by the backtracking algorithm.
 bool validateNewQueen(int* array, int position, int newQueen) {
     for (int i = 0; i < position; i++) {
         int distance = position - i;
