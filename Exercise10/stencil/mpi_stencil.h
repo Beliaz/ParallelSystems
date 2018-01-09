@@ -89,6 +89,7 @@ public:
                 epsilon += std::abs(new_value - current);
             }
         }
+        send_recv_border(target);
 
         return epsilon;
     }
@@ -427,14 +428,21 @@ public:
         {
             for(unsigned int i = 0; i < mini_batch_size; i++)
             {
+#if defined(OPT)
                 optimized_iteration(grid1, grid2);
                 optimized_iteration(grid2, grid1);
+#else
+                iteration(grid1,grid2);
+                iteration(grid2,grid1);
+#endif
             }
-
+#if defined(OPT)
             optimized_iteration(grid1, grid2);
-
             const auto actual_epsilon = optimized_iteration(grid2, grid1);
-
+#else
+            iteration(grid1,grid2);
+            const auto actual_epsilon = iteration(grid2,grid1);
+#endif
             iterations += 2 + mini_batch_size * 2;;
 
             double sum_epsilon;
