@@ -46,6 +46,7 @@ int placeNewQueen(int* array, int position, int problemSize) {
         }
         else {
             foundPermutations++;
+            printArray(array, problemSize);
         }
     }
     return foundPermutations;
@@ -63,9 +64,25 @@ int mpi(int problemSize) {
     int foundIterations = 0;
     auto *array = new int[problemSize];
 
-    for (int i = processor; i < problemSize; i+=processorCount) {
+    int offsetStart = problemSize - problemSize % processorCount;
+
+    std::cout << offsetStart << std::endl;
+    for (int i = processor; i < offsetStart; i+=processorCount) {
         array[0] = i;
         foundIterations += placeNewQueen(array, 1, problemSize);
+    }
+
+    //todo optimize for big processor count and small n
+    //second layer, if necessary
+    for (int i = offsetStart; i < problemSize; i++) {
+        for (int j = processor; j < problemSize; j+=processorCount) {
+            array[0] = i;
+            array[1] = j;
+            if (!validateNewQueen(array, 1, j))
+                continue;
+
+            foundIterations += placeNewQueen(array, 2, problemSize);
+        }
     }
 
     int total = 0;
