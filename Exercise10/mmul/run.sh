@@ -29,7 +29,9 @@
 module load gcc/5.1.0
 module load openmpi/2.1.1
 
-mpirun -np $NSLOTS ./stencil
+echo $NSLOTS
+
+mpirun -np $NSLOTS ./mmul 2048
 
 module unload openmpi/2.1.1
 module unload gcc/5.1.0

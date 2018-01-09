@@ -6,6 +6,7 @@
 
 #include "mmul.h"
 
+
 int main(int argc, char* argv[])
 {
     using namespace std::chrono;
@@ -28,14 +29,14 @@ int main(int argc, char* argv[])
     const auto n = atol(argv[1]);
 
     const auto a = my_rank == 0
-        ? factory_t::create_index_range(n)
+        ? matrix_t(n, 1)
         : matrix_t(n);
 
     const auto b = my_rank == 0
         ? factory_t::create_identity(n)
         : matrix_t(n);
 
-    const auto c = multiply(a, b, summa_distributed{ 4, true });
+    const auto c = multiply(a, b, summa_distributed_2{ 4, true });
         
     MPI_Finalize();
     
@@ -45,10 +46,12 @@ int main(int argc, char* argv[])
 
     std::cout << diff.count() << " ms" << std::endl;
 
-    if(!(c == a))
+    if(!(c == multiply(a, b, naive_parallel())))
     {
         std::cout << "incorrect result" << std::endl;
     }
+
+    std::cin.get();
     
     return EXIT_SUCCESS;
 }

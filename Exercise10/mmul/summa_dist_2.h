@@ -1,33 +1,19 @@
-#ifndef SUMMA_DIST_H
-#define SUMMA_DIST_H
+#ifndef SUMMA_DIST_2_H
+#define SUMMA_DIST_2_H
 
-#include <mpi.h>
 
 #include "matrix.h"
 #include "gsl/gsl"
 #include "naive_seq.h"
 #include "summa_seq.h"
+#include "summa_dist.h"
 #include <thread>
-#include <iterator>
+#include "naive_par.h"
 
-enum tags
-{
-    block_a,
-    block_b,
-    column_a = 1024,
-    row_b = 1024*1024,
-    block_c
-};
-
-struct summa_distributed { size_t blocks = 4; bool print = false; };
-
-inline size_t get_processor_rank(const size_t y, const size_t x, const size_t procs_per_dim)
-{
-    return y * procs_per_dim + x;
-}
+struct summa_distributed_2 { size_t blocks = 4; bool print = false; };
 
 template<typename T>
-matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, const summa_distributed opt)
+matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, const summa_distributed_2 opt)
 {
     Expects(a.n() == b.n());
 
@@ -47,7 +33,7 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, const summa_distribut
 
     if (blocks_per_dim == 1)
     {
-        return multiply(a, b, naive_sequential());
+        return multiply(a, b, naive_parallel());
     }
 
     const auto block_size = n / blocks_per_dim;
@@ -168,15 +154,18 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, const summa_distribut
             &requests[1]);
 
         MPI_Waitall(2, requests, nullptr);
+        
+        //Ensures(!(block[0] == matrix<T>(n, 0)));
+        //Ensures(!(block[1] == matrix<T>(n, 0)));
     }
       
+    const auto proc_y = gsl::narrow<long>(rank / blocks_per_dim);
+    const auto proc_x = gsl::narrow<long>(rank % blocks_per_dim);
+
     constexpr auto mod = [](const auto a, const auto b)
     {
         return (b + (a % b)) % b;
     };
-
-    const auto proc_y = gsl::narrow<long>(rank / blocks_per_dim);
-    const auto proc_x = gsl::narrow<long>(rank % blocks_per_dim);
 
     const auto neighbour_bottom_rank =
         get_processor_rank(mod(proc_y + 1, blocks_per_dim), proc_x, blocks_per_dim);
@@ -190,94 +179,58 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, const summa_distribut
     const auto neighbour_top_rank =
         get_processor_rank(mod(proc_y - 1, blocks_per_dim), proc_x, blocks_per_dim);
 
-    Ensures(neighbour_right_rank < num_blocks);
-    Ensures(neighbour_bottom_rank < num_blocks);
-    Ensures(neighbour_left_rank < num_blocks);
-    Ensures(neighbour_top_rank < num_blocks);
+    Ensures(neighbour_right_rank < num_blocks && neighbour_right_rank != rank);
+    Ensures(neighbour_bottom_rank < num_blocks && neighbour_right_rank != rank);
+    Ensures(neighbour_left_rank < num_blocks && neighbour_right_rank != rank);
+    Ensures(neighbour_top_rank < num_blocks && neighbour_right_rank != rank);
     
-    for (size_t it = 0; it < n; ++it)
+    for(size_t it = 0; it < blocks_per_dim; it++)
     {
-        //std::cout << "(" << rank << "): iteration " << it << std::endl;
+        std::vector<MPI_Request> requests;
 
-        // current row/column
-        const auto k = it % block_size;
-
-        // send row/column ===================================================
-        MPI_Request row_send_request;
-        MPI_Isend(&block[1](k, 0),
-            gsl::narrow<int>(block_size),
+        requests.push_back(MPI_Request());
+        MPI_Isend(block[1].begin(),
+            gsl::narrow<int>(block[1].size()),
             MPI_DOUBLE,
             gsl::narrow<int>(neighbour_bottom_rank),
-            row_b,
+            block_b,
             MPI_COMM_WORLD,
-            &row_send_request);
+            &requests.back());
 
-        std::vector<T> column(block_size);
-
-        for (size_t i = 0; i < column.size(); ++i)
-        {
-            column[i] = block[0](i, k);
-        }
-
-        MPI_Request col_send_request;
-        MPI_Isend(column.data(),
-            gsl::narrow<int>(block_size),
+        requests.push_back(MPI_Request());
+        MPI_Isend(block[0].begin(),
+            gsl::narrow<int>(block[0].size()),
             MPI_DOUBLE,
             gsl::narrow<int>(neighbour_right_rank),
-            column_a,
+            block_a,
             MPI_COMM_WORLD,
-            &col_send_request);
+            &requests.back());
 
-      
-        // ===================================================================
+        block[2] += multiply(block[1], block[0], naive_parallel());
 
-        //std::cout << "(" << rank << "): updating block" << std::endl;
-
-        update_block(block, k);
-
-        // recv row/column ===================================================
-        
-        MPI_Request row_recv_request;
-        MPI_Irecv(&block[1](k, 0), 
-            gsl::narrow<int>(block_size),
+        requests.push_back(MPI_Request());
+        MPI_Irecv(block[1].begin(),
+            gsl::narrow<int>(block[1].size()),
             MPI_DOUBLE,
             gsl::narrow<int>(neighbour_top_rank),
-            row_b, 
-            MPI_COMM_WORLD, 
-            &row_recv_request);
+            block_b,
+            MPI_COMM_WORLD,
+            &requests.back());
 
-        MPI_Request col_recv_request;
-        MPI_Irecv(column.data(), 
-            gsl::narrow<int>(block_size),
+        requests.push_back(MPI_Request());
+        MPI_Irecv(block[0].begin(),
+            gsl::narrow<int>(block[0].size()),
             MPI_DOUBLE,
             gsl::narrow<int>(neighbour_left_rank),
-            column_a, 
-            MPI_COMM_WORLD, 
-            &col_recv_request);
- 
-        //std::cout << "(" << rank << "): receiving row" << std::endl;
-        MPI_Wait(&row_recv_request, nullptr);
+            block_a,
+            MPI_COMM_WORLD,
+            &requests.back());
 
-        //std::cout << "(" << rank << "): receiving col" << std::endl;
-        MPI_Wait(&col_recv_request, nullptr);
-
-        for (size_t i = 0; i < column.size(); ++i)
-        {
-            block[0](i, k) = column[i];
-        }
-
-        // ===================================================================
-          
-        // wait for send to complete
-        //std::cout << "(" << rank << "): wait for row sending to complete" << std::endl;
-        MPI_Wait(&row_send_request, nullptr);
-
-        //std::cout << "(" << rank << "): wait for col sending to complete" << std::endl;
-        MPI_Wait(&col_send_request, nullptr);
+        MPI_Waitall(gsl::narrow<int>(requests.size()), requests.data(), nullptr);
+        
+        //Ensures(!(block[0] == matrix<T>(n, 0)));
+        //Ensures(!(block[1] == matrix<T>(n, 0)));
     }
- 
-
-    MPI_Barrier(MPI_COMM_WORLD);
 
     // send result ======================================================
 
@@ -290,7 +243,26 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, const summa_distribut
             block_c,
             MPI_COMM_WORLD);
 
-        //std::this_thread::sleep_for(std::chrono::milliseconds(rank * 300));
+        std::this_thread::sleep_for(std::chrono::milliseconds(rank * 300));
+
+        std::cout << std::endl;
+        std::cout << std::endl;
+        std::cout << "(" << proc_x << ", " << proc_y << ")" << std::endl;
+
+        for(const auto& m : block)
+        {
+            for (size_t i = 0; i < block_size; ++i)
+            {
+                for (size_t j = 0; j < block_size; ++j)
+                {
+                    std::cout << std::setfill(' ') << std::setw(2) << m(i, j) << " ";
+                }
+
+                std::cout << std::endl;
+            }
+
+            std::cout << std::endl;
+        }
 
         return b;
     }
@@ -299,29 +271,35 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, const summa_distribut
 
     //std::cout << "gathering final result" << std::endl;
 
-    //std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-
     auto c = matrix<T>(n);
 
     for (auto y = 0; y < gsl::narrow<long>(blocks_per_dim); ++y)
     {
         for (auto x = 0; x < gsl::narrow<long>(blocks_per_dim); ++x)
         {     
-            matrix<T> temp(block_size);
+            matrix<T> temp(block_size, 0);
 
             if(x == 0 && y == 0)
             {
                 temp = block[2];
+
+                if (temp == matrix<T>(block_size, 2))
+                    std::cout << "(" << x << ", " << y << "): incorrect block" << std::endl;
             }
             else
             {
                 MPI_Recv(temp.begin(),
-                    gsl::narrow<int>(block_size * block_size),
+                    gsl::narrow<int>(temp.size()),
                     MPI_DOUBLE,
                     gsl::narrow<int>(get_processor_rank(y, x, blocks_per_dim)),
                     block_c,
                     MPI_COMM_WORLD,
                     nullptr);
+            }
+
+            if(temp == matrix<T>(block_size, 0))
+            {
+                std::cout << "(" << x << ", " << y << "): incorrect block" << std::endl;
             }
 
             for (size_t i = 0; i < block_size; ++i)
@@ -334,7 +312,7 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, const summa_distribut
         }
     }
 
-    if (!opt.print || n > 8) return c;
+    if (!opt.print || block_size > 32) return c;
 
     // print result =====================================================
 
@@ -357,4 +335,4 @@ matrix<T> multiply(const matrix<T>& a, const matrix<T>& b, const summa_distribut
     return c;
 }
 
-#endif // SUMMA_DIST_H
+#endif // SUMMA_DIST_2_H
