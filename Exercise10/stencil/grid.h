@@ -28,7 +28,11 @@ enum class direction_t
     north,
     east,
     south,
-    west
+    west,
+    northeast,
+    northwest,
+    southeast,
+    southwest
 };
 
 class grid
@@ -46,8 +50,14 @@ public:
             from_y_(y_idx_ * blocksize_),
             to_y_((y_idx_ + 1) * blocksize_),
     
-            data_(size)
+            data_(size),
+            iteration_high(size)
     {
+        for (auto i = 0; i < n ; i++)
+            for (auto j = 0; j < n ; j++)
+                iteration_high[linearize(i,j)]=0;
+
+
         for (auto i = 0; i < n; i++)
         {
             set(0, i, borders[0]);
@@ -94,6 +104,18 @@ public:
         get(row, column) = value;
     }
 
+    void incr_iteration(const unsigned int row, const unsigned int column)
+    {
+        iteration_high[linearize(row,column)]++;
+    }
+    void set_iteration(const unsigned int row, const unsigned int column, const int value)
+    {
+        iteration_high[linearize(row,column)] = value;
+    }
+    void get_iteration(const unsigned int row, const unsigned int column)
+    {
+        return iteration_high[linearize(row,column)];
+    }
     void print() 
     {
         for (long i = 0; i < n; i++) 
@@ -109,6 +131,10 @@ public:
 
     std::vector<double> get_block_borders(const direction_t direction) const
     {
+        if(direction == direction_t::northwest || direction == direction_t::northeast
+           || direction == direction_t::southwest || direction == direction_t::southeast)
+            return;
+
         std::vector<double> borders(blocksize_);
 
         for (auto i = 0u; i < blocksize_; ++i)
@@ -120,8 +146,78 @@ public:
     void set_block_borders(const gsl::span<const double> borders,
                            const direction_t direction)
     {
+        if(direction == direction_t::northwest || direction == direction_t::northeast
+                || direction == direction_t::southwest || direction == direction_t::southeast)
+            return;
         for (auto i = 0u; i < blocksize_; ++i)
             get_outer_border_element(direction, i) = borders[i];
+    }
+
+    std::vector<double> own_data()
+    {
+        std::vector<double> retval(blocksize_*blocksize_);
+        for (int row = top_y(); row < bottom_y(); ++row) {
+            for (int column = left_x(); column < right_x(); ++column) {
+                retval[linearize(row,column)] = get(row,column);
+            }
+        }
+        return retval;
+    }
+
+    void set_other_data(const std::vector<double> other_data,
+                        const direction_t direction){
+        int min_row = top_y();
+        int max_row = bottom_y();
+        int min_column = left_x();
+        int max_column = right_x();
+        switch (direction){
+            case direction_t ::north:
+                min_row = top_y() - blocksize_;
+                max_row = top_y();
+                break;
+            case direction_t ::east:
+                min_column = right_x();
+                max_column = right_x() + blocksize_;
+                break;
+            case direction_t ::south:
+                min_row = bottom_y();
+                max_row = bottom_y() + blocksize_;
+                break;
+            case direction_t ::west:
+                min_column = left_x() - blocksize_;
+                max_column = left_x();
+                break;
+            case direction_t ::northeast:
+                min_row = top_y() - blocksize_;
+                max_row = top_y();
+                min_column = right_x();
+                max_column = right_x() + blocksize_;
+                break;
+            case direction_t ::northwest:
+                min_column = left_x() - blocksize_;
+                max_column = left_x();
+                min_row = top_y() - blocksize_;
+                max_row = top_y();
+                break;
+            case direction_t ::southeast:
+                min_row = bottom_y();
+                max_row = bottom_y() + blocksize_;
+                min_column = right_x();
+                max_column = right_x() + blocksize_;
+                break;
+            case direction_t ::southwest:
+                min_row = bottom_y();
+                max_row = bottom_y() + blocksize_;
+                min_column = left_x() - blocksize_;
+                max_column = left_x();
+                break;
+        }
+        int counter=0;
+        for (int row = min_row; row < max_row; ++row) {
+            for (int column = min_column; column < max_column; ++column) {
+                data_[linearize(row,column)] = other_data[counter++];
+            }
+        }
     }
 
     size_t idx_y() const { return y_idx_; }
@@ -146,6 +242,7 @@ private:
     const size_t to_y_;
 
     std::vector<double> data_;
+    std::vector<int> iteration_high;
 
     double& get_border_element(const direction_t direction, const size_t idx, const size_t offset)
     {
