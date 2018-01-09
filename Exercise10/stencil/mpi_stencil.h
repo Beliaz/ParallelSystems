@@ -238,21 +238,21 @@ public:
 
     int execute(grid &grid1, grid &grid2) const
     {
-        constexpr auto mini_batch_size = 50;
+        unsigned int mini_batch_size = 1000 / epsilon;
 
         auto iterations = 0;
 
         while (true)
         {
-            for(auto i = 0; i < mini_batch_size; i++)
+            for(unsigned int i = 0; i < mini_batch_size; i++)
             {
-                optimized_iteration(grid1, grid2);
-                optimized_iteration(grid2, grid1);
+                iteration(grid1, grid2);
+                iteration(grid2, grid1);
             }
-            
-            optimized_iteration(grid1, grid2);
 
-            const auto actual_epsilon = optimized_iteration(grid2, grid1);
+            iteration(grid1, grid2);
+
+            const auto actual_epsilon = iteration(grid2, grid1);
 
             iterations += 2 + mini_batch_size * 2;;
 
@@ -261,6 +261,8 @@ public:
 
             if (sum_epsilon < epsilon)
                 break;
+
+            mini_batch_size = sum_epsilon / epsilon * 10;
         }
 
         return iterations;
