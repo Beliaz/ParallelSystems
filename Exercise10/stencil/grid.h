@@ -108,14 +108,17 @@ public:
     {
         iteration_high[linearize(row,column)]++;
     }
+
     void set_iteration(const unsigned int row, const unsigned int column, const int value)
     {
         iteration_high[linearize(row,column)] = value;
     }
-    void get_iteration(const unsigned int row, const unsigned int column)
+
+    int get_iteration(const unsigned int row, const unsigned int column)
     {
         return iteration_high[linearize(row,column)];
     }
+
     void print() 
     {
         for (long i = 0; i < n; i++) 
@@ -131,9 +134,6 @@ public:
 
     std::vector<double> get_block_borders(const direction_t direction) const
     {
-        if(direction == direction_t::northwest || direction == direction_t::northeast
-           || direction == direction_t::southwest || direction == direction_t::southeast)
-            return;
 
         std::vector<double> borders(blocksize_);
 
@@ -146,18 +146,15 @@ public:
     void set_block_borders(const gsl::span<const double> borders,
                            const direction_t direction)
     {
-        if(direction == direction_t::northwest || direction == direction_t::northeast
-                || direction == direction_t::southwest || direction == direction_t::southeast)
-            return;
         for (auto i = 0u; i < blocksize_; ++i)
             get_outer_border_element(direction, i) = borders[i];
     }
 
-    std::vector<double> own_data()
+    std::vector<double> own_data() const
     {
         std::vector<double> retval(blocksize_*blocksize_);
-        for (int row = top_y(); row < bottom_y(); ++row) {
-            for (int column = left_x(); column < right_x(); ++column) {
+        for (auto row = top_y(); row < bottom_y(); ++row) {
+            for (auto column = left_x(); column < right_x(); ++column) {
                 retval[linearize(row,column)] = get(row,column);
             }
         }
