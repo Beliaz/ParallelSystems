@@ -1,7 +1,7 @@
 #include "wtime.h"
 #include <time.h>
 #ifndef DOS
-#include <sys/time.h>
+#include "gettimeofday.h"
 #endif
 
 void wtime(double *t)

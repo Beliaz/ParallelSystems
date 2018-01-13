@@ -39,9 +39,9 @@ static void zero3(void *oz, int n1, int n2, int n3);
 // are always passed as subroutine args.
 //-------------------------------------------------------------------------c
 /* commcon /noautom/ */
-static double u[NR];
-static double v[NR];
-static double r[NR];
+__declspec(align(64)) static double u[NR];
+__declspec(align(64)) static double v[NR];
+__declspec(align(64)) static double r[NR];
 
 /* common /grid/ */
 static int is1, is2, is3, ie1, ie2, ie3;
@@ -49,9 +49,10 @@ static int is1, is2, is3, ie1, ie2, ie3;
 /* common /rans_save/ starts */
 double starts[NM];
 
-
 int main()
 {
+    init_rnd();
+
   //-------------------------------------------------------------------------c
   // k is the current level. It is passed down through subroutine args
   // and is NOT global. it is the current iteration
@@ -320,6 +321,8 @@ int main()
     }
   }
 
+  free_rnd();
+
   return 0;
 }
 
@@ -452,11 +455,14 @@ static void psinv(void *or, void *ou, int n1, int n2, int n3,
 
   int i3, i2, i1;
 
-  double r1[M], r2[M];
+  __declspec(align(64)) double r1[M];
+  __declspec(align(64)) double r2[M];
 
   if (timeron) timer_start(T_psinv);
   for (i3 = 1; i3 < n3-1; i3++) {
     for (i2 = 1; i2 < n2-1; i2++) {
+
+      #pragma nounroll
       for (i1 = 0; i1 < n1; i1++) {
         r1[i1] = r[i3][i2-1][i1] + r[i3][i2+1][i1]
                + r[i3-1][i2][i1] + r[i3+1][i2][i1];
@@ -506,7 +512,7 @@ static void psinv(void *or, void *ou, int n1, int n2, int n3,
 // Note that this vectorizes, and is also fine for cache
 // based machines.
 //---------------------------------------------------------------------
-static void resid(void *ou, void *ov, void *or, int n1, int n2, int n3,
+static void resid(void *restrict ou, void *restrict ov, void *restrict or, int n1, int n2, int n3,
                   double a[4], int k)
 {
   double (*u)[n2][n1] = (double (*)[n2][n1])ou;
@@ -514,17 +520,22 @@ static void resid(void *ou, void *ov, void *or, int n1, int n2, int n3,
   double (*r)[n2][n1] = (double (*)[n2][n1])or;
 
   int i3, i2, i1;
-  double u1[M], u2[M];
+  __declspec(align(64)) double u1[M];
+  __declspec(align(64)) double u2[M];
 
   if (timeron) timer_start(T_resid);
   for (i3 = 1; i3 < n3-1; i3++) {
     for (i2 = 1; i2 < n2-1; i2++) {
+
+      #pragma nounroll
       for (i1 = 0; i1 < n1; i1++) {
         u1[i1] = u[i3][i2-1][i1] + u[i3][i2+1][i1]
                + u[i3-1][i2][i1] + u[i3+1][i2][i1];
         u2[i1] = u[i3-1][i2-1][i1] + u[i3-1][i2+1][i1]
                + u[i3+1][i2-1][i1] + u[i3+1][i2+1][i1];
       }
+
+      #pragma nounroll
       for (i1 = 1; i1 < n1-1; i1++) {
         r[i3][i2][i1] = v[i3][i2][i1]
                       - a[0] * u[i3][i2][i1]
@@ -565,8 +576,8 @@ static void resid(void *ou, void *ov, void *or, int n1, int n2, int n3,
 // Note that this vectorizes, and is also fine for cache
 // based machines.
 //---------------------------------------------------------------------
-static void rprj3(void *or, int m1k, int m2k, int m3k,
-                  void *os, int m1j, int m2j, int m3j, int k)
+static void rprj3(void* restrict or, int m1k, int m2k, int m3k,
+                  void* restrict os, int m1j, int m2j, int m3j, int k)
 {
   double (*r)[m2k][m1k] = (double (*)[m2k][m1k])or;
   double (*s)[m2j][m1j] = (double (*)[m2j][m1j])os;
@@ -599,6 +610,7 @@ static void rprj3(void *or, int m1k, int m2k, int m3k,
     for (j2 = 1; j2 < m2j-1; j2++) {
       i2 = 2*j2-d2;
 
+      #pragma nounroll
       for (j1 = 1; j1 < m1j; j1++) {
         i1 = 2*j1-d1;
         x1[i1] = r[i3+1][i2  ][i1] + r[i3+1][i2+2][i1]
@@ -670,24 +682,31 @@ static void interp(void *oz, int mm1, int mm2, int mm3,
           z3[i1] = z[i3+1][i2+1][i1] + z[i3+1][i2][i1] + z1[i1];
         }
 
+        #pragma simd vecremainder
         for (i1 = 0; i1 < mm1-1; i1++) {
           u[2*i3][2*i2][2*i1] = u[2*i3][2*i2][2*i1]
                               + z[i3][i2][i1];
           u[2*i3][2*i2][2*i1+1] = u[2*i3][2*i2][2*i1+1]
                                 + 0.5 * (z[i3][i2][i1+1] + z[i3][i2][i1]);
         }
+
+        #pragma simd vecremainder
         for (i1 = 0; i1 < mm1-1; i1++) {
           u[2*i3][2*i2+1][2*i1] = u[2*i3][2*i2+1][2*i1]
                                 + 0.5 * z1[i1];
           u[2*i3][2*i2+1][2*i1+1] = u[2*i3][2*i2+1][2*i1+1]
                                   + 0.25 * (z1[i1] + z1[i1+1]);
         }
+
+        #pragma simd vecremainder
         for (i1 = 0; i1 < mm1-1; i1++) {
           u[2*i3+1][2*i2][2*i1] = u[2*i3+1][2*i2][2*i1]
                                   + 0.5 * z2[i1];
           u[2*i3+1][2*i2][2*i1+1] = u[2*i3+1][2*i2][2*i1+1]
                                   + 0.25 * (z2[i1] + z2[i1+1]);
         }
+
+        #pragma simd vecremainder
         for (i1 = 0; i1 < mm1-1; i1++) {
           u[2*i3+1][2*i2+1][2*i1] = u[2*i3+1][2*i2+1][2*i1]
                                   + 0.25 * z3[i1];
@@ -938,6 +957,7 @@ static void zran3(void *oz, int n1, int n2, int n3, int nx1, int ny1, int k)
   //---------------------------------------------------------------------
   // fill array
   //---------------------------------------------------------------------
+  #pragma omp parallel for
   for (i3 = 1; i3 < e3; i3++) {
     x1 = starts[i3];
     for (i2 = 1; i2 < e2; i2++) {

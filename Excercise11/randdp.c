@@ -1,5 +1,46 @@
 #include <stdio.h>
 #include <math.h>
+#include <mkl_vsl.h>
+
+//#define INTEL_RNG
+#ifdef INTEL_RNG
+
+VSLStreamStatePtr stream;
+
+
+void init_rnd()
+{
+    vslNewStream(&stream, VSL_BRNG_MCG59, 777);
+}
+
+void free_rnd()
+{
+    vslDeleteStream(&stream);
+}
+
+double randlc(double* _, double __)
+{
+    double r;
+    vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD_ACCURATE, stream, 1, &r, 0.0, 1.0);
+    return r;
+}
+
+void vranlc(int n, double* _, double __, double y[])
+{
+    vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD_ACCURATE, stream, n, y, 0.0, 1.0);
+}
+
+#else
+
+void init_rnd()
+{
+
+}
+
+void free_rnd()
+{
+
+}
 
 double randlc( double *x, double a )
 {
@@ -66,7 +107,6 @@ double randlc( double *x, double a )
 
   return r;
 }
-
 
 void vranlc( int n, double *x, double a, double y[] )
 {
@@ -140,5 +180,5 @@ void vranlc( int n, double *x, double a, double y[] )
   return;
 }
 
-
+#endif
 
