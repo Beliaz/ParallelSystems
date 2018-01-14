@@ -597,7 +597,7 @@ static void rprj3(void* restrict or, int m1k, int m2k, int m3k,
 
   int j3, j2, j1, i3, i2, i1, d1, d2, d3, j;
 
-  double x1[M], y1[M], x2, y2;
+  double x2, y2;
 
   if (timeron) timer_start(T_rprj3);
   if (m1k == 3) {
@@ -618,7 +618,12 @@ static void rprj3(void* restrict or, int m1k, int m2k, int m3k,
     d3 = 1;
   }
 
+#pragma omp parallel for if(m2j * m1j > 64)
   for (j3 = 1; j3 < m3j-1; j3++) {
+
+    _declspec(align(64)) double x1[M];
+    _declspec(align(64)) double y1[M];
+
     i3 = 2*j3-d3;
     for (j2 = 1; j2 < m2j-1; j2++) {
       i2 = 2*j2-d2;
