@@ -464,9 +464,7 @@ static void psinv(void *or, void *ou, int n1, int n2, int n3,
     __declspec(align(64)) double r2[M];
 
     for (i2 = 1; i2 < n2-1; i2++) {
-
-
-
+        
       #pragma nounroll
       for (i1 = 0; i1 < n1; i1++) {
         r1[i1] = r[i3][i2-1][i1] + r[i3][i2+1][i1]
@@ -517,6 +515,12 @@ static void psinv(void *or, void *ou, int n1, int n2, int n3,
 // Note that this vectorizes, and is also fine for cache
 // based machines.
 //---------------------------------------------------------------------
+// restricting is okay even though ov and or point to the same location
+// since we are reading/writing to the same element at the same time
+// Therefor there are no harmful data dependencies that would prevent
+// vectorization
+//
+// results in a ~35% percent speed up on my local machine
 static void resid(void *restrict ou, void *restrict ov, void *restrict or, int n1, int n2, int n3,
                   double a[4], int k)
 {
