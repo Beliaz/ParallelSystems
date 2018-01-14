@@ -1,0 +1,7 @@
+All tests done 5 times with a problem size of 14 on a dual cora machine with hyper threading
+Type + Threads        Duration
+MPI 4                   6.1s
+MPI 2                   7.02s
+MPI 1                  12.81s
+Single                 12.91s
+OpenMP 4                6.48s
