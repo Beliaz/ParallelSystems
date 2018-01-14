@@ -1,11 +1,12 @@
 #include "wtime.h"
 #include <time.h>
-#ifndef DOS
-#include "sys/time.h"
-#endif
 
 #ifdef WIN32
 #include "gettimeofday.h"
+#else
+#ifndef DOS
+#include "sys/time.h"
+#endif
 #endif
 
 void wtime(double *t)
