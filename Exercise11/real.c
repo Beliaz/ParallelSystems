@@ -676,8 +676,8 @@ static void rprj3(void* restrict or, int m1k, int m2k, int m3k,
 // based machines.  Vector machines may get slightly better
 // performance however, with 8 separate "do i1" loops, rather than 4.
 //---------------------------------------------------------------------
-static void interp(void *oz, int mm1, int mm2, int mm3,
-                   void *ou, int n1, int n2, int n3, int k)
+static void interp(void *restrict oz, int mm1, int mm2, int mm3,
+                   void *restrict ou, int n1, int n2, int n3, int k)
 {
   double (*z)[mm2][mm1] = (double (*)[mm2][mm1])oz;
   double (*u)[n2][n1] = (double (*)[n2][n1])ou;
@@ -692,6 +692,7 @@ static void interp(void *oz, int mm1, int mm2, int mm3,
 
   if (timeron) timer_start(T_interp);
   if (n1 != 3 && n2 != 3 && n3 != 3) {
+
     for (i3 = 0; i3 < mm3-1; i3++) {
       for (i2 = 0; i2 < mm2-1; i2++) {
         for (i1 = 0; i1 < mm1; i1++) {
