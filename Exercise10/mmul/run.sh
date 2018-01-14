@@ -8,7 +8,7 @@
 
 # Name your job. Unless you use the -o and -e options, output will
 # go to a unique file name.ojob_id for each job.
-#$ -N mpi_stencil
+#$ -N mmul
 
 # Redirect output stream to this file.
 #$ -o output.dat
@@ -29,9 +29,17 @@
 module load gcc/5.1.0
 module load openmpi/2.1.1
 
+<<<<<<< HEAD
+for SLOT in 1 4
+do 
+    printf "2048:" $SLOT ":"
+    mpirun -np $NSLOTS ./mmul 51
+done
+=======
 echo $NSLOTS
 
 mpirun -np $NSLOTS ./mmul 2048
+>>>>>>> 877865f77d8fa4b2581a6c6f9d904e2e1fe79417
 
 module unload openmpi/2.1.1
 module unload gcc/5.1.0
