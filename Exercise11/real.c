@@ -459,6 +459,8 @@ static void psinv(void *or, void *ou, int n1, int n2, int n3,
   __declspec(align(64)) double r2[M];
 
   if (timeron) timer_start(T_psinv);
+
+  #pragma omp parallel for
   for (i3 = 1; i3 < n3-1; i3++) {
     for (i2 = 1; i2 < n2-1; i2++) {
 
@@ -839,6 +841,8 @@ static void norm2u3(void *or, int n1, int n2, int n3,
   max_rnmu = 0.0;
 
   double my_rnmu = 0.0;
+
+  #pragma omp parallel for
   for (i3 = 1; i3 < n3-1; i3++) {
     for (i2 = 1; i2 < n2-1; i2++) {
       for (i1 = 1; i1 < n1-1; i1++) {
@@ -1090,6 +1094,7 @@ static void zran3(void *oz, int n1, int n2, int n3, int nx1, int ny1, int k)
   }
   */
 
+  #pragma omp parallel for
   for (i3 = 0; i3 < n3; i3++) {
     for (i2 = 0; i2 < n2; i2++) {
       for (i1 = 0; i1 < n1; i1++) {
@@ -1225,6 +1230,7 @@ static void zero3(void *oz, int n1, int n2, int n3)
 
   int i1, i2, i3;
 
+  #pragma omp parallel for
   for (i3 = 0; i3 < n3; i3++) {
     for (i2 = 0; i2 < n2; i2++) {
       for (i1 = 0; i1 < n1; i1++) {
