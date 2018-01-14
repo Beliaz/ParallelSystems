@@ -529,34 +529,38 @@ static void resid(void *restrict ou, void *restrict ov, void *restrict or, int n
   double (*r)[n2][n1] = (double (*)[n2][n1])or;
 
   int i3, i2, i1;
-  __declspec(align(64)) double u1[M];
-  __declspec(align(64)) double u2[M];
 
   if (timeron) timer_start(T_resid);
+
+  #pragma omp parallel for if(n2 * n1 > 64)
   for (i3 = 1; i3 < n3-1; i3++) {
-    for (i2 = 1; i2 < n2-1; i2++) {
+    
+      __declspec(align(64)) double u1[M];
+      __declspec(align(64)) double u2[M];
+      
+      for (i2 = 1; i2 < n2-1; i2++) {
 
-      #pragma nounroll
-      for (i1 = 0; i1 < n1; i1++) {
-        u1[i1] = u[i3][i2-1][i1] + u[i3][i2+1][i1]
-               + u[i3-1][i2][i1] + u[i3+1][i2][i1];
-        u2[i1] = u[i3-1][i2-1][i1] + u[i3-1][i2+1][i1]
-               + u[i3+1][i2-1][i1] + u[i3+1][i2+1][i1];
-      }
+          #pragma nounroll
+          for (i1 = 0; i1 < n1; i1++) {
+            u1[i1] = u[i3][i2-1][i1] + u[i3][i2+1][i1]
+                   + u[i3-1][i2][i1] + u[i3+1][i2][i1];
+            u2[i1] = u[i3-1][i2-1][i1] + u[i3-1][i2+1][i1]
+                   + u[i3+1][i2-1][i1] + u[i3+1][i2+1][i1];
+          }
 
-      #pragma nounroll
-      for (i1 = 1; i1 < n1-1; i1++) {
-        r[i3][i2][i1] = v[i3][i2][i1]
-                      - a[0] * u[i3][i2][i1]
-        //-------------------------------------------------------------------
-        //  Assume a[1] = 0      (Enable 2 lines below if a[1] not= 0)
-        //-------------------------------------------------------------------
-        //            - a[1] * ( u[i3][i2][i1-1] + u[i3][i2][i1+1]
-        //                     + u1[i1] )
-        //-------------------------------------------------------------------
-                      - a[2] * ( u2[i1] + u1[i1-1] + u1[i1+1] )
-                      - a[3] * ( u2[i1-1] + u2[i1+1] );
-      }
+          #pragma nounroll
+          for (i1 = 1; i1 < n1-1; i1++) {
+            r[i3][i2][i1] = v[i3][i2][i1]
+                          - a[0] * u[i3][i2][i1]
+            //-------------------------------------------------------------------
+            //  Assume a[1] = 0      (Enable 2 lines below if a[1] not= 0)
+            //-------------------------------------------------------------------
+            //            - a[1] * ( u[i3][i2][i1-1] + u[i3][i2][i1+1]
+            //                     + u1[i1] )
+            //-------------------------------------------------------------------
+                          - a[2] * ( u2[i1] + u1[i1-1] + u1[i1+1] )
+                          - a[3] * ( u2[i1-1] + u2[i1+1] );
+          }
     }
   }
   if (timeron) timer_stop(T_resid);
