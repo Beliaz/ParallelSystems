@@ -12,9 +12,9 @@ link_libraries(m)
 
 add_executable(real ${real_src})
 
-set(CMAKE_C_FLAGS_FLAGS "${CMAKE_CXX_FLAGS} -g3")
+set(CMAKE_CXX_FLAGS_FLAGS "${CMAKE_CXX_FLAGS} -g3 -std=c99 -restrict")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -march=native -fpermissive")
-set(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG -restrict -march=native -opt-report -parallel -ipo")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -march=native -opt-report -parallel -ipo")
 
 FIND_PACKAGE(OpenMP)
 IF(OPENMP_FOUND)

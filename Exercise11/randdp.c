@@ -1,21 +1,23 @@
 #include <stdio.h>
 #include <math.h>
-#include <mkl_vsl.h>
 
 //#define INTEL_RNG
 #ifdef INTEL_RNG
+
+
+#include <mkl_vsl.h>
 
 VSLStreamStatePtr stream;
 
 
 void init_rnd()
 {
-    vslNewStream(&stream, VSL_BRNG_MCG59, 777);
+  vslNewStream(&stream, VSL_BRNG_MCG59, 777);
 }
 
 void free_rnd()
 {
-    vslDeleteStream(&stream);
+  vslDeleteStream(&stream);
 }
 
 double randlc(double* _, double __)
