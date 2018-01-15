@@ -45,9 +45,9 @@ __declspec(align(64)) static double u[NR];
 __declspec(align(64)) static double v[NR];
 __declspec(align(64)) static double r[NR];
 #else
-static double u[NR] __attribute__((aligned(64));
-static double v[NR] __attribute__((aligned(64));
-static double r[NR] __attribute__((aligned(64));
+static double u[NR] __attribute__((aligned(64)));
+static double v[NR] __attribute__((aligned(64)));
+static double r[NR] __attribute__((aligned(64)));
 #endif
 
 /* common /grid/ */
@@ -471,8 +471,8 @@ static void psinv(void *or, void *ou, int n1, int n2, int n3,
     __declspec(align(64)) double r1[M];
     __declspec(align(64)) double r2[M];
 #else
-    static double r1[M] __attribute__((aligned(64));
-    static double r2[M] __attribute__((aligned(64));
+    static double r1[M] __attribute__((aligned(64)));
+    static double r2[M] __attribute__((aligned(64)));
 #endif
 
     for (i2 = 1; i2 < n2-1; i2++) {
@@ -551,8 +551,8 @@ static void resid(void *restrict ou, void *restrict ov, void *restrict or, int n
       __declspec(align(64)) double u1[M];
       __declspec(align(64)) double u2[M];
 #else
-      static double u1[M] __attribute__((aligned(64));
-      static double u2[M] __attribute__((aligned(64));
+      static double u1[M] __attribute__((aligned(64)));
+      static double u2[M] __attribute__((aligned(64)));
 #endif
 
       for (i2 = 1; i2 < n2-1; i2++) {
@@ -638,8 +638,13 @@ static void rprj3(void* restrict or, int m1k, int m2k, int m3k,
 #pragma omp parallel for if(m2j * m1j > 64)
   for (j3 = 1; j3 < m3j-1; j3++) {
 
+#ifdef WIN32
     _declspec(align(64)) double x1[M];
     _declspec(align(64)) double y1[M];
+#else
+    double x1[M] __attribute__((aligned(64)));
+    double y1[M] __attribute__((aligned(64)));
+#endif
 
     i3 = 2*j3-d3;
     for (j2 = 1; j2 < m2j-1; j2++) {
