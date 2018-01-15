@@ -67,9 +67,10 @@ public:
     }
 
     //Does the job and returns the delta Epsilon accumulated over all comparisons.
-    static double iteration(const grid& source, grid& target)
+    double iteration(const grid& source, grid& target) const
     {
         auto epsilon = 0.0;
+
 
         for (auto row = source.top_y(); row < source.bottom_y(); row++)
         {
@@ -89,6 +90,7 @@ public:
                 epsilon += std::abs(new_value - current);
             }
         }
+        if(num_blocks!=1)
         send_recv_border(target);
 
         return epsilon;
@@ -364,15 +366,6 @@ public:
 
 
 
-
-
-
-
-
-
-
-
-
     //////////////////////////////////////// END NEW OPTIMIZION
 
 
@@ -382,9 +375,11 @@ public:
         {
             const auto direction = std::get<0>(neighbour);
             const auto rank = std::get<1>(neighbour);
+
             if(direction == direction_t::northwest || direction == direction_t::northeast
                || direction == direction_t::southwest || direction == direction_t::southeast)
                 continue;
+
             const auto border = current_grid.get_block_borders(direction);
 
             MPI_Send(border.data(), border.size(), MPI_DOUBLE,
@@ -402,9 +397,11 @@ public:
         {
             const auto direction = std::get<0>(neighbour);
             const auto rank = std::get<1>(neighbour);
+
             if(direction == direction_t::northwest || direction == direction_t::northeast
                || direction == direction_t::southwest || direction == direction_t::southeast)
                 return;
+
             MPI_Recv(receive_buffer.data(), receive_buffer.size(), MPI_DOUBLE, rank,
                      rank, communicator, MPI_STATUS_IGNORE);
 
@@ -443,7 +440,7 @@ public:
             iteration(grid1,grid2);
             const auto actual_epsilon = iteration(grid2,grid1);
 #endif
-            iterations += 2 + mini_batch_size * 2;;
+            iterations += 2 + mini_batch_size * 2;
 
             double sum_epsilon;
             MPI_Allreduce(&actual_epsilon, &sum_epsilon, 1, MPI_DOUBLE, MPI_SUM, communicator);
