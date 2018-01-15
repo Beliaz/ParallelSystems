@@ -34,11 +34,11 @@ do
     echo $threads " threads"
     echo "-----------------------------------------------------"
     
-    ./real_old_gcc | grep -E "SUCCESSFUL|FAILED"
+    ./real_old_gcc | grep -E "benchmk|SUCCESSFUL|FAILED"
 
     echo
 
-    ./real | grep -E "SUCCESSFUL|FAILED"
+    ./real | grep -E "benchmk|SUCCESSFUL|FAILED"
 
     echo
     echo "====================================================="
