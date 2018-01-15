@@ -464,17 +464,17 @@ static void psinv(void *or, void *ou, int n1, int n2, int n3,
 
   if (timeron) timer_start(T_psinv);
 
-#pragma omp parallel for if(n2 * n1 > 64)
+    #ifdef WIN32
+      __declspec(align(64)) double r1[M];
+      __declspec(align(64)) double r2[M];
+    #else
+      static double r1[M] __attribute__((aligned(64)));
+      static double r2[M] __attribute__((aligned(64)));
+    #endif
+
+  #pragma omp parallel for default(shared) private(i1, i2, i3, r1, r2)
   for (i3 = 1; i3 < n3-1; i3++) {
  
-#ifdef WIN32
-    __declspec(align(64)) double r1[M];
-    __declspec(align(64)) double r2[M];
-#else
-    static double r1[M] __attribute__((aligned(64)));
-    static double r2[M] __attribute__((aligned(64)));
-#endif
-
     for (i2 = 1; i2 < n2-1; i2++) {
         
       #pragma nounroll
@@ -533,28 +533,28 @@ static void psinv(void *or, void *ou, int n1, int n2, int n3,
 // vectorization
 //
 // results in a ~35% percent speed up on my local machine
-static void resid(void *restrict ou, void *restrict ov, void *restrict or, int n1, int n2, int n3,
-                  double a[4], int k)
+static void resid(void *restrict ou, void *restrict ov, void * or , int n1, int n2, int n3,
+    double a[4], int k)
 {
-  double (*u)[n2][n1] = (double (*)[n2][n1])ou;
-  double (*v)[n2][n1] = (double (*)[n2][n1])ov;
-  double (*r)[n2][n1] = (double (*)[n2][n1])or;
+    double(*u)[n2][n1] = (double(*)[n2][n1])ou;
+    double(*v)[n2][n1] = (double(*)[n2][n1])ov;
+    double(*r)[n2][n1] = (double(*)[n2][n1]) or ;
 
-  int i3, i2, i1;
+    int i3, i2, i1;
 
-  if (timeron) timer_start(T_resid);
-
-  #pragma omp parallel for if(n2 * n1 > 64)
-  for (i3 = 1; i3 < n3-1; i3++) {
-    
 #ifdef WIN32
-      __declspec(align(64)) double u1[M];
-      __declspec(align(64)) double u2[M];
+    __declspec(align(64)) double u1[M];
+    __declspec(align(64)) double u2[M];
 #else
-      static double u1[M] __attribute__((aligned(64)));
-      static double u2[M] __attribute__((aligned(64)));
+    static double u1[M] __attribute__((aligned(64)));
+    static double u2[M] __attribute__((aligned(64)));
 #endif
 
+    if (timeron) timer_start(T_resid);
+
+  #pragma omp parallel for default(shared) private(i1, i2, i3, u1, u2)
+  for (i3 = 1; i3 < n3-1; i3++) {
+    
       for (i2 = 1; i2 < n2-1; i2++) {
 
           #pragma nounroll
@@ -635,16 +635,16 @@ static void rprj3(void* restrict or, int m1k, int m2k, int m3k,
     d3 = 1;
   }
 
-#pragma omp parallel for if(m2j * m1j > 64)
-  for (j3 = 1; j3 < m3j-1; j3++) {
-
 #ifdef WIN32
-    _declspec(align(64)) double x1[M];
-    _declspec(align(64)) double y1[M];
+  _declspec(align(64)) double x1[M];
+  _declspec(align(64)) double y1[M];
 #else
-    double x1[M] __attribute__((aligned(64)));
-    double y1[M] __attribute__((aligned(64)));
+  double x1[M] __attribute__((aligned(64)));
+  double y1[M] __attribute__((aligned(64)));
 #endif
+
+  #pragma omp parallel for default(shared) private(j1, j2, j3, i1, i2, i3, d1, d2, d3, j, x1, y1, x2, y2)
+  for (j3 = 1; j3 < m3j-1; j3++) {
 
     i3 = 2*j3-d3;
     for (j2 = 1; j2 < m2j-1; j2++) {
@@ -710,11 +710,20 @@ static void interp(void *restrict oz, int mm1, int mm2, int mm3,
   // 535 to handle up to 1024^3
   //      integer m
   //      parameter( m=535 )
-  double z1[M], z2[M], z3[M];
+#ifdef WIN32
+  _declspec(align(64)) double z1[M];
+  _declspec(align(64)) double z2[M];
+  _declspec(align(64)) double z3[M];
+#else
+  double z1[M] __attribute__((aligned(64)));
+  double z2[M] __attribute__((aligned(64)));
+  double z3[M] __attribute__((aligned(64)));
+#endif
 
   if (timeron) timer_start(T_interp);
   if (n1 != 3 && n2 != 3 && n3 != 3) {
 
+    #pragma omp parallel for default(shared) private(i3, i2, i1, t1, t2, t3, z1, z2, z3)
     for (i3 = 0; i3 < mm3-1; i3++) {
       for (i2 = 0; i2 < mm2-1; i2++) {
         for (i1 = 0; i1 < mm1; i1++) {
@@ -756,7 +765,9 @@ static void interp(void *restrict oz, int mm1, int mm2, int mm3,
         }
       }
     }
-  } else {
+  } 
+  else
+  {
     if (n1 == 3) {
       d1 = 2;
       t1 = 1;
@@ -781,64 +792,69 @@ static void interp(void *restrict oz, int mm1, int mm2, int mm3,
       t3 = 0;
     }
 
-    for (i3 = d3; i3 <= mm3-1; i3++) {
-      for (i2 = d2; i2 <= mm2-1; i2++) {
-        for (i1 = d1; i1 <= mm1-1; i1++) {
-          u[2*i3-d3-1][2*i2-d2-1][2*i1-d1-1] =
-            u[2*i3-d3-1][2*i2-d2-1][2*i1-d1-1]
-            + z[i3-1][i2-1][i1-1];
-        }
-        for (i1 = 1; i1 <= mm1-1; i1++) {
-          u[2*i3-d3-1][2*i2-d2-1][2*i1-t1-1] =
-            u[2*i3-d3-1][2*i2-d2-1][2*i1-t1-1]
-            + 0.5 * (z[i3-1][i2-1][i1] + z[i3-1][i2-1][i1-1]);
-        }
-      }
-      for (i2 = 1; i2 <= mm2-1; i2++) {
-        for (i1 = d1; i1 <= mm1-1; i1++) {
-          u[2*i3-d3-1][2*i2-t2-1][2*i1-d1-1] =
-            u[2*i3-d3-1][2*i2-t2-1][2*i1-d1-1]
-            + 0.5 * (z[i3-1][i2][i1-1] + z[i3-1][i2-1][i1-1]);
-        }
-        for (i1 = 1; i1 <= mm1-1; i1++) {
-          u[2*i3-d3-1][2*i2-t2-1][2*i1-t1-1] =
-            u[2*i3-d3-1][2*i2-t2-1][2*i1-t1-1]
-            + 0.25 * (z[i3-1][i2][i1] + z[i3-1][i2-1][i1]
-                    + z[i3-1][i2][i1-1] + z[i3-1][i2-1][i1-1]);
-        }
-      }
-    }
+    #pragma omp parallel default(shared) private(i3, i2, i1)
+    {
+        #pragma omp for 
+        for (i3 = d3; i3 <= mm3 - 1; i3++) {
+                    for (i2 = d2; i2 <= mm2 - 1; i2++) {
+                        for (i1 = d1; i1 <= mm1 - 1; i1++) {
+                            u[2 * i3 - d3 - 1][2 * i2 - d2 - 1][2 * i1 - d1 - 1] =
+                                u[2 * i3 - d3 - 1][2 * i2 - d2 - 1][2 * i1 - d1 - 1]
+                                + z[i3 - 1][i2 - 1][i1 - 1];
+                        }
+                        for (i1 = 1; i1 <= mm1 - 1; i1++) {
+                            u[2 * i3 - d3 - 1][2 * i2 - d2 - 1][2 * i1 - t1 - 1] =
+                                u[2 * i3 - d3 - 1][2 * i2 - d2 - 1][2 * i1 - t1 - 1]
+                                + 0.5 * (z[i3 - 1][i2 - 1][i1] + z[i3 - 1][i2 - 1][i1 - 1]);
+                        }
+                    }
+                    for (i2 = 1; i2 <= mm2 - 1; i2++) {
+                        for (i1 = d1; i1 <= mm1 - 1; i1++) {
+                            u[2 * i3 - d3 - 1][2 * i2 - t2 - 1][2 * i1 - d1 - 1] =
+                                u[2 * i3 - d3 - 1][2 * i2 - t2 - 1][2 * i1 - d1 - 1]
+                                + 0.5 * (z[i3 - 1][i2][i1 - 1] + z[i3 - 1][i2 - 1][i1 - 1]);
+                        }
+                        for (i1 = 1; i1 <= mm1 - 1; i1++) {
+                            u[2 * i3 - d3 - 1][2 * i2 - t2 - 1][2 * i1 - t1 - 1] =
+                                u[2 * i3 - d3 - 1][2 * i2 - t2 - 1][2 * i1 - t1 - 1]
+                                + 0.25 * (z[i3 - 1][i2][i1] + z[i3 - 1][i2 - 1][i1]
+                                    + z[i3 - 1][i2][i1 - 1] + z[i3 - 1][i2 - 1][i1 - 1]);
+                        }
+                    }
+                }
 
-    for (i3 = 1; i3 <= mm3-1; i3++) {
-      for (i2 = d2; i2 <= mm2-1; i2++) {
-        for (i1 = d1; i1 <= mm1-1; i1++) {
-          u[2*i3-t3-1][2*i2-d2-1][2*i1-d1-1] =
-            u[2*i3-t3-1][2*i2-d2-1][2*i1-d1-1]
-            + 0.5 * (z[i3][i2-1][i1-1] + z[i3-1][i2-1][i1-1]);
-        }
-        for (i1 = 1; i1 <= mm1-1; i1++) {
-          u[2*i3-t3-1][2*i2-d2-1][2*i1-t1-1] =
-            u[2*i3-t3-1][2*i2-d2-1][2*i1-t1-1]
-            + 0.25 * (z[i3  ][i2-1][i1] + z[i3  ][i2-1][i1-1]
-                    + z[i3-1][i2-1][i1] + z[i3-1][i2-1][i1-1]);
-        }
-      }
-      for (i2 = 1; i2 <= mm2-1; i2++) {
-        for (i1 = d1; i1 <= mm1-1; i1++) {
-          u[2*i3-t3-1][2*i2-t2-1][2*i1-d1-1] =
-            u[2*i3-t3-1][2*i2-t2-1][2*i1-d1-1]
-            + 0.25 * (z[i3  ][i2][i1-1] + z[i3  ][i2-1][i1-1]
-                    + z[i3-1][i2][i1-1] + z[i3-1][i2-1][i1-1]);
-        }
-        for (i1 = 1; i1 <= mm1-1; i1++) {
-          u[2*i3-t3-1][2*i2-t2-1][2*i1-t1-1] =
-            u[2*i3-t3-1][2*i2-t2-1][2*i1-t1-1]
-            + 0.125 * (z[i3  ][i2][i1  ] + z[i3  ][i2-1][i1  ]
-                     + z[i3  ][i2][i1-1] + z[i3  ][i2-1][i1-1]
-                     + z[i3-1][i2][i1  ] + z[i3-1][i2-1][i1  ]
-                     + z[i3-1][i2][i1-1] + z[i3-1][i2-1][i1-1]);
-        }
-      }
+        #pragma omp for 
+         for (i3 = 1; i3 <= mm3 - 1; i3++) {
+                    for (i2 = d2; i2 <= mm2 - 1; i2++) {
+                        for (i1 = d1; i1 <= mm1 - 1; i1++) {
+                            u[2 * i3 - t3 - 1][2 * i2 - d2 - 1][2 * i1 - d1 - 1] =
+                                u[2 * i3 - t3 - 1][2 * i2 - d2 - 1][2 * i1 - d1 - 1]
+                                + 0.5 * (z[i3][i2 - 1][i1 - 1] + z[i3 - 1][i2 - 1][i1 - 1]);
+                        }
+                        for (i1 = 1; i1 <= mm1 - 1; i1++) {
+                            u[2 * i3 - t3 - 1][2 * i2 - d2 - 1][2 * i1 - t1 - 1] =
+                                u[2 * i3 - t3 - 1][2 * i2 - d2 - 1][2 * i1 - t1 - 1]
+                                + 0.25 * (z[i3][i2 - 1][i1] + z[i3][i2 - 1][i1 - 1]
+                                    + z[i3 - 1][i2 - 1][i1] + z[i3 - 1][i2 - 1][i1 - 1]);
+                        }
+                    }
+                    for (i2 = 1; i2 <= mm2 - 1; i2++) {
+                        for (i1 = d1; i1 <= mm1 - 1; i1++) {
+                            u[2 * i3 - t3 - 1][2 * i2 - t2 - 1][2 * i1 - d1 - 1] =
+                                u[2 * i3 - t3 - 1][2 * i2 - t2 - 1][2 * i1 - d1 - 1]
+                                + 0.25 * (z[i3][i2][i1 - 1] + z[i3][i2 - 1][i1 - 1]
+                                    + z[i3 - 1][i2][i1 - 1] + z[i3 - 1][i2 - 1][i1 - 1]);
+                        }
+                        for (i1 = 1; i1 <= mm1 - 1; i1++) {
+                            u[2 * i3 - t3 - 1][2 * i2 - t2 - 1][2 * i1 - t1 - 1] =
+                                u[2 * i3 - t3 - 1][2 * i2 - t2 - 1][2 * i1 - t1 - 1]
+                                + 0.125 * (z[i3][i2][i1] + z[i3][i2 - 1][i1]
+                                    + z[i3][i2][i1 - 1] + z[i3][i2 - 1][i1 - 1]
+                                    + z[i3 - 1][i2][i1] + z[i3 - 1][i2 - 1][i1]
+                                    + z[i3 - 1][i2][i1 - 1] + z[i3 - 1][i2 - 1][i1 - 1]);
+                        }
+                    }
+                }
     }
   }
   if (timeron) timer_stop(T_interp);
@@ -1267,7 +1283,7 @@ static void zero3(void *oz, int n1, int n2, int n3)
 
   int i1, i2, i3;
 
-  
+  #pragma omp parallel for default(shared) private(i1, i2, i3)
   for (i3 = 0; i3 < n3; i3++) {
     for (i2 = 0; i2 < n2; i2++) {
       for (i1 = 0; i1 < n1; i1++) {
