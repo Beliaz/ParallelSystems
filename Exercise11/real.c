@@ -39,9 +39,16 @@ static void zero3(void *oz, int n1, int n2, int n3);
 // are always passed as subroutine args.
 //-------------------------------------------------------------------------c
 /* commcon /noautom/ */
+
+#ifdef WIN32
 __declspec(align(64)) static double u[NR];
 __declspec(align(64)) static double v[NR];
 __declspec(align(64)) static double r[NR];
+#else
+static double u[NR] __attribute__((aligned(64));
+static double v[NR] __attribute__((aligned(64));
+static double r[NR] __attribute__((aligned(64));
+#endif
 
 /* common /grid/ */
 static int is1, is2, is3, ie1, ie2, ie3;
@@ -459,9 +466,14 @@ static void psinv(void *or, void *ou, int n1, int n2, int n3,
 
 #pragma omp parallel for if(n2 * n1 > 64)
   for (i3 = 1; i3 < n3-1; i3++) {
-      
+ 
+#ifdef WIN32
     __declspec(align(64)) double r1[M];
     __declspec(align(64)) double r2[M];
+#else
+    static double r1[M] __attribute__((aligned(64));
+    static double r2[M] __attribute__((aligned(64));
+#endif
 
     for (i2 = 1; i2 < n2-1; i2++) {
         
@@ -535,9 +547,14 @@ static void resid(void *restrict ou, void *restrict ov, void *restrict or, int n
   #pragma omp parallel for if(n2 * n1 > 64)
   for (i3 = 1; i3 < n3-1; i3++) {
     
+#ifdef WIN32
       __declspec(align(64)) double u1[M];
       __declspec(align(64)) double u2[M];
-      
+#else
+      static double u1[M] __attribute__((aligned(64));
+      static double u2[M] __attribute__((aligned(64));
+#endif
+
       for (i2 = 1; i2 < n2-1; i2++) {
 
           #pragma nounroll
