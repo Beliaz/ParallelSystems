@@ -643,7 +643,7 @@ static void rprj3(void* restrict or, int m1k, int m2k, int m3k,
   double y1[M] __attribute__((aligned(64)));
 #endif
 
-  #pragma omp parallel for default(shared) private(j1, j2, j3, i1, i2, i3, d1, d2, d3, j, x1, y1, x2, y2)
+  #pragma omp parallel for default(shared) private(j1, j2, j3, i1, i2, i3, x1, y1, x2, y2)
   for (j3 = 1; j3 < m3j-1; j3++) {
 
     i3 = 2*j3-d3;
@@ -723,7 +723,7 @@ static void interp(void *restrict oz, int mm1, int mm2, int mm3,
   if (timeron) timer_start(T_interp);
   if (n1 != 3 && n2 != 3 && n3 != 3) {
 
-    #pragma omp parallel for default(shared) private(i3, i2, i1, t1, t2, t3, z1, z2, z3)
+    #pragma omp parallel for default(shared) private(i3, i2, i1, z1, z2, z3)
     for (i3 = 0; i3 < mm3-1; i3++) {
       for (i2 = 0; i2 < mm2-1; i2++) {
         for (i1 = 0; i1 < mm1; i1++) {
