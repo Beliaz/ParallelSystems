@@ -5,8 +5,8 @@ original
 =====================================================
 
  Verification    =               SUCCESSFUL
-  benchmk :   14.790  (100.00%)
-  benchmk :   29.277  (100.00%)
+  benchmk :   14.825  (100.00%)
+  benchmk :   29.309  (100.00%)
 
 =====================================================
 optimized
@@ -16,31 +16,31 @@ thread(s): 1
 -----------------------------------------------------
 
  Verification    =               SUCCESSFUL
-  benchmk :   12.984  (100.00%)
-  benchmk :   25.746  (100.00%)
+  benchmk :   12.989  (100.00%)
+  benchmk :   25.785  (100.00%)
 
 
 thread(s): 2
 -----------------------------------------------------
 
  Verification    =               SUCCESSFUL
-  benchmk :    9.296  (100.00%)
-  benchmk :   14.563  (100.00%)
+  benchmk :    9.294  (100.00%)
+  benchmk :   18.443  (100.00%)
 
 
 thread(s): 4
 -----------------------------------------------------
 
  Verification    =               SUCCESSFUL
-  benchmk :    6.554  (100.00%)
-  benchmk :   12.666  (100.00%)
+  benchmk :    6.385  (100.00%)
+  benchmk :   12.672  (100.00%)
 
 
 thread(s): 8
 -----------------------------------------------------
 
  Verification    =               SUCCESSFUL
-  benchmk :    7.555  (100.00%)
-  benchmk :   15.088  (100.00%)
+  benchmk :    7.517  (100.00%)
+  benchmk :   14.978  (100.00%)
 
   Unloading intel/15.0
