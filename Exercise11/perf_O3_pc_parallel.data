@@ -1,0 +1,26 @@
+Performance counter stats for './real' (3 runs):
+
+      49004,697205      cpu-clock (msec)          #   13,040 CPUs utilized            ( +-  7,25% )
+            15.945      context-switches          #    0,325 K/sec                    ( +- 42,17% )
+             6.131      cpu-migrations            #    0,125 K/sec                    ( +- 64,99% )
+           110.689      page-faults               #    0,002 M/sec                    ( +-  0,01% )
+   143.474.921.613      cycles                    #    2,928 GHz                      ( +-  6,02% )  (33,29%)
+    65.507.254.707      instructions              #    0,46  insn per cycle           ( +- 27,51% )  (33,38%)
+    10.994.368.636      branches                  #  224,353 M/sec                    ( +- 47,14% )  (33,49%)
+        16.588.415      branch-misses             #    0,15% of all branches          ( +-  7,19% )  (33,52%)
+                 0      cache-references          #    0,000 K/sec                    (33,68%)
+                 0      cache-misses              #    0,000 % of all cache refs      (33,73%)
+   <not supported>      bus-cycles
+    20.232.952.133      L1-dcache-loads           #  412,878 M/sec                    ( +- 13,73% )  (33,67%)
+        90.853.160      L1-dcache-load-misses     #    0,45% of all L1-dcache hits    ( +-  3,37% )  (33,59%)
+   <not supported>      L1-dcache-stores
+                 0      LLC-loads                 #    0,000 K/sec                    (33,55%)
+                 0      LLC-load-misses           #    0,00% of all LL-cache hits     (33,47%)
+                 0      LLC-stores                #    0,000 K/sec                    (33,42%)
+   <not supported>      LLC-prefetches
+    20.542.987.833      L1-dcache-loads           #  419,204 M/sec                    ( +- 12,03% )  (33,41%)
+        90.172.389      L1-dcache-load-misses     #    0,44% of all L1-dcache hits    ( +-  1,72% )  (33,36%)
+                 0      LLC-loads                 #    0,000 K/sec                    (33,35%)
+                 0      LLC-load-misses           #    0,00% of all LL-cache hits     (33,30%)
+
+       3,758099217 seconds time elapsed                                          ( +- 15,51% )
