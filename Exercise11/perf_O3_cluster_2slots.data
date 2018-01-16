@@ -1,0 +1,29 @@
+
+ Performance counter stats for './real' (3 runs):
+
+      25617.681783      cpu-clock (msec)          #    1.937 CPUs utilized            ( +-  4.81% )
+               127      context-switches          #    0.005 K/sec                    ( +- 43.25% )
+                 9      cpu-migrations            #    0.000 K/sec                    ( +- 21.72% )
+             1,238      page-faults               #    0.048 K/sec
+    63,320,672,003      cycles                    #    2.472 GHz                      ( +-  4.78% )  (11.77%)
+    62,220,447,172      instructions              #    0.98  insn per cycle           ( +-  0.26% )  (17.65%)
+     2,041,617,076      branches                  #   79.696 M/sec                    ( +-  2.04% )  (17.66%)
+        14,387,986      branch-misses             #    0.70% of all branches          ( +-  0.23% )  (17.66%)
+     1,168,990,807      cache-references          #   45.632 M/sec                    ( +-  0.04% )  (11.78%)
+        37,467,493      cache-misses              #    3.205 % of all cache refs      ( +- 17.05% )  (11.78%)
+     8,459,908,786      bus-cycles                #  330.237 M/sec                    ( +-  4.79% )  (11.78%)
+    29,367,940,534      L1-dcache-loads           # 1146.393 M/sec                    ( +-  0.14% )  (11.77%)
+     2,045,619,147      L1-dcache-load-misses     #    6.94% of all L1-dcache hits    ( +-  8.20% )  (11.77%)
+     3,436,847,837      L1-dcache-stores          #  134.159 M/sec                    ( +-  0.11% )  (11.76%)
+     1,022,137,407      LLC-loads                 #   39.900 M/sec                    ( +-  0.23% )  (11.77%)
+        29,759,354      LLC-load-misses           #    2.91% of all LL-cache hits     ( +- 17.97% )  (11.77%)
+       146,249,327      LLC-stores                #    5.709 M/sec                    ( +-  0.32% )  (11.77%)
+   <not supported>      LLC-prefetches
+    29,543,230,722      L1-dcache-loads           # 1153.236 M/sec                    ( +-  0.21% )  (11.76%)
+     2,047,791,178      L1-dcache-load-misses     #    6.95% of all L1-dcache hits    ( +-  8.08% )  (11.76%)
+     1,022,290,035      LLC-loads                 #   39.906 M/sec                    ( +-  0.18% )  (11.76%)
+        29,503,622      LLC-load-misses           #    2.89% of all LL-cache hits     ( +- 18.43% )  (11.76%)
+
+      13.225868925 seconds time elapsed                                          ( +-  2.52% )
+
+  Unloading gcc/5.1.0
