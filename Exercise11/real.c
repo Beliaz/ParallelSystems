@@ -38,9 +38,9 @@ static void zero3(void *oz, int n1, int n2, int n3);
 // are always passed as subroutine args.
 //-------------------------------------------------------------------------c
 /* commcon /noautom/ */
-static double u[NR] __attribute__((aligned(64)));
-static double v[NR] __attribute__((aligned(64)));
-static double r[NR] __attribute__((aligned(64)));
+static double u[NR];
+static double v[NR];
+static double r[NR];
 
 /* common /grid/ */
 static int is1, is2, is3, ie1, ie2, ie3;
@@ -451,8 +451,7 @@ static void psinv(void *or, void *ou, int n1, int n2, int n3,
 
     int i3, i2, i1;
 
-    double r1[M] __attribute__((aligned(64)));
-    double r2[M] __attribute__((aligned(64)));
+    double r1[M], r2[M];
 
     if (timeron) timer_start(T_psinv);
 #pragma omp parallel for private(i1, i2, i3, r1, r2) 
@@ -512,9 +511,9 @@ static void psinv(void *or, void *ou, int n1, int n2, int n3,
 static void resid(void *ou, void *ov, void *or, int n1, int n2, int n3,
                   double a[4], int k)
 {
-    double (*u)[n2][n1] = (double (*)[n2][n1])ou;
-    double (*v)[n2][n1] = (double (*)[n2][n1])ov;
-    double (*r)[n2][n1] = (double (*)[n2][n1])or;
+    double (*u)[n2][n1] __attribute__((aligned(64))) = (double (*)[n2][n1])ou;
+    double (*v)[n2][n1] __attribute__((aligned(64))) = (double (*)[n2][n1])ov;
+    double (*r)[n2][n1] __attribute__((aligned(64))) = (double (*)[n2][n1])or;
 
     int i3, i2, i1;
     double u1[M] __attribute__((aligned(64)));
@@ -524,13 +523,14 @@ static void resid(void *ou, void *ov, void *or, int n1, int n2, int n3,
 #pragma omp parallel for private(i1, i2, i3, u1, u2)
     for (i3 = 1; i3 < n3 - 1; i3++) {
         for (i2 = 1; i2 < n2 - 1; i2++) {
+#pragma omp simd aligned(u,u1,u2:64)
             for (i1 = 0; i1 < n1; i1++) {
                 u1[i1] = u[i3][i2 - 1][i1] + u[i3][i2 + 1][i1]
                          + u[i3 - 1][i2][i1] + u[i3 + 1][i2][i1];
                 u2[i1] = u[i3 - 1][i2 - 1][i1] + u[i3 - 1][i2 + 1][i1]
                          + u[i3 + 1][i2 - 1][i1] + u[i3 + 1][i2 + 1][i1];
             }
-
+#pragma omp simd aligned(u,u1,u2,v,r:64)
             for (i1 = 1; i1 < n1 - 1; i1++) {
                 r[i3][i2][i1] = v[i3][i2][i1]
                                 - a[0] * u[i3][i2][i1]
@@ -579,9 +579,7 @@ static void rprj3(void *or, int m1k, int m2k, int m3k,
 
     int j3, j2, j1, i3, i2, i1, d1, d2, d3, j;
 
-    double x1[M] __attribute__((aligned(64)));
-    double y1[M] __attribute__((aligned(64)));;
-    double x2, y2;
+    double x1[M], y1[M], x2, y2;
 
     if (timeron) timer_start(T_rprj3);
     if (m1k == 3) {
@@ -667,9 +665,7 @@ static void interp(void *oz, int mm1, int mm2, int mm3,
     // 535 to handle up to 1024^3
     //      integer m
     //      parameter( m=535 )
-    double z1[M] __attribute__((aligned(64)));
-    double z2[M] __attribute__((aligned(64)));
-    double z3[M] __attribute__((aligned(64)));
+    double z1[M], z2[M], z3[M];
 
     if (timeron) timer_start(T_interp);
     if (n1 != 3 && n2 != 3 && n3 != 3) {
