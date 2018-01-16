@@ -28,22 +28,33 @@
 
 module load intel/15.0
 
+echo
+echo "====================================================="
+echo "original"
+echo "====================================================="
+echo
+
+./real_old | grep -E "benchmk|Verification"
+./real_old_40 | grep benchmk
+
+echo
+echo "====================================================="
+echo "optimized"
+echo "====================================================="
+
 for threads in 1 2 4 8
 do
     export OMP_NUM_THREADS=$threads
 
+    echo
+    echo "thread(s): "$threads
     echo "-----------------------------------------------------"
-    echo $threads " thread(s)"
-    echo "-----------------------------------------------------"
-    
-    ./real_old_gcc | grep -E "benchmk|Verification"
-
+       
     echo
 
     ./real | grep -E "benchmk|Verification"
+    ./real_40 | grep benchmk
 
-    echo
-    echo "====================================================="
     echo 
 done
 
