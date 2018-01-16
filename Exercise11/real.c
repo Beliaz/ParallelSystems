@@ -338,12 +338,13 @@ static void setup(int *n1, int *n2, int *n3)
             ng[k][ax] = ng[k+1][ax]/2;
         }
     }
+#pragma omp parallel for
     for (k = lt; k >= 1; k--) {
         nx[k] = ng[k][0];
         ny[k] = ng[k][1];
         nz[k] = ng[k][2];
     }
-
+#pragma omp parallel for
     for (k = lt; k >= 1; k--) {
         for (ax = 0; ax < 3; ax++) {
             mi[k][ax] = 2 + ng[k][ax];
@@ -366,6 +367,7 @@ static void setup(int *n1, int *n2, int *n3)
     *n3 = 3 + ie3 - is3;
 
     ir[lt] = 0;
+#pragma omp parallel for
     for (j = lt-1; j >= 1; j--) {
         ir[j] = ir[j+1]+ONE*m1[j+1]*m2[j+1]*m3[j+1];
     }
