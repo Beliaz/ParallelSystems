@@ -532,7 +532,7 @@ static void psinv(void *or, void *ou, int n1, int n2, int n3,
 // vectorization
 //
 // results in a ~35% percent speed up on my local machine
-static void resid(void *restrict ou, void *restrict ov, void * or , int n1, int n2, int n3,
+static void resid(void *restrict ou, void *restrict ov, void *restrict or , int n1, int n2, int n3,
     double a[4], int k)
 {
     double(*u)[n2][n1] = (double(*)[n2][n1])ou;
@@ -556,6 +556,7 @@ static void resid(void *restrict ou, void *restrict ov, void * or , int n1, int 
     
       for (i2 = 1; i2 < n2-1; i2++) {
 
+          #pragma omp simd
           #pragma nounroll
           for (i1 = 0; i1 < n1; i1++) {
             u1[i1] = u[i3][i2-1][i1] + u[i3][i2+1][i1]
@@ -564,6 +565,7 @@ static void resid(void *restrict ou, void *restrict ov, void * or , int n1, int 
                    + u[i3+1][i2-1][i1] + u[i3+1][i2+1][i1];
           }
 
+          #pragma omp simd 
           #pragma nounroll
           for (i1 = 1; i1 < n1-1; i1++) {
             r[i3][i2][i1] = v[i3][i2][i1]
@@ -649,7 +651,7 @@ static void rprj3(void* restrict or, int m1k, int m2k, int m3k,
     for (j2 = 1; j2 < m2j-1; j2++) {
       i2 = 2*j2-d2;
 
-      #pragma nounroll
+      #pragma omp simd
       for (j1 = 1; j1 < m1j; j1++) {
         i1 = 2*j1-d1;
         x1[i1] = r[i3+1][i2  ][i1] + r[i3+1][i2+2][i1]
@@ -658,6 +660,7 @@ static void rprj3(void* restrict or, int m1k, int m2k, int m3k,
                + r[i3  ][i2+2][i1] + r[i3+2][i2+2][i1];
       }
 
+      #pragma omp simd
       for (j1 = 1; j1 < m1j-1; j1++) {
         i1 = 2*j1-d1;
         y2 = r[i3  ][i2  ][i1+1] + r[i3+2][i2  ][i1+1]
