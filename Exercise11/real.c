@@ -77,7 +77,6 @@ int main()
   int i;
   char *t_names[T_last];
   double tmax;
-
   for (i = T_init; i < T_last; i++) {
     timer_clear(i);
   }
@@ -823,7 +822,7 @@ static void interp(void *restrict oz, int mm1, int mm2, int mm3,
                     }
                 }
 
-        #pragma omp for 
+        #pragma omp for nowait 
          for (i3 = 1; i3 <= mm3 - 1; i3++) {
                     for (i2 = d2; i2 <= mm2 - 1; i2++) {
                         for (i1 = d1; i1 <= mm1 - 1; i1++) {
@@ -941,6 +940,9 @@ static void comm3(void *ou, int n1, int n2, int n3, int kk)
 
   if (timeron) timer_start(T_comm3);
 
+#pragma omp parallel private(i1, i2, i3)
+  {
+#pragma omp for
   for (i3 = 1; i3 < n3-1; i3++) {
     for (i2 = 1; i2 < n2-1; i2++) {
       u[i3][i2][   0] = u[i3][i2][n1-2];
@@ -955,11 +957,13 @@ static void comm3(void *ou, int n1, int n2, int n3, int kk)
     }
   }
 
+#pragma omp for nowait
   for (i2 = 0; i2 < n2; i2++) {
     for (i1 = 0; i1 < n1; i1++) {
       u[   0][i2][i1] = u[n3-2][i2][i1];
       u[n3-1][i2][i1] = u[   1][i2][i1];
     }
+  }
   }
   if (timeron) timer_stop(T_comm3);
 }
