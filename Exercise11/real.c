@@ -511,26 +511,24 @@ static void psinv(void *or, void *ou, int n1, int n2, int n3,
 static void resid(void *ou, void *ov, void *or, int n1, int n2, int n3,
                   double a[4], int k)
 {
-    double (*u)[n2][n1] __attribute__((aligned(64))) = (double (*)[n2][n1])ou;
-    double (*v)[n2][n1] __attribute__((aligned(64))) = (double (*)[n2][n1])ov;
-    double (*r)[n2][n1] __attribute__((aligned(64))) = (double (*)[n2][n1])or;
+    double (*u)[n2][n1] = (double (*)[n2][n1])ou;
+    double (*v)[n2][n1] = (double (*)[n2][n1])ov;
+    double (*r)[n2][n1] = (double (*)[n2][n1])or;
 
     int i3, i2, i1;
-    double u1[M] __attribute__((aligned(64)));
-    double u2[M] __attribute__((aligned(64)));
+    double u1[M], u2[M];
 
     if (timeron) timer_start(T_resid);
 #pragma omp parallel for private(i1, i2, i3, u1, u2)
     for (i3 = 1; i3 < n3 - 1; i3++) {
         for (i2 = 1; i2 < n2 - 1; i2++) {
-#pragma omp simd aligned(u,u1,u2:64)
             for (i1 = 0; i1 < n1; i1++) {
                 u1[i1] = u[i3][i2 - 1][i1] + u[i3][i2 + 1][i1]
                          + u[i3 - 1][i2][i1] + u[i3 + 1][i2][i1];
                 u2[i1] = u[i3 - 1][i2 - 1][i1] + u[i3 - 1][i2 + 1][i1]
                          + u[i3 + 1][i2 - 1][i1] + u[i3 + 1][i2 + 1][i1];
             }
-#pragma omp simd aligned(u,u1,u2,v,r:64)
+
             for (i1 = 1; i1 < n1 - 1; i1++) {
                 r[i3][i2][i1] = v[i3][i2][i1]
                                 - a[0] * u[i3][i2][i1]
