@@ -14,8 +14,8 @@ enum tags
 {
     block_a,
     block_b,
-    column_a = 1024,
-    row_b = 1024*1024,
+    column_a,
+    row_b,
     block_c
 };
 
